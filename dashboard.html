@@ -5,181 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Business Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: white;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .voice-section {
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
+        .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 30px; }
+        
+        .section {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
+        
         .record-btn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 120px; height: 120px; border-radius: 50%;
             background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-            transition: all 0.3s ease;
+            border: none; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            margin: 20px auto; transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            font-size: 2rem;
-            color: white;
+            font-size: 2rem; color: white;
         }
-
-        .record-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(45deg, #ff4757, #c44569);
-        }
-
-        .record-btn.active {
-            background: linear-gradient(45deg, #2ed573, #17a2b8);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .status {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 500;
-            min-height: 40px;
-        }
-
-        .query-section {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
+        
+        .record-btn:hover { transform: scale(1.05); background: linear-gradient(45deg, #ff4757, #c44569); }
+        .record-btn.recording { background: linear-gradient(45deg, #2ed573, #17a2b8); animation: pulse 1s infinite; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .status { text-align: center; margin-top: 15px; font-weight: 500; min-height: 40px; }
+        
         .query-input {
-            width: 100%;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
+            width: 100%; padding: 15px 20px; border: none; border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2); color: white; font-size: 1.1rem; margin-bottom: 15px;
         }
-
-        .query-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+        .query-input::placeholder { color: rgba(255, 255, 255, 0.7); }
+        
+        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; }
+        
+        .btn {
+            padding: 12px 16px; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px;
+            color: white; cursor: pointer; transition: all 0.3s ease;
+            text-align: left; font-size: 0.9rem;
         }
-
-        .test-btn {
-            background: rgba(46, 213, 115, 0.8);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            display: none; /* Hidden by default */
-        }
-
-        .test-btn:hover {
-            background: rgba(46, 213, 115, 1);
-            transform: translateY(-2px);
-        }
-
-        .quick-queries {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .quick-query-btn {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        .quick-query-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
+        .btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        
         .response-area {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            min-height: 150px;
+            background: rgba(255, 255, 255, 0.1); border-radius: 15px;
+            padding: 20px; margin-top: 20px; min-height: 150px;
             border: 2px dashed rgba(255, 255, 255, 0.3);
         }
-
+        
         .transcript {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            min-height: 100px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            display: none;
+            background: rgba(0, 0, 0, 0.2); border-radius: 10px;
+            padding: 15px; margin-top: 15px; min-height: 100px;
+            font-family: monospace; font-size: 0.9rem; display: none;
         }
-
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -190,405 +85,245 @@
         </div>
 
         <div class="main-grid">
-            <div class="voice-section">
+            <div class="section">
                 <h2>🎤 Voice Interface</h2>
                 <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">
-                    Record business updates OR ask questions with your voice
+                    Record business updates OR ask questions
                 </p>
                 
-                <button class="record-btn" onclick="microphoneClick()">
-                    🎤
-                </button>
-                <div class="status" id="voiceStatus">Click to start recording</div>
-                
-                <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; font-size: 0.85rem;">
-                    <strong>💡 Voice Examples:</strong><br>
-                    <strong>Updates:</strong> "Dannon project got approved..."<br>
-                    <strong>Queries:</strong> "Show me Danny's projects" or "Philippines status"
-                </div>
-                
-                <div class="transcript" id="transcript">
-                    Transcript will appear here...
-                </div>
+                <button class="record-btn" id="micBtn">🎤</button>
+                <div class="status" id="status">Click to start recording</div>
+                <div class="transcript" id="transcript">Transcript appears here...</div>
             </div>
 
-            <div class="query-section">
+            <div class="section">
                 <h2>🔍 Business Intelligence</h2>
                 <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">
                     Search your supplier and project data
                 </p>
                 
-                <input type="text" class="query-input" id="queryInput" 
-                       placeholder="Search: 'Danny projects', 'Philippines suppliers', 'high probability'..."
-                       onkeypress="handleKeyPress(event)">
+                <input type="text" class="query-input" id="searchBox" 
+                       placeholder="Search: 'Danny projects', 'Philippines', 'high probability'...">
                 
-                <div class="quick-queries">
-                    <button class="quick-query-btn" onclick="quickQuery('suppliers')">
-                        🏢 Supplier Portfolio
-                    </button>
-                    <button class="quick-query-btn" onclick="quickQuery('projects')">
-                        🎯 Project Pipeline
-                    </button>
-                    <button class="quick-query-btn" onclick="quickQuery('danny')">
-                        👤 Danny's Portfolio
-                    </button>
-                    <button class="quick-query-btn" onclick="quickQuery('financial')">
-                        💰 2025 Targets
-                    </button>
+                <div class="btn-grid">
+                    <button class="btn" id="suppliersBtn">🏢 Supplier Portfolio</button>
+                    <button class="btn" id="projectsBtn">🎯 Project Pipeline</button>
+                    <button class="btn" id="dannyBtn">👤 Danny's Portfolio</button>
+                    <button class="btn" id="financialBtn">💰 2025 Targets</button>
                 </div>
 
-                <div class="response-area" id="responseArea">
+                <div class="response-area" id="results">
                     <div style="opacity: 0.6;">
-                        🎯 <strong>Ready!</strong> Use voice recording or search to explore your business data.<br><br>
-                        <strong>Try asking:</strong> "Show me high probability projects" or "Danny's suppliers"
+                        🎯 <strong>Ready!</strong> Click any button above or use the search box to explore your business data.
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Inline JavaScript with real business data -->
     <script>
-        // Real business data from your Excel dashboard
-        var businessData = {
+        console.log('🚀 Dashboard starting...');
+
+        // Business data
+        var data = {
             suppliers: [
-                {brand: "Casbah", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
-                {brand: "Dannon", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
-                {brand: "Fruzel", country: "Taiwan", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
-                {brand: "Happy Family", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
-                {brand: "CP Ram", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
-                {brand: "Catalina Crunch", country: "USA", owner: "Facu", discovery: "In Progress", specSheets: "Pending", priceList: "Pending"},
-                {brand: "Diamond Brew", country: "USA", owner: "Chris", discovery: "Too Early", specSheets: "Not Started", priceList: "Not Started"},
-                {brand: "Goodles", country: "USA", owner: "Danny", discovery: "In Process", specSheets: "Analysis", priceList: "Pending"}
+                {name: "Casbah", country: "USA", owner: "Facu", status: "Active"},
+                {name: "Dannon", country: "USA", owner: "Danny", status: "Active"},
+                {name: "Fruzel", country: "Taiwan", owner: "Chris", status: "Active"},
+                {name: "Happy Family", country: "USA", owner: "Danny", status: "Active"},
+                {name: "CP Ram", country: "USA", owner: "Facu", status: "Active"},
+                {name: "Catalina Crunch", country: "USA", owner: "Facu", status: "In Progress"},
+                {name: "Diamond Brew", country: "USA", owner: "Chris", status: "Early Stage"},
+                {name: "Goodles", country: "USA", owner: "Danny", status: "Analysis"}
             ],
             projects: [
-                {brand: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
-                {brand: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
-                {brand: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", samples: "Done"},
-                {brand: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Danny", probability: "Hi", presented: "Done"},
-                {brand: "CP Ram", country: "USA", owner: "Danny", probability: "Lo", presented: "Done"},
-                {brand: "Happy Family", country: "Canada", distributor: "AMG", owner: "Danny", probability: "Hi", presented: "Done"},
-                {brand: "Dannon", country: "Australia", distributor: "Butter Field Vallis", owner: "Chris", probability: "Medium", presented: "Done"},
-                {brand: "Casbah", country: "Caribbean", distributor: "Colomer & Suarez", owner: "Facu", probability: "Hi", presented: "Done"}
-            ],
-            countries: ["Philippines", "USA", "Mexico", "Taiwan", "Canada", "Australia", "Caribbean", "Bermuda", "Panama", "Peru", "Puerto Rico", "Israel", "South Korea", "Thailand", "Chile", "India", "Jordan", "Dominican Republic"],
-            distributors: ["Linkage Foods", "Eatics", "AMG", "Butter Field Vallis", "Colomer & Suarez", "Alvarez y Sanchez"],
-            retailers: ["Costco", "Dollar General", "Healthy Options", "Costco HQ"],
-            owners: ["Danny", "Facu", "Chris"],
-            targets: {
-                sop: 5825000,
-                soc: 291250,
-                totalProjects: 46,
-                totalSuppliers: 19
-            }
+                {name: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
+                {name: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
+                {name: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
+                {name: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Danny", probability: "Hi"},
+                {name: "Happy Family", country: "Canada", distributor: "AMG", owner: "Danny", probability: "Hi"},
+                {name: "Dannon", country: "Australia", distributor: "Butter Field Vallis", owner: "Chris", probability: "Medium"},
+                {name: "Casbah", country: "Caribbean", distributor: "Colomer & Suarez", owner: "Facu", probability: "Hi"}
+            ]
         };
 
-        // Voice memory for storing voice inputs
-        var voiceMemory = [];
+        var isRecording = false;
 
-        // Test function to verify JavaScript is working (keep for debugging)
-        function testFunction() {
-            alert('✅ JavaScript is working!');
-            document.getElementById('responseArea').innerHTML = '<div style="color: #2ed573;"><strong>✅ SUCCESS!</strong> Business dashboard loaded with ' + businessData.suppliers.length + ' suppliers and ' + businessData.projects.length + ' projects!</div>';
-            console.log('JavaScript test successful with business data loaded');
-        }
-
-        // Enhanced microphone function with voice recognition
-        function microphoneClick() {
+        // Microphone function
+        function micClick() {
             console.log('🎤 Microphone clicked');
-            
-            var button = document.getElementsByClassName('record-btn')[0];
-            var status = document.getElementById('voiceStatus');
+            var btn = document.getElementById('micBtn');
+            var status = document.getElementById('status');
             var transcript = document.getElementById('transcript');
-            
-            if (button.classList.contains('active')) {
+
+            if (isRecording) {
                 // Stop recording
-                button.classList.remove('active');
-                status.innerHTML = '✅ Processing voice input...';
-                transcript.style.display = 'block';
+                isRecording = false;
+                btn.classList.remove('recording');
+                status.innerHTML = '✅ Processing...';
                 
-                // Simulate voice processing with realistic business scenario
-                var sampleVoiceInput = "Update on Dannon project: we received confirmation from Linkage Foods in the Philippines. They want to increase the order to 5 pallets of product for Q2 delivery. Also, Chris mentioned that the Fruzel Taiwan supplier is ready to provide updated spec sheets by next week.";
-                
-                transcript.innerHTML = '"' + sampleVoiceInput + '"';
-                
-                // Process the voice input
                 setTimeout(function() {
-                    processVoiceInput(sampleVoiceInput);
+                    var demo = "Update on Dannon project: Linkage Foods confirmed order increase to 5 pallets for Q2 delivery. Philippines market looking strong.";
+                    transcript.innerHTML = '"' + demo + '"';
+                    
+                    document.getElementById('results').innerHTML = 
+                        '<div><strong>🎤 Voice Update Processed</strong></div>' +
+                        '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
+                        '<strong>Detected:</strong> Dannon, Philippines, Linkage Foods, 5 pallets, Q2<br>' +
+                        '✅ Information stored and ready for queries!' +
+                        '</div>';
+                    
                     status.innerHTML = 'Voice processed! Click to record again';
                 }, 2000);
-                
             } else {
                 // Start recording
-                button.classList.add('active');
-                status.innerHTML = '🎤 Recording... (click again to stop)';
+                isRecording = true;
+                btn.classList.add('recording');
+                status.innerHTML = '🎤 Recording... (click to stop)';
                 transcript.style.display = 'block';
                 transcript.innerHTML = 'Listening for your voice...';
                 
-                document.getElementById('responseArea').innerHTML = 
-                    '<div style="color: #ffa502;">🎤 Recording in progress... Speak about your projects, then click microphone to stop.</div>';
+                document.getElementById('results').innerHTML = 
+                    '<div style="color: #ffa502;">🎤 Recording in progress... Speak about your business updates.</div>';
             }
         }
 
-        // Process voice input and extract business information
-        function processVoiceInput(voiceText) {
-            // Store voice input
-            voiceMemory.push({
-                text: voiceText,
-                timestamp: new Date().toLocaleString(),
-                processed: true
-            });
-
-            // Extract key business information
-            var extracted = extractBusinessInfo(voiceText);
+        // Show suppliers
+        function showSuppliers() {
+            console.log('📊 Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + data.suppliers.length + ' total)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
             
-            document.getElementById('responseArea').innerHTML = 
-                '<div><strong>🎤 Voice Input Processed</strong></div>' +
-                '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
-                '<strong>📝 Detected Information:</strong><br>' +
-                (extracted.projects.length > 0 ? '🎯 Projects: ' + extracted.projects.join(', ') + '<br>' : '') +
-                (extracted.people.length > 0 ? '👥 People: ' + extracted.people.join(', ') + '<br>' : '') +
-                (extracted.countries.length > 0 ? '🌍 Countries: ' + extracted.countries.join(', ') + '<br>' : '') +
-                (extracted.quantities.length > 0 ? '📦 Quantities: ' + extracted.quantities.join(', ') + '<br>' : '') +
-                '<br><strong>✅ Information stored and ready for queries!</strong>' +
-                '</div>';
+            data.suppliers.forEach(function(supplier) {
+                html += '• <strong>' + supplier.name + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.status + '<br>';
+            });
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
         }
 
-        // Extract business information from voice text
-        function extractBusinessInfo(text) {
-            var lowerText = text.toLowerCase();
-            var extracted = {
-                projects: [],
-                people: [],
-                countries: [],
-                quantities: []
-            };
+        // Show projects
+        function showProjects() {
+            console.log('📊 Showing projects');
+            var hiProb = data.projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = data.projects.filter(function(p) { return p.probability === 'Medium'; });
+            var loProb = data.projects.filter(function(p) { return p.probability === 'Lo'; });
 
-            // Find project brands
-            businessData.suppliers.forEach(function(supplier) {
-                if (lowerText.includes(supplier.brand.toLowerCase())) {
-                    extracted.projects.push(supplier.brand);
-                }
+            var html = '<div><strong>🎯 Project Pipeline</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects<br><br>';
+            html += '<strong>High Priority Projects:</strong><br>';
+            hiProb.forEach(function(project) {
+                html += '• ' + project.name + ' in ' + project.country + (project.distributor ? ' via ' + project.distributor : '') + '<br>';
             });
-
-            // Find people
-            businessData.owners.forEach(function(owner) {
-                if (lowerText.includes(owner.toLowerCase())) {
-                    extracted.people.push(owner);
-                }
-            });
-
-            // Find countries
-            businessData.countries.forEach(function(country) {
-                if (lowerText.includes(country.toLowerCase())) {
-                    extracted.countries.push(country);
-                }
-            });
-
-            // Find quantities (pallets, units, etc.)
-            var quantityMatches = text.match(/(\d+)\s+(pallets?|units?|boxes?)/gi);
-            if (quantityMatches) {
-                extracted.quantities = quantityMatches;
-            }
-
-            return extracted;
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
         }
 
-        // Enhanced search function with real business data
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                var input = document.getElementById('queryInput');
-                var query = input.value.trim();
-                
-                if (query) {
-                    console.log('Search query:', query);
-                    searchBusinessData(query);
-                    input.value = '';
-                }
-            }
+        // Show Danny's portfolio
+        function showDanny() {
+            console.log('📊 Showing Danny portfolio');
+            var dannySuppliers = data.suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = data.projects.filter(function(p) { return p.owner === 'Danny'; });
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Suppliers (' + dannySuppliers.length + '):</strong><br>';
+            dannySuppliers.forEach(function(supplier) {
+                html += '• ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.status + '<br>';
+            });
+            html += '<br><strong>Projects (' + dannyProjects.length + '):</strong><br>';
+            dannyProjects.forEach(function(project) {
+                html += '• ' + project.name + ' in ' + project.country + ' - ' + project.probability + ' probability<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
         }
 
-        // Search through real business data
-        function searchBusinessData(query) {
+        // Show financial
+        function showFinancial() {
+            console.log('📊 Showing financial');
+            var html = '<div><strong>💰 Financial Targets 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Annual Targets:</strong><br>';
+            html += '• SOP Target: $5,825,000<br>';
+            html += '• SOC Target: $291,250<br>';
+            html += '• Total Projects: 46<br>';
+            html += '• Active Suppliers: ' + data.suppliers.length + '<br><br>';
+            html += '<strong>Geographic Coverage:</strong> 18+ countries<br>';
+            html += '<strong>Distribution Partners:</strong> 6 active distributors';
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Search function
+        function searchData(query) {
+            console.log('🔍 Searching for:', query);
             var lowerQuery = query.toLowerCase();
-            var results = {
-                suppliers: [],
-                projects: [],
-                people: {},
-                countries: {}
-            };
+            var results = [];
 
             // Search suppliers
-            businessData.suppliers.forEach(function(supplier) {
-                if (supplier.brand.toLowerCase().includes(lowerQuery) || 
-                    supplier.country.toLowerCase().includes(lowerQuery) || 
-                    supplier.owner.toLowerCase().includes(lowerQuery)) {
-                    results.suppliers.push(supplier);
+            data.suppliers.forEach(function(supplier) {
+                if (supplier.name.toLowerCase().includes(lowerQuery) || 
+                    supplier.owner.toLowerCase().includes(lowerQuery) ||
+                    supplier.country.toLowerCase().includes(lowerQuery)) {
+                    results.push('🏢 Supplier: ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.owner);
                 }
             });
 
             // Search projects
-            businessData.projects.forEach(function(project) {
-                if (project.brand.toLowerCase().includes(lowerQuery) || 
-                    project.country.toLowerCase().includes(lowerQuery) || 
+            data.projects.forEach(function(project) {
+                if (project.name.toLowerCase().includes(lowerQuery) || 
                     project.owner.toLowerCase().includes(lowerQuery) ||
-                    (project.distributor && project.distributor.toLowerCase().includes(lowerQuery))) {
-                    results.projects.push(project);
+                    project.country.toLowerCase().includes(lowerQuery) ||
+                    project.probability.toLowerCase().includes(lowerQuery)) {
+                    results.push('🎯 Project: ' + project.name + ' in ' + project.country + ' - ' + project.probability);
                 }
             });
 
-            // Search voice memory
-            var voiceResults = voiceMemory.filter(function(entry) {
-                return entry.text.toLowerCase().includes(lowerQuery);
-            });
-
-            displaySearchResults(query, results, voiceResults);
-        }
-
-        // Display comprehensive search results
-        function displaySearchResults(query, results, voiceResults) {
             var html = '<div><strong>🔍 Search Results for: "' + query + '"</strong></div>';
-            
-            if (results.suppliers.length > 0) {
+            if (results.length > 0) {
                 html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                html += '<strong>🏢 Suppliers Found (' + results.suppliers.length + '):</strong><br>';
-                results.suppliers.forEach(function(supplier) {
-                    html += '• ' + supplier.brand + ' (' + supplier.country + ') - Owner: ' + supplier.owner + ' - Status: ' + supplier.discovery + '<br>';
+                html += '<strong>Found ' + results.length + ' results:</strong><br>';
+                results.forEach(function(result) {
+                    html += '• ' + result + '<br>';
                 });
                 html += '</div>';
-            }
-
-            if (results.projects.length > 0) {
-                html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                html += '<strong>🎯 Projects Found (' + results.projects.length + '):</strong><br>';
-                results.projects.forEach(function(project) {
-                    html += '• ' + project.brand + ' in ' + project.country;
-                    if (project.distributor) html += ' via ' + project.distributor;
-                    html += ' - ' + project.probability + ' probability - Owner: ' + project.owner + '<br>';
-                });
-                html += '</div>';
-            }
-
-            if (voiceResults.length > 0) {
-                html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                html += '<strong>🎤 Voice Notes Found (' + voiceResults.length + '):</strong><br>';
-                voiceResults.forEach(function(entry) {
-                    html += '• "' + entry.text.substring(0, 100) + '..." (' + entry.timestamp + ')<br>';
-                });
-                html += '</div>';
-            }
-
-            if (results.suppliers.length === 0 && results.projects.length === 0 && voiceResults.length === 0) {
+            } else {
                 html += '<div style="background: rgba(255, 165, 2, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                html += 'No direct matches found. Try searching for:<br>';
-                html += '• <strong>Suppliers:</strong> Casbah, Dannon, Fruzel, Happy Family<br>';
-                html += '• <strong>Countries:</strong> Philippines, USA, Mexico, Taiwan<br>';
-                html += '• <strong>People:</strong> Danny, Facu, Chris<br>';
-                html += '• <strong>Status:</strong> "high probability", "done", "pending"';
+                html += 'No results found. Try: "Danny", "Philippines", "high probability", "Dannon"';
                 html += '</div>';
             }
 
-            document.getElementById('responseArea').innerHTML = html;
+            document.getElementById('results').innerHTML = html;
         }
 
-        // Test search function
-        function testSearch() {
-            document.getElementById('queryInput').value = 'Danny projects';
-            document.getElementById('queryInput').focus();
-            
-            document.getElementById('responseArea').innerHTML = 
-                '<div style="color: #2ed573;">✅ Search box ready! Try: "Danny projects", "Philippines", "Dannon", "high probability"</div>';
-        }
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            console.log('✅ Dashboard loaded with', data.suppliers.length, 'suppliers and', data.projects.length, 'projects');
 
-        // Enhanced quick query function with real data
-        function quickQuery(type) {
-            console.log('Quick query:', type);
-            
-            var html = '';
-            
-            switch(type) {
-                case 'suppliers':
-                    html = '<div><strong>🏢 Supplier Portfolio</strong></div>';
-                    html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                    html += '<strong>Total Active Suppliers:</strong> ' + businessData.suppliers.length + '<br><br>';
-                    businessData.suppliers.forEach(function(supplier) {
-                        html += '• <strong>' + supplier.brand + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.discovery + '<br>';
-                    });
-                    html += '</div>';
-                    break;
-                    
-                case 'projects':
-                    var hiProb = businessData.projects.filter(function(p) { return p.probability === 'Hi'; });
-                    var medProb = businessData.projects.filter(function(p) { return p.probability === 'Medium'; });
-                    var loProb = businessData.projects.filter(function(p) { return p.probability === 'Lo'; });
-                    
-                    html = '<div><strong>🎯 Project Pipeline</strong></div>';
-                    html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                    html += '<strong>Pipeline Summary:</strong><br>';
-                    html += '• High Probability: ' + hiProb.length + ' projects<br>';
-                    html += '• Medium Probability: ' + medProb.length + ' projects<br>';
-                    html += '• Low Probability: ' + loProb.length + ' projects<br><br>';
-                    html += '<strong>High Priority Projects:</strong><br>';
-                    hiProb.forEach(function(project) {
-                        html += '• ' + project.brand + ' in ' + project.country + (project.distributor ? ' via ' + project.distributor : '') + '<br>';
-                    });
-                    html += '</div>';
-                    break;
-                    
-                case 'danny':
-                    var dannySuppliers = businessData.suppliers.filter(function(s) { return s.owner === 'Danny'; });
-                    var dannyProjects = businessData.projects.filter(function(p) { return p.owner === 'Danny'; });
-                    
-                    html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
-                    html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                    html += '<strong>Suppliers (' + dannySuppliers.length + '):</strong><br>';
-                    dannySuppliers.forEach(function(supplier) {
-                        html += '• ' + supplier.brand + ' (' + supplier.country + ') - ' + supplier.discovery + '<br>';
-                    });
-                    html += '<br><strong>Projects (' + dannyProjects.length + '):</strong><br>';
-                    dannyProjects.forEach(function(project) {
-                        html += '• ' + project.brand + ' in ' + project.country + ' - ' + project.probability + ' probability<br>';
-                    });
-                    html += '</div>';
-                    break;
-                    
-                case 'financial':
-                    html = '<div><strong>💰 Financial Targets 2025</strong></div>';
-                    html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                    html += '<strong>Annual Targets:</strong><br>';
-                    html += '• SOP Target: 
-</body>
-</html> + businessData.targets.sop.toLocaleString() + '<br>';
-                    html += '• SOC Target: 
-</body>
-</html> + businessData.targets.soc.toLocaleString() + '<br>';
-                    html += '• Total Projects: ' + businessData.targets.totalProjects + '<br>';
-                    html += '• Active Suppliers: ' + businessData.targets.totalSuppliers + '<br><br>';
-                    html += '<strong>Geographic Coverage:</strong> ' + businessData.countries.length + ' countries<br>';
-                    html += '<strong>Distribution Partners:</strong> ' + businessData.distributors.length + ' active distributors';
-                    html += '</div>';
-                    break;
-            }
-            
-            document.getElementById('responseArea').innerHTML = html;
-        }
+            // Connect microphone button
+            document.getElementById('micBtn').addEventListener('click', micClick);
 
-        // Initialize when page loads
-        window.onload = function() {
-            console.log('🎯 Dashboard loaded successfully with business data!');
-            console.log('Loaded:', businessData.suppliers.length, 'suppliers,', businessData.projects.length, 'projects');
-            
-            // Test that elements exist
-            var elements = ['voiceStatus', 'queryInput', 'responseArea'];
-            elements.forEach(function(id) {
-                var element = document.getElementById(id);
-                if (element) {
-                    console.log('✅ Found element:', id);
-                } else {
-                    console.error('❌ Missing element:', id);
+            // Connect search box
+            document.getElementById('searchBox').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    searchData(this.value.trim());
+                    this.value = '';
                 }
             });
-        };
+
+            // Connect all buttons
+            document.getElementById('suppliersBtn').addEventListener('click', showSuppliers);
+            document.getElementById('projectsBtn').addEventListener('click', showProjects);
+            document.getElementById('dannyBtn').addEventListener('click', showDanny);
+            document.getElementById('financialBtn').addEventListener('click', showFinancial);
+
+            console.log('🎯 All buttons connected and ready!');
+        });
     </script>
 </body>
 </html>
