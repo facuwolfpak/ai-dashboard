@@ -421,38 +421,73 @@
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
-                recognition.continuous = false;
+                recognition.continuous = true; // Keep listening continuously
                 recognition.interimResults = true;
                 recognition.lang = 'en-US';
+
+                let silenceTimer = null;
+                let lastSpeechTime = Date.now();
+                let fullTranscript = '';
 
                 recognition.onstart = function() {
                     isRecording = true;
                     updateRecordingState();
-                    document.getElementById('voiceStatus').textContent = '🎤 Listening... Speak now';
-                    console.log('Real speech recognition started');
+                    document.getElementById('voiceStatus').textContent = '🎤 Recording... (click button to stop)';
+                    document.getElementById('transcript').style.display = 'block';
+                    document.getElementById('transcript').innerHTML = '<div>Listening for your voice...</div>';
+                    fullTranscript = '';
+                    console.log('Continuous recording started');
                 };
 
                 recognition.onresult = function(event) {
-                    let transcript = '';
+                    // Clear silence timer since we got speech
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = null;
+                    }
+                    lastSpeechTime = Date.now();
+
+                    // Build the full transcript
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        transcript += event.results[i][0].transcript;
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                        } else {
+                            interimTranscript += transcript;
+                        }
                     }
-                    
-                    document.getElementById('transcript').style.display = 'block';
-                    document.getElementById('transcript').innerHTML = `<div>"${transcript}"</div>`;
-                    
-                    if (event.results[event.results.length - 1].isFinal) {
-                        document.getElementById('voiceStatus').textContent = '✅ Processing your input...';
-                        setTimeout(() => processVoiceInput(transcript), 1000);
+
+                    // Update full transcript
+                    if (finalTranscript) {
+                        fullTranscript += finalTranscript;
                     }
+
+                    // Display current state
+                    const displayText = fullTranscript + (interimTranscript ? '<span style="opacity:0.6;">' + interimTranscript + '</span>' : '');
+                    document.getElementById('transcript').innerHTML = `<div>"${displayText}"</div>`;
+                    
+                    // Update status
+                    document.getElementById('voiceStatus').textContent = '🎤 Recording... (click button to stop)';
+
+                    // Start silence timer for auto-stop after 1 minute
+                    if (silenceTimer) clearTimeout(silenceTimer);
+                    silenceTimer = setTimeout(() => {
+                        if (isRecording) {
+                            console.log('Auto-stopping due to 1 minute of silence');
+                            stopRecording();
+                        }
+                    }, 60000); // 60 seconds
                 };
 
                 recognition.onerror = function(event) {
                     console.error('Speech recognition error:', event.error);
-                    isRecording = false;
-                    updateRecordingState();
                     
                     if (event.error === 'not-allowed') {
+                        isRecording = false;
+                        updateRecordingState();
                         document.getElementById('voiceStatus').innerHTML = `
                             <div style="color: #ff6b6b; margin-bottom: 10px;">🚫 Microphone access denied</div>
                             <div style="font-size: 0.9rem; line-height: 1.4;">
@@ -460,22 +495,40 @@
                             </div>
                         `;
                     } else if (event.error === 'no-speech') {
-                        document.getElementById('voiceStatus').textContent = '🔇 No speech detected. Click to try again.';
+                        // Don't stop on no-speech since we want continuous recording
+                        console.log('No speech detected, continuing to listen...');
                     } else {
+                        isRecording = false;
+                        updateRecordingState();
                         document.getElementById('voiceStatus').textContent = `❌ Error: ${event.error}. Click to try again.`;
                     }
                 };
 
                 recognition.onend = function() {
-                    isRecording = false;
-                    updateRecordingState();
-                    if (document.getElementById('voiceStatus').textContent.includes('Listening')) {
-                        document.getElementById('voiceStatus').textContent = 'Click to start recording';
-                    }
                     console.log('Speech recognition ended');
+                    
+                    // Process the full transcript if we have one
+                    if (fullTranscript.trim() && isRecording === false) {
+                        document.getElementById('voiceStatus').textContent = '✅ Processing your recording...';
+                        setTimeout(() => {
+                            processVoiceInput(fullTranscript.trim());
+                            document.getElementById('voiceStatus').innerHTML = `
+                                <div>✅ Recording processed!</div>
+                                <div style="font-size: 0.8rem; margin-top: 5px;">
+                                    Click microphone to record again
+                                </div>
+                            `;
+                        }, 1000);
+                    }
+                    
+                    // Clear timers
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = null;
+                    }
                 };
 
-                console.log('✅ Speech recognition initialized');
+                console.log('✅ Continuous speech recognition initialized');
                 return true;
             }
             console.log('❌ Speech recognition not supported');
@@ -488,9 +541,11 @@
             
             if (isRecording) {
                 btn.classList.add('recording');
+                btn.title = 'Click to stop recording';
             } else {
                 btn.classList.remove('recording');
-                if (status.textContent.includes('Listening')) {
+                btn.title = 'Click to start recording';
+                if (status.textContent.includes('Recording')) {
                     status.textContent = 'Click to start recording';
                 }
             }
@@ -504,7 +559,8 @@
             }
 
             if (isRecording) {
-                recognition.stop();
+                // Stop recording
+                stopRecording();
                 return;
             }
 
@@ -515,6 +571,16 @@
                 console.error('Error starting recognition:', error);
                 document.getElementById('voiceStatus').textContent = 'Error starting microphone. Trying demo...';
                 setTimeout(startVoiceDemo, 1000);
+            }
+        }
+
+        function stopRecording() {
+            if (recognition && isRecording) {
+                isRecording = false; // Set this first to prevent auto-restart
+                updateRecordingState();
+                recognition.stop();
+                document.getElementById('voiceStatus').textContent = 'Stopping recording...';
+                console.log('Manual stop requested');
             }
         }
 
