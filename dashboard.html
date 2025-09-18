@@ -426,90 +426,87 @@ function smartQuery(query) {
         <div class="dashboard-grid">
             <div class="dashboard-card">
                 <div class="card-header">
-                    <div class="card-title">🏝️ Bahamas Project</div>
+                    <div class="card-title">🎯 High Probability Projects</div>
+                    <div class="status-indicator status-green"></div>
+                </div>
+                <div class="card-content">
+                    <div class="metric">
+                        <span>Active Projects:</span>
+                        <span>4 High Priority</span>
+                    </div>
+                    <div class="metric">
+                        <span>Key Markets:</span>
+                        <span>Mexico, Philippines</span>
+                    </div>
+                    <div class="metric">
+                        <span>Main Distributor:</span>
+                        <span>Linkage Foods, Eatics</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">🏢 Supplier Portfolio</div>
+                    <div class="status-indicator status-green"></div>
+                </div>
+                <div class="card-content">
+                    <div class="metric">
+                        <span>Total Suppliers:</span>
+                        <span>19 Active</span>
+                    </div>
+                    <div class="metric">
+                        <span>Documentation:</span>
+                        <span>85% Complete</span>
+                    </div>
+                    <div class="metric">
+                        <span>Key Owners:</span>
+                        <span>Danny, Facu, Chris</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-title">💰 Financial Targets 2025</div>
                     <div class="status-indicator status-yellow"></div>
                 </div>
                 <div class="card-content">
                     <div class="metric">
-                        <span>Progress:</span>
-                        <span>65% Complete</span>
+                        <span>SOP Target:</span>
+                        <span>$5.8M</span>
                     </div>
                     <div class="metric">
-                        <span>Budget:</span>
-                        <span>$850k / $1.2M</span>
+                        <span>SOC Target:</span>
+                        <span>$291K</span>
                     </div>
                     <div class="metric">
-                        <span>Timeline:</span>
-                        <span>2 weeks behind</span>
+                        <span>Pipeline:</span>
+                        <span>46 Active Projects</span>
                     </div>
                     <div class="pending-alert">
-                        <strong>⚠️ Pending:</strong> Environmental permits approval needed
+                        <strong>📊 Focus:</strong> Convert Hi probability projects to orders
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-card">
                 <div class="card-header">
-                    <div class="card-title">🚀 Miami Expansion</div>
+                    <div class="card-title">🌍 Geographic Coverage</div>
                     <div class="status-indicator status-green"></div>
                 </div>
                 <div class="card-content">
                     <div class="metric">
-                        <span>Progress:</span>
-                        <span>92% Complete</span>
+                        <span>Countries:</span>
+                        <span>21 Markets</span>
                     </div>
                     <div class="metric">
-                        <span>Budget:</span>
-                        <span>$2.1M / $2.3M</span>
+                        <span>Top Markets:</span>
+                        <span>USA, Philippines, Mexico</span>
                     </div>
                     <div class="metric">
-                        <span>Timeline:</span>
-                        <span>On track</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">🏢 Office Renovation</div>
-                    <div class="status-indicator status-red"></div>
-                </div>
-                <div class="card-content">
-                    <div class="metric">
-                        <span>Progress:</span>
-                        <span>30% Complete</span>
-                    </div>
-                    <div class="metric">
-                        <span>Budget:</span>
-                        <span>$450k / $500k</span>
-                    </div>
-                    <div class="metric">
-                        <span>Timeline:</span>
-                        <span>4 weeks delayed</span>
-                    </div>
-                    <div class="pending-alert">
-                        <strong>🚨 Critical:</strong> Contractor selection overdue
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <div class="card-title">📊 Weekly Analytics</div>
-                    <div class="status-indicator status-green"></div>
-                </div>
-                <div class="card-content">
-                    <div class="metric">
-                        <span>Team Productivity:</span>
-                        <span>+15%</span>
-                    </div>
-                    <div class="metric">
-                        <span>Active Projects:</span>
-                        <span>12</span>
-                    </div>
-                    <div class="metric">
-                        <span>Completed Tasks:</span>
-                        <span>47 this week</span>
+                        <span>Distributors:</span>
+                        <span>15+ Partners</span>
                     </div>
                 </div>
             </div>
@@ -958,7 +955,209 @@ function smartQuery(query) {
             return response;
         }
 
-        function searchForYellowBird() {
+        function searchByOwner(query) {
+            const lowerQuery = query.toLowerCase();
+            const owner = dashboardData.owners.find(o => lowerQuery.includes(o.toLowerCase()));
+            
+            if (owner) {
+                const ownerSuppliers = dashboardData.suppliers.filter(s => s.owner === owner);
+                const ownerProjects = dashboardData.projects.filter(p => p.owner === owner);
+                
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>👤 ${owner}'s Portfolio</strong>
+                    </div>
+                    
+                    <div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>Suppliers:</strong> ${ownerSuppliers.length} | <strong>Projects:</strong> ${ownerProjects.length}
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>🏢 Suppliers:</strong><br>
+                        ${ownerSuppliers.map(s => `• ${s.brand} (${s.country})`).join('<br>')}
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
+                        <strong>🎯 Active Projects:</strong><br>
+                        ${ownerProjects.map(p => `• ${p.brand} in ${p.country} - ${p.probability} probability`).join('<br>')}
+                    </div>
+
+                    <div class="timestamp">Portfolio updated ${new Date().toLocaleString()}</div>
+                `;
+            }
+            
+            return `
+                <div style="background: rgba(255,107,107,0.2); padding: 15px; border-radius: 10px;">
+                    <strong>Owner not found.</strong><br>
+                    Available owners: ${dashboardData.owners.join(', ')}
+                </div>
+            `;
+        }
+
+        function searchByCountry(query) {
+            const lowerQuery = query.toLowerCase();
+            const country = dashboardData.countries.find(c => lowerQuery.includes(c.toLowerCase()));
+            
+            if (country) {
+                const countrySuppliers = dashboardData.suppliers.filter(s => s.country === country);
+                const countryProjects = dashboardData.projects.filter(p => p.country === country);
+                
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🌍 ${country} Market Overview</strong>
+                    </div>
+                    
+                    <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>Suppliers:</strong> ${countrySuppliers.length} | <strong>Projects:</strong> ${countryProjects.length}
+                    </div>
+
+                    ${countrySuppliers.length > 0 ? `
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <strong>🏢 Local Suppliers:</strong><br>
+                            ${countrySuppliers.map(s => `• ${s.brand} (Owner: ${s.owner})`).join('<br>')}
+                        </div>
+                    ` : ''}
+
+                    ${countryProjects.length > 0 ? `
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
+                            <strong>🎯 Market Projects:</strong><br>
+                            ${countryProjects.map(p => `• ${p.brand} via ${p.distributor || 'TBD'} - ${p.probability} probability`).join('<br>')}
+                        </div>
+                    ` : ''}
+
+                    <div class="timestamp">Market data ${new Date().toLocaleString()}</div>
+                `;
+            }
+            
+            return `
+                <div style="background: rgba(255,107,107,0.2); padding: 15px; border-radius: 10px;">
+                    <strong>Country not found.</strong><br>
+                    Key markets: ${dashboardData.countries.slice(0, 5).join(', ')}...
+                </div>
+            `;
+        }
+
+        function generateBusinessStatusReport() {
+            const hiProbProjects = dashboardData.projects.filter(p => p.probability === 'Hi');
+            const loProbProjects = dashboardData.projects.filter(p => p.probability === 'Lo');
+            const presentedProjects = dashboardData.projects.filter(p => p.presented === 'Done');
+            
+            return `
+                <div style="margin-bottom: 15px;">
+                    <strong>📊 Business Status Dashboard</strong>
+                </div>
+                
+                <div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>🎯 Project Pipeline:</strong><br>
+                    High Probability: ${hiProbProjects.length} projects<br>
+                    Low Probability: ${loProbProjects.length} projects<br>
+                    Presented: ${presentedProjects.length} projects
+                </div>
+
+                <div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>🏢 Supplier Status:</strong><br>
+                    Total Active Suppliers: ${dashboardData.metadata.totalSuppliers}<br>
+                    Key Markets: ${dashboardData.countries.slice(0, 3).join(', ')}
+                </div>
+
+                <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px;">
+                    <strong>💰 Financial Targets:</strong><br>
+                    SOP Target: ${dashboardData.metadata.targetSOP.toLocaleString()}<br>
+                    SOC Target: ${dashboardData.metadata.targetSOC.toLocaleString()}
+                </div>
+
+                <div class="timestamp">Status updated ${new Date().toLocaleString()}</div>
+            `;
+        }
+
+        function generateFinancialReport() {
+            return `
+                <div style="margin-bottom: 15px;">
+                    <strong>💰 Financial Dashboard</strong>
+                </div>
+                
+                <div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>🎯 2025 Targets:</strong><br>
+                    SOP (Sales Operating Plan): ${dashboardData.metadata.targetSOP.toLocaleString()}<br>
+                    SOC (Sales Operating Cost): ${dashboardData.metadata.targetSOC.toLocaleString()}
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>📈 Pipeline Value:</strong><br>
+                    Active Projects: ${dashboardData.metadata.activeProjects}<br>
+                    High Probability Projects: ${dashboardData.projects.filter(p => p.probability === 'Hi').length}<br>
+                    Revenue Potential: Under calculation
+                </div>
+
+                <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px;">
+                    <strong>💡 Key Metrics:</strong><br>
+                    Supplier Coverage: ${dashboardData.metadata.totalSuppliers} brands<br>
+                    Geographic Reach: ${dashboardData.countries.length} countries<br>
+                    Distribution Partners: ${dashboardData.distributors.length} active
+                </div>
+
+                <div class="timestamp">Financial data ${new Date().toLocaleString()}</div>
+            `;
+        }
+
+        function searchBusinessData(query, relevantVoiceInputs) {
+            // General business search across all data
+            const lowerQuery = query.toLowerCase();
+            const results = [];
+            
+            // Search suppliers
+            const matchingSuppliers = dashboardData.suppliers.filter(s => 
+                s.brand.toLowerCase().includes(lowerQuery)
+            );
+            
+            // Search projects  
+            const matchingProjects = dashboardData.projects.filter(p =>
+                p.brand.toLowerCase().includes(lowerQuery) ||
+                p.country.toLowerCase().includes(lowerQuery)
+            );
+            
+            if (matchingSuppliers.length > 0 || matchingProjects.length > 0 || relevantVoiceInputs.length > 0) {
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🔍 Search Results for: "${query}"</strong>
+                    </div>
+                    
+                    ${matchingSuppliers.length > 0 ? `
+                        <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                            <strong>🏢 Suppliers (${matchingSuppliers.length}):</strong><br>
+                            ${matchingSuppliers.map(s => `• ${s.brand} (${s.country}) - ${s.owner}`).join('<br>')}
+                        </div>
+                    ` : ''}
+
+                    ${matchingProjects.length > 0 ? `
+                        <div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                            <strong>🎯 Projects (${matchingProjects.length}):</strong><br>
+                            ${matchingProjects.map(p => `• ${p.brand} in ${p.country} - ${p.probability}`).join('<br>')}
+                        </div>
+                    ` : ''}
+
+                    ${relevantVoiceInputs.length > 0 ? `
+                        <div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px;">
+                            <strong>🎤 Voice Notes (${relevantVoiceInputs.length}):</strong><br>
+                            ${relevantVoiceInputs.map(entry => `• "${entry.text.substring(0, 100)}..." (${entry.processed})`).join('<br>')}
+                        </div>
+                    ` : ''}
+
+                    <div class="timestamp">Search completed ${new Date().toLocaleString()}</div>
+                `;
+            } else {
+                return `
+                    <div>I searched for: "${query}"</div>
+                    <div style="margin-top: 15px; background: rgba(255,165,2,0.2); padding: 15px; border-radius: 10px;">
+                        No matching information found. Try searching for:<br>
+                        • <strong>Suppliers:</strong> Casbah, Dannon, Fruzel, Happy Family<br>
+                        • <strong>Countries:</strong> Philippines, USA, Mexico, Taiwan<br>
+                        • <strong>Owners:</strong> Danny, Facu, Chris<br>
+                        • <strong>Status:</strong> "high probability projects", "suppliers status"
+                    </div>
+                `;
+            }
+        }
             // Search through voice memory and project data for Yellow Bird mentions
             const yellowBirdInfo = [];
             
