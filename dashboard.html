@@ -197,4 +197,236 @@
             {name: "Yellow Bird", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", revenue: 50000},
             {name: "Yellow Bird", country: "Caribbean", distributor: "Butter Field Vallis", owner: "Danny", probability: "Med", revenue: 75000},
             {name: "Yellow Bird", country: "Puerto Rico", distributor: "Colomer & Suarez", owner: "Danny", probability: "Med", revenue: 100000},
-            {name: "Wavers", country: "Bermuda", distribut
+            {name: "Wavers", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", revenue: 30000},
+            {name: "Wavers", country: "Caribbean", distributor: "Butter Field Vallis", owner: "Danny", probability: "Med", revenue: 45000},
+            {name: "Fruzel", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", revenue: 40000},
+            {name: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", revenue: 0},
+            {name: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", revenue: 0},
+            {name: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", revenue: 0}
+        ];
+
+        var isRecording = false;
+        var voiceMemory = [];
+
+        // Microphone handler
+        function handleMic() {
+            console.log('Microphone clicked!');
+            var btn = document.getElementsByClassName('mic-btn')[0];
+            var status = document.getElementById('status');
+            var transcript = document.getElementById('transcript');
+
+            if (isRecording) {
+                // Stop recording
+                isRecording = false;
+                btn.classList.remove('recording');
+                status.innerHTML = '✅ Processing...';
+                
+                setTimeout(function() {
+                    var demo = "Update on Yellow Bird Australia project: confirmed 3 pallets delivery via Stellar Distributor for October 1st. Revenue target is 200,000 dollars and probability remains high.";
+                    transcript.innerHTML = '"' + demo + '"';
+                    
+                    document.getElementById('results').innerHTML = 
+                        '<div><strong>🎤 Voice Update Processed</strong></div>' +
+                        '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
+                        '<strong>🐦 Detected:</strong> Yellow Bird, Australia, 3 pallets, October 1st, $200,000<br>' +
+                        '<strong>📍 Distributor:</strong> Stellar Distributor<br>' +
+                        '<strong>📊 Status:</strong> High probability project<br>' +
+                        '✅ Information stored and ready for queries!' +
+                        '</div>';
+                    
+                    voiceMemory.push({text: demo, date: new Date().toLocaleString()});
+                    status.innerHTML = 'Voice processed! Click to record again';
+                }, 2000);
+            } else {
+                // Start recording
+                isRecording = true;
+                btn.classList.add('recording');
+                status.innerHTML = '🎤 Recording... (click to stop)';
+                transcript.style.display = 'block';
+                transcript.innerHTML = 'Listening for your voice...';
+                
+                document.getElementById('results').innerHTML = 
+                    '<div style="color: #ffa502;">🎤 Recording in progress... Speak about Yellow Bird, projects, or any business updates.</div>';
+            }
+        }
+
+        // Search handler
+        function handleSearch() {
+            var query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            console.log('Searching for:', query);
+            var lowerQuery = query.toLowerCase();
+            
+            // Special Yellow Bird search
+            if (lowerQuery.includes('yellow bird') || lowerQuery.includes('yellowbird')) {
+                var yellowProjects = projects.filter(function(p) {
+                    return p.name.toLowerCase().includes('yellow bird');
+                });
+                var totalRevenue = yellowProjects.reduce(function(sum, p) { return sum + p.revenue; }, 0);
+                
+                var html = '<div><strong>🐦 Yellow Bird Complete Portfolio</strong></div>';
+                html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += '<strong>📊 Portfolio Overview:</strong><br>';
+                html += '• Total Projects: ' + yellowProjects.length + '<br>';
+                html += '• Total Revenue: $' + totalRevenue.toLocaleString() + '<br><br>';
+                html += '<strong>🌍 Global Projects:</strong><br>';
+                yellowProjects.forEach(function(p) {
+                    var status = p.revenue > 0 ? '$' + p.revenue.toLocaleString() + ' - ' + p.probability : 'Pipeline';
+                    html += '• ' + p.country + ' via ' + p.distributor + ' - ' + status + '<br>';
+                });
+                
+                if (voiceMemory.length > 0) {
+                    html += '<br><strong>🎤 Recent Voice Updates:</strong><br>';
+                    voiceMemory.forEach(function(v) {
+                        if (v.text.toLowerCase().includes('yellow bird')) {
+                            html += '• "' + v.text.substring(0, 80) + '..." (' + v.date + ')<br>';
+                        }
+                    });
+                }
+                html += '</div>';
+            } else {
+                // Regular search
+                var results = [];
+                suppliers.forEach(function(s) {
+                    if (s.name.toLowerCase().includes(lowerQuery) || 
+                        s.owner.toLowerCase().includes(lowerQuery) ||
+                        s.country.toLowerCase().includes(lowerQuery)) {
+                        results.push('🏢 ' + s.name + ' (' + s.country + ') - ' + s.owner);
+                    }
+                });
+                projects.forEach(function(p) {
+                    if (p.name.toLowerCase().includes(lowerQuery) || 
+                        p.country.toLowerCase().includes(lowerQuery) ||
+                        p.probability.toLowerCase().includes(lowerQuery)) {
+                        var rev = p.revenue > 0 ? ' - $' + p.revenue.toLocaleString() : '';
+                        results.push('🎯 ' + p.name + ' in ' + p.country + ' - ' + p.probability + rev);
+                    }
+                });
+
+                var html = '<div><strong>🔍 Search: "' + query + '"</strong></div>';
+                if (results.length > 0) {
+                    html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += '<strong>Found ' + results.length + ' results:</strong><br>';
+                    results.forEach(function(r) { html += '• ' + r + '<br>'; });
+                    html += '</div>';
+                } else {
+                    html += '<div style="background: rgba(255, 165, 2, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += 'No results. Try: "Yellow Bird", "Danny", "high probability", "Philippines"';
+                    html += '</div>';
+                }
+            }
+            
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html>
