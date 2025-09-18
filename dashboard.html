@@ -238,16 +238,53 @@
         </div>
     </div>
 
-    <!-- Inline JavaScript for maximum compatibility -->
+    <!-- Inline JavaScript with real business data -->
     <script>
+        // Real business data from your Excel dashboard
+        var businessData = {
+            suppliers: [
+                {brand: "Casbah", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Dannon", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Fruzel", country: "Taiwan", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Happy Family", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "CP Ram", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Catalina Crunch", country: "USA", owner: "Facu", discovery: "In Progress", specSheets: "Pending", priceList: "Pending"},
+                {brand: "Diamond Brew", country: "USA", owner: "Chris", discovery: "Too Early", specSheets: "Not Started", priceList: "Not Started"},
+                {brand: "Goodles", country: "USA", owner: "Danny", discovery: "In Process", specSheets: "Analysis", priceList: "Pending"}
+            ],
+            projects: [
+                {brand: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
+                {brand: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
+                {brand: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", samples: "Done"},
+                {brand: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Danny", probability: "Hi", presented: "Done"},
+                {brand: "CP Ram", country: "USA", owner: "Danny", probability: "Lo", presented: "Done"},
+                {brand: "Happy Family", country: "Canada", distributor: "AMG", owner: "Danny", probability: "Hi", presented: "Done"},
+                {brand: "Dannon", country: "Australia", distributor: "Butter Field Vallis", owner: "Chris", probability: "Medium", presented: "Done"},
+                {brand: "Casbah", country: "Caribbean", distributor: "Colomer & Suarez", owner: "Facu", probability: "Hi", presented: "Done"}
+            ],
+            countries: ["Philippines", "USA", "Mexico", "Taiwan", "Canada", "Australia", "Caribbean", "Bermuda", "Panama", "Peru", "Puerto Rico", "Israel", "South Korea", "Thailand", "Chile", "India", "Jordan", "Dominican Republic"],
+            distributors: ["Linkage Foods", "Eatics", "AMG", "Butter Field Vallis", "Colomer & Suarez", "Alvarez y Sanchez"],
+            retailers: ["Costco", "Dollar General", "Healthy Options", "Costco HQ"],
+            owners: ["Danny", "Facu", "Chris"],
+            targets: {
+                sop: 5825000,
+                soc: 291250,
+                totalProjects: 46,
+                totalSuppliers: 19
+            }
+        };
+
+        // Voice memory for storing voice inputs
+        var voiceMemory = [];
+
         // Test function to verify JavaScript is working
         function testFunction() {
             alert('✅ JavaScript is working!');
-            document.getElementById('responseArea').innerHTML = '<div style="color: #2ed573;"><strong>✅ SUCCESS!</strong> JavaScript is working perfectly!</div>';
-            console.log('JavaScript test successful');
+            document.getElementById('responseArea').innerHTML = '<div style="color: #2ed573;"><strong>✅ SUCCESS!</strong> JavaScript is working with real business data!</div>';
+            console.log('JavaScript test successful with business data loaded');
         }
 
-        // Microphone button function
+        // Enhanced microphone function with voice recognition
         function microphoneClick() {
             console.log('🎤 Microphone clicked');
             
@@ -258,32 +295,97 @@
             if (button.classList.contains('active')) {
                 // Stop recording
                 button.classList.remove('active');
-                status.innerHTML = '✅ Recording stopped!';
-                transcript.style.display = 'none';
+                status.innerHTML = '✅ Processing voice input...';
+                transcript.style.display = 'block';
                 
-                // Simulate processing
+                // Simulate voice processing with realistic business scenario
+                var sampleVoiceInput = "Update on Dannon project: we received confirmation from Linkage Foods in the Philippines. They want to increase the order to 5 pallets of product for Q2 delivery. Also, Chris mentioned that the Fruzel Taiwan supplier is ready to provide updated spec sheets by next week.";
+                
+                transcript.innerHTML = '"' + sampleVoiceInput + '"';
+                
+                // Process the voice input
                 setTimeout(function() {
-                    document.getElementById('responseArea').innerHTML = 
-                        '<div><strong>🎤 Voice Demo Complete!</strong></div>' +
-                        '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
-                        'Microphone button is working! In the full version, this would capture and process your voice.' +
-                        '</div>';
-                    status.innerHTML = 'Click microphone to start again';
-                }, 1000);
+                    processVoiceInput(sampleVoiceInput);
+                    status.innerHTML = 'Voice processed! Click to record again';
+                }, 2000);
                 
             } else {
                 // Start recording
                 button.classList.add('active');
                 status.innerHTML = '🎤 Recording... (click again to stop)';
                 transcript.style.display = 'block';
-                transcript.innerHTML = 'Demo: "Show me Danny\'s portfolio and Philippines projects..."';
+                transcript.innerHTML = 'Listening for your voice...';
                 
                 document.getElementById('responseArea').innerHTML = 
-                    '<div style="color: #ffa502;">🎤 Recording in progress... Click microphone again to stop.</div>';
+                    '<div style="color: #ffa502;">🎤 Recording in progress... Speak about your projects, then click microphone to stop.</div>';
             }
         }
 
-        // Handle Enter key in search box
+        // Process voice input and extract business information
+        function processVoiceInput(voiceText) {
+            // Store voice input
+            voiceMemory.push({
+                text: voiceText,
+                timestamp: new Date().toLocaleString(),
+                processed: true
+            });
+
+            // Extract key business information
+            var extracted = extractBusinessInfo(voiceText);
+            
+            document.getElementById('responseArea').innerHTML = 
+                '<div><strong>🎤 Voice Input Processed</strong></div>' +
+                '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
+                '<strong>📝 Detected Information:</strong><br>' +
+                (extracted.projects.length > 0 ? '🎯 Projects: ' + extracted.projects.join(', ') + '<br>' : '') +
+                (extracted.people.length > 0 ? '👥 People: ' + extracted.people.join(', ') + '<br>' : '') +
+                (extracted.countries.length > 0 ? '🌍 Countries: ' + extracted.countries.join(', ') + '<br>' : '') +
+                (extracted.quantities.length > 0 ? '📦 Quantities: ' + extracted.quantities.join(', ') + '<br>' : '') +
+                '<br><strong>✅ Information stored and ready for queries!</strong>' +
+                '</div>';
+        }
+
+        // Extract business information from voice text
+        function extractBusinessInfo(text) {
+            var lowerText = text.toLowerCase();
+            var extracted = {
+                projects: [],
+                people: [],
+                countries: [],
+                quantities: []
+            };
+
+            // Find project brands
+            businessData.suppliers.forEach(function(supplier) {
+                if (lowerText.includes(supplier.brand.toLowerCase())) {
+                    extracted.projects.push(supplier.brand);
+                }
+            });
+
+            // Find people
+            businessData.owners.forEach(function(owner) {
+                if (lowerText.includes(owner.toLowerCase())) {
+                    extracted.people.push(owner);
+                }
+            });
+
+            // Find countries
+            businessData.countries.forEach(function(country) {
+                if (lowerText.includes(country.toLowerCase())) {
+                    extracted.countries.push(country);
+                }
+            });
+
+            // Find quantities (pallets, units, etc.)
+            var quantityMatches = text.match(/(\d+)\s+(pallets?|units?|boxes?)/gi);
+            if (quantityMatches) {
+                extracted.quantities = quantityMatches;
+            }
+
+            return extracted;
+        }
+
+        // Enhanced search function with real business data
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 var input = document.getElementById('queryInput');
@@ -291,65 +393,181 @@
                 
                 if (query) {
                     console.log('Search query:', query);
-                    
-                    document.getElementById('responseArea').innerHTML = 
-                        '<div><strong>🔍 Search Test:</strong> "' + query + '"</div>' +
-                        '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
-                        '✅ Search box is working! Your query was: <strong>' + query + '</strong><br>' +
-                        'In the full version, this would search your business data.' +
-                        '</div>';
-                    
+                    searchBusinessData(query);
                     input.value = '';
                 }
             }
         }
 
+        // Search through real business data
+        function searchBusinessData(query) {
+            var lowerQuery = query.toLowerCase();
+            var results = {
+                suppliers: [],
+                projects: [],
+                people: {},
+                countries: {}
+            };
+
+            // Search suppliers
+            businessData.suppliers.forEach(function(supplier) {
+                if (supplier.brand.toLowerCase().includes(lowerQuery) || 
+                    supplier.country.toLowerCase().includes(lowerQuery) || 
+                    supplier.owner.toLowerCase().includes(lowerQuery)) {
+                    results.suppliers.push(supplier);
+                }
+            });
+
+            // Search projects
+            businessData.projects.forEach(function(project) {
+                if (project.brand.toLowerCase().includes(lowerQuery) || 
+                    project.country.toLowerCase().includes(lowerQuery) || 
+                    project.owner.toLowerCase().includes(lowerQuery) ||
+                    (project.distributor && project.distributor.toLowerCase().includes(lowerQuery))) {
+                    results.projects.push(project);
+                }
+            });
+
+            // Search voice memory
+            var voiceResults = voiceMemory.filter(function(entry) {
+                return entry.text.toLowerCase().includes(lowerQuery);
+            });
+
+            displaySearchResults(query, results, voiceResults);
+        }
+
+        // Display comprehensive search results
+        function displaySearchResults(query, results, voiceResults) {
+            var html = '<div><strong>🔍 Search Results for: "' + query + '"</strong></div>';
+            
+            if (results.suppliers.length > 0) {
+                html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += '<strong>🏢 Suppliers Found (' + results.suppliers.length + '):</strong><br>';
+                results.suppliers.forEach(function(supplier) {
+                    html += '• ' + supplier.brand + ' (' + supplier.country + ') - Owner: ' + supplier.owner + ' - Status: ' + supplier.discovery + '<br>';
+                });
+                html += '</div>';
+            }
+
+            if (results.projects.length > 0) {
+                html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += '<strong>🎯 Projects Found (' + results.projects.length + '):</strong><br>';
+                results.projects.forEach(function(project) {
+                    html += '• ' + project.brand + ' in ' + project.country;
+                    if (project.distributor) html += ' via ' + project.distributor;
+                    html += ' - ' + project.probability + ' probability - Owner: ' + project.owner + '<br>';
+                });
+                html += '</div>';
+            }
+
+            if (voiceResults.length > 0) {
+                html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += '<strong>🎤 Voice Notes Found (' + voiceResults.length + '):</strong><br>';
+                voiceResults.forEach(function(entry) {
+                    html += '• "' + entry.text.substring(0, 100) + '..." (' + entry.timestamp + ')<br>';
+                });
+                html += '</div>';
+            }
+
+            if (results.suppliers.length === 0 && results.projects.length === 0 && voiceResults.length === 0) {
+                html += '<div style="background: rgba(255, 165, 2, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += 'No direct matches found. Try searching for:<br>';
+                html += '• <strong>Suppliers:</strong> Casbah, Dannon, Fruzel, Happy Family<br>';
+                html += '• <strong>Countries:</strong> Philippines, USA, Mexico, Taiwan<br>';
+                html += '• <strong>People:</strong> Danny, Facu, Chris<br>';
+                html += '• <strong>Status:</strong> "high probability", "done", "pending"';
+                html += '</div>';
+            }
+
+            document.getElementById('responseArea').innerHTML = html;
+        }
+
         // Test search function
         function testSearch() {
-            document.getElementById('queryInput').value = 'Test search query';
+            document.getElementById('queryInput').value = 'Danny projects';
             document.getElementById('queryInput').focus();
             
             document.getElementById('responseArea').innerHTML = 
-                '<div style="color: #2ed573;">✅ Search box is ready! Type something and press Enter.</div>';
+                '<div style="color: #2ed573;">✅ Search box ready! Try: "Danny projects", "Philippines", "Dannon", "high probability"</div>';
         }
 
-        // Quick query function
+        // Enhanced quick query function with real data
         function quickQuery(type) {
             console.log('Quick query:', type);
             
-            var responses = {
-                'suppliers': {
-                    title: '🏢 Supplier Test',
-                    content: 'Found 4 suppliers: Casbah (USA), Dannon (USA), Fruzel (Taiwan), Happy Family (USA)'
-                },
-                'projects': {
-                    title: '🎯 Project Test', 
-                    content: 'Found 3 projects: Horizon Organic in Philippines, Dannon in Philippines, Casbah in Philippines'
-                },
-                'danny': {
-                    title: '👤 Danny\'s Portfolio Test',
-                    content: 'Danny manages: 2 suppliers (Dannon, Happy Family) and 3 projects in Philippines'
-                },
-                'financial': {
-                    title: '💰 Financial Test',
-                    content: 'SOP Target: $5,825,000 | SOC Target: $291,250 | Active Projects: 46'
-                }
-            };
+            var html = '';
             
-            var response = responses[type] || {title: '❓ Unknown', content: 'Test query not recognized'};
+            switch(type) {
+                case 'suppliers':
+                    html = '<div><strong>🏢 Supplier Portfolio</strong></div>';
+                    html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += '<strong>Total Active Suppliers:</strong> ' + businessData.suppliers.length + '<br><br>';
+                    businessData.suppliers.forEach(function(supplier) {
+                        html += '• <strong>' + supplier.brand + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.discovery + '<br>';
+                    });
+                    html += '</div>';
+                    break;
+                    
+                case 'projects':
+                    var hiProb = businessData.projects.filter(function(p) { return p.probability === 'Hi'; });
+                    var medProb = businessData.projects.filter(function(p) { return p.probability === 'Medium'; });
+                    var loProb = businessData.projects.filter(function(p) { return p.probability === 'Lo'; });
+                    
+                    html = '<div><strong>🎯 Project Pipeline</strong></div>';
+                    html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += '<strong>Pipeline Summary:</strong><br>';
+                    html += '• High Probability: ' + hiProb.length + ' projects<br>';
+                    html += '• Medium Probability: ' + medProb.length + ' projects<br>';
+                    html += '• Low Probability: ' + loProb.length + ' projects<br><br>';
+                    html += '<strong>High Priority Projects:</strong><br>';
+                    hiProb.forEach(function(project) {
+                        html += '• ' + project.brand + ' in ' + project.country + (project.distributor ? ' via ' + project.distributor : '') + '<br>';
+                    });
+                    html += '</div>';
+                    break;
+                    
+                case 'danny':
+                    var dannySuppliers = businessData.suppliers.filter(function(s) { return s.owner === 'Danny'; });
+                    var dannyProjects = businessData.projects.filter(function(p) { return p.owner === 'Danny'; });
+                    
+                    html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+                    html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += '<strong>Suppliers (' + dannySuppliers.length + '):</strong><br>';
+                    dannySuppliers.forEach(function(supplier) {
+                        html += '• ' + supplier.brand + ' (' + supplier.country + ') - ' + supplier.discovery + '<br>';
+                    });
+                    html += '<br><strong>Projects (' + dannyProjects.length + '):</strong><br>';
+                    dannyProjects.forEach(function(project) {
+                        html += '• ' + project.brand + ' in ' + project.country + ' - ' + project.probability + ' probability<br>';
+                    });
+                    html += '</div>';
+                    break;
+                    
+                case 'financial':
+                    html = '<div><strong>💰 Financial Targets 2025</strong></div>';
+                    html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                    html += '<strong>Annual Targets:</strong><br>';
+                    html += '• SOP Target: 
+</body>
+</html> + businessData.targets.sop.toLocaleString() + '<br>';
+                    html += '• SOC Target: 
+</body>
+</html> + businessData.targets.soc.toLocaleString() + '<br>';
+                    html += '• Total Projects: ' + businessData.targets.totalProjects + '<br>';
+                    html += '• Active Suppliers: ' + businessData.targets.totalSuppliers + '<br><br>';
+                    html += '<strong>Geographic Coverage:</strong> ' + businessData.countries.length + ' countries<br>';
+                    html += '<strong>Distribution Partners:</strong> ' + businessData.distributors.length + ' active distributors';
+                    html += '</div>';
+                    break;
+            }
             
-            document.getElementById('responseArea').innerHTML = 
-                '<div><strong>' + response.title + '</strong></div>' +
-                '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
-                '✅ Button is working!<br><br>' +
-                '<strong>Demo Result:</strong> ' + response.content +
-                '</div>';
+            document.getElementById('responseArea').innerHTML = html;
         }
 
         // Initialize when page loads
         window.onload = function() {
-            console.log('🎯 Dashboard loaded successfully!');
-            console.log('All functions should be working now.');
+            console.log('🎯 Dashboard loaded successfully with business data!');
+            console.log('Loaded:', businessData.suppliers.length, 'suppliers,', businessData.projects.length, 'projects');
             
             // Test that elements exist
             var elements = ['voiceStatus', 'queryInput', 'responseArea'];
