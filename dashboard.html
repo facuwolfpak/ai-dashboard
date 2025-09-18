@@ -394,8 +394,9 @@
         // All global variables
         let isRecording = false;
         let recognition = null;
+        let voiceMemory = []; // Store all voice inputs for querying
 
-        // Project data
+        // Project data - will be updated with voice inputs
         const projectData = {
             bahamas: {
                 status: "In Progress - Behind Schedule",
@@ -410,7 +411,8 @@
                     "Construction: 📅 Waiting for permits"
                 ],
                 risks: "Permit delays could extend timeline by additional 3-4 weeks",
-                nextSteps: "Follow up with local authorities, prepare alternative timeline"
+                nextSteps: "Follow up with local authorities, prepare alternative timeline",
+                voiceNotes: [] // Store voice-specific information
             }
         };
 
@@ -544,17 +546,210 @@
         }
 
         function processVoiceInput(transcript) {
+            // Store the voice input with timestamp
+            const voiceEntry = {
+                timestamp: new Date(),
+                text: transcript,
+                processed: new Date().toLocaleString()
+            };
+            voiceMemory.push(voiceEntry);
+            
+            // Parse the transcript for key information
+            const parsedInfo = parseVoiceForKeyInfo(transcript);
+            
+            // Update project data with new information
+            if (parsedInfo.project && projectData[parsedInfo.project]) {
+                if (parsedInfo.details.length > 0) {
+                    projectData[parsedInfo.project].voiceNotes = projectData[parsedInfo.project].voiceNotes || [];
+                    projectData[parsedInfo.project].voiceNotes.push(...parsedInfo.details);
+                }
+            }
+
             const responseArea = document.getElementById('responseArea');
             responseArea.innerHTML = `
                 <div style="margin-bottom: 15px;">
                     <strong>🎤 Voice Input Processed:</strong> "${transcript.substring(0, 100)}..."
                 </div>
-                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
-                    <strong>AI Analysis:</strong><br>
-                    I've logged your debrief input and identified key topics. I can now answer specific questions about your projects based on this context.
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>AI Analysis Detected:</strong><br>
+                    ${parsedInfo.summary || 'General project update recorded'}
+                    ${parsedInfo.details.length > 0 ? '<br><br><strong>Key Details:</strong><br>• ' + parsedInfo.details.join('<br>• ') : ''}
+                </div>
+                <div style="background: rgba(46, 213, 115, 0.2); padding: 10px; border-radius: 8px;">
+                    ✅ Information stored and ready for queries
                 </div>
                 <div class="timestamp">Processed at ${new Date().toLocaleTimeString()}</div>
             `;
+
+            console.log('Voice memory updated:', voiceMemory);
+            console.log('Project data updated:', projectData);
+        }
+
+        function parseVoiceForKeyInfo(transcript) {
+            const lowerTranscript = transcript.toLowerCase();
+            const result = {
+                project: null,
+                details: [],
+                summary: null
+            };
+
+            // Detect project mentions
+            if (lowerTranscript.includes('bahamas') || lowerTranscript.includes('bahama')) {
+                result.project = 'bahamas';
+            }
+
+            // Parse specific information patterns
+            const patterns = [
+                // Yellow Bird / Yellowbird pattern
+                {
+                    regex: /(\d+)\s+(pallets?|pallet)\s+(?:of\s+)?(?:yellow\s*bird|yellowbird)/i,
+                    extract: (match) => `${match[1]} pallets of Yellow Bird ordered`
+                },
+                // Date patterns
+                {
+                    regex: /(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})/i,
+                    extract: (match) => `Scheduled for ${match[1]} ${match[2]}`
+                },
+                // Budget/money patterns
+                {
+                    regex: /\$?([\d,]+)(?:\s*(?:dollars?|k|thousand|million))?/i,
+                    extract: (match) => `Budget item: ${match[1]}`
+                },
+                // Commitment/purchase patterns
+                {
+                    regex: /(commit|committed|committing|buying|purchase|ordered?).*?(\d+.*?)(?:on|by|before)/i,
+                    extract: (match) => `Commitment: ${match[2]}`
+                }
+            ];
+
+            patterns.forEach(pattern => {
+                const match = transcript.match(pattern.regex);
+                if (match) {
+                    result.details.push(pattern.extract(match));
+                }
+            });
+
+            // Generate summary
+            if (result.project && result.details.length > 0) {
+                result.summary = `${result.project.charAt(0).toUpperCase() + result.project.slice(1)} project update with ${result.details.length} key detail${result.details.length > 1 ? 's' : ''}`;
+            }
+
+            return result;
+        }
+
+        function smartQuery(query) {
+            const lowerQuery = query.toLowerCase();
+            let response = '';
+
+            // Search voice memory for relevant information
+            const relevantVoiceInputs = voiceMemory.filter(entry => {
+                return entry.text.toLowerCase().includes(lowerQuery) ||
+                       lowerQuery.split(' ').some(word => entry.text.toLowerCase().includes(word));
+            });
+
+            // Specific query patterns
+            if (lowerQuery.includes('yellow') && (lowerQuery.includes('bird') || lowerQuery.includes('pallet'))) {
+                response = searchForYellowBird();
+            } else if (lowerQuery.includes('bahamas') || lowerQuery.includes('bahama')) {
+                response = generateEnhancedBahamasReport();
+            } else if (lowerQuery.includes('pending')) {
+                response = generatePendingReport();
+            } else if (lowerQuery.includes('timeline') || lowerQuery.includes('schedule')) {
+                response = generateTimelineReport();
+            } else if (lowerQuery.includes('budget') || lowerQuery.includes('money')) {
+                response = generateBudgetReport();
+            } else {
+                // General search through voice memory
+                response = searchVoiceMemory(query, relevantVoiceInputs);
+            }
+
+            return response;
+        }
+
+        function searchForYellowBird() {
+            // Search through voice memory and project data for Yellow Bird mentions
+            const yellowBirdInfo = [];
+            
+            voiceMemory.forEach(entry => {
+                const text = entry.text.toLowerCase();
+                if (text.includes('yellow bird') || text.includes('yellowbird')) {
+                    // Extract pallet information
+                    const palletMatch = text.match(/(\d+)\s+(pallets?|pallet)/i);
+                    const dateMatch = text.match(/(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})/i);
+                    
+                    yellowBirdInfo.push({
+                        pallets: palletMatch ? palletMatch[1] : 'mentioned',
+                        date: dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : 'date not specified',
+                        fullText: entry.text.substring(0, 100) + '...',
+                        timestamp: entry.processed
+                    });
+                }
+            });
+
+            if (yellowBirdInfo.length > 0) {
+                const totalPallets = yellowBirdInfo.reduce((sum, info) => {
+                    return sum + (parseInt(info.pallets) || 0);
+                }, 0);
+
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🐦 Yellow Bird Search Results</strong>
+                    </div>
+                    
+                    <div style="background: rgba(255,193,7,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>📦 Total Pallets Found:</strong> ${totalPallets > 0 ? totalPallets + ' pallets' : 'Pallets mentioned but quantity needs clarification'}
+                    </div>
+
+                    ${yellowBirdInfo.map(info => `
+                        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                            <strong>Pallets:</strong> ${info.pallets}<br>
+                            <strong>Date:</strong> ${info.date}<br>
+                            <strong>From voice note:</strong> "${info.fullText}"<br>
+                            <small style="opacity: 0.7;">Recorded: ${info.timestamp}</small>
+                        </div>
+                    `).join('')}
+
+                    <div class="timestamp">Query processed ${new Date().toLocaleString()}</div>
+                `;
+            } else {
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🐦 Yellow Bird Search Results</strong>
+                    </div>
+                    
+                    <div style="background: rgba(255,107,107,0.2); padding: 15px; border-radius: 10px;">
+                        <strong>No Yellow Bird information found</strong><br>
+                        Try recording a voice note about Yellow Bird orders, then ask again.
+                    </div>
+                `;
+            }
+        }
+
+        function searchVoiceMemory(query, relevantInputs) {
+            if (relevantInputs.length > 0) {
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🔍 Search Results for: "${query}"</strong>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
+                        <strong>Found ${relevantInputs.length} relevant voice note${relevantInputs.length > 1 ? 's' : ''}:</strong><br><br>
+                        ${relevantInputs.map(entry => `
+                            • "${entry.text.substring(0, 150)}..."<br>
+                            <small style="opacity: 0.7;">Recorded: ${entry.processed}</small>
+                        `).join('<br><br>')}
+                    </div>
+
+                    <div class="timestamp">Search completed ${new Date().toLocaleString()}</div>
+                `;
+            } else {
+                return `
+                    <div>I searched for: "${query}"</div>
+                    <div style="margin-top: 15px; background: rgba(255,165,2,0.2); padding: 15px; border-radius: 10px;">
+                        No matching information found in voice notes. Try recording more details first, then search again.
+                    </div>
+                `;
+            }
         }
 
         function handleQuickQuery(type) {
@@ -563,7 +758,7 @@
 
             switch(type) {
                 case 'bahamas':
-                    response = generateBahamasReport();
+                    response = generateEnhancedBahamasReport();
                     break;
                 case 'pending':
                     response = generatePendingReport();
@@ -579,8 +774,10 @@
             responseArea.innerHTML = response;
         }
 
-        function generateBahamasReport() {
+        function generateEnhancedBahamasReport() {
             const data = projectData.bahamas;
+            const voiceNotes = data.voiceNotes || [];
+            
             return `
                 <div style="margin-bottom: 15px;">
                     <strong>🏝️ Bahamas Project Status Report</strong>
@@ -597,6 +794,13 @@
                     <strong>⚠️ Critical Issue:</strong><br>
                     ${data.lastUpdate}
                 </div>
+
+                ${voiceNotes.length > 0 ? `
+                    <div style="background: rgba(46,213,115,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>📝 Recent Voice Updates:</strong><br>
+                        ${voiceNotes.map(note => `• ${note}`).join('<br>')}
+                    </div>
+                ` : ''}
 
                 <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
                     <strong>Key Milestones:</strong><br>
@@ -686,23 +890,13 @@
             if (queryInput) {
                 queryInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        const query = e.target.value.toLowerCase();
-                        if (query.includes('bahamas')) {
-                            handleQuickQuery('bahamas');
-                        } else if (query.includes('pending')) {
-                            handleQuickQuery('pending');
-                        } else if (query.includes('timeline') || query.includes('schedule')) {
-                            handleQuickQuery('timeline');
-                        } else if (query.includes('budget') || query.includes('money')) {
-                            handleQuickQuery('budget');
-                        } else {
-                            document.getElementById('responseArea').innerHTML = `
-                                <div>I understand you're asking: "${e.target.value}"</div>
-                                <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">
-                                    I'm analyzing your query and cross-referencing with project data. Try asking about specific projects like "Bahamas status" or "show pending items".
-                                </div>
-                            `;
-                        }
+                        const query = e.target.value;
+                        console.log('Query entered:', query);
+                        
+                        // Use smart query system
+                        const response = smartQuery(query);
+                        document.getElementById('responseArea').innerHTML = response;
+                        
                         e.target.value = '';
                     }
                 });
