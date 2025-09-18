@@ -103,7 +103,7 @@
                 </p>
                 
                 <input type="text" class="query-input" id="searchBox" 
-                       placeholder="Search: 'Danny projects', 'Philippines', 'high probability'...">
+                       placeholder="Search: 'Danny projects', 'Yellow Bird', 'high probability'...">
                 
                 <div class="btn-grid">
                     <button class="btn" id="suppliersBtn">🏢 Supplier Portfolio</button>
@@ -114,7 +114,7 @@
 
                 <div class="response-area" id="results">
                     <div style="opacity: 0.6;">
-                        🎯 <strong>Ready!</strong> Click any button above or use the search box to explore your business data.
+                        🎯 <strong>Ready!</strong> Click any button above or search to explore your business data.
                     </div>
                 </div>
             </div>
@@ -124,30 +124,78 @@
     <script>
         console.log('🚀 Dashboard starting...');
 
-        // Business data
+        // Complete business data from Excel
         var data = {
             suppliers: [
-                {name: "Casbah", country: "USA", owner: "Facu", status: "Active"},
-                {name: "Dannon", country: "USA", owner: "Danny", status: "Active"},
-                {name: "Fruzel", country: "Taiwan", owner: "Chris", status: "Active"},
-                {name: "Happy Family", country: "USA", owner: "Danny", status: "Active"},
-                {name: "CP Ram", country: "USA", owner: "Facu", status: "Active"},
-                {name: "Catalina Crunch", country: "USA", owner: "Facu", status: "In Progress"},
-                {name: "Diamond Brew", country: "USA", owner: "Chris", status: "Early Stage"},
-                {name: "Goodles", country: "USA", owner: "Danny", status: "Analysis"}
+                {name: "Casbah", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Dannon", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Fruzel", country: "Taiwan", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Happy Family", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Horizon Organic", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "International Delight", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Mill & Folks", country: "Hungary", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Root Foods", country: "Vietnam", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Vermints", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Yellow Bird", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "CP Ram", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Wavers", country: "Canada", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Nature Valley", country: "USA", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Amy's Kitchen", country: "USA", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Cascadian Farm", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {name: "Catalina Crunch", country: "USA", owner: "Facu", discovery: "In Progress", specSheets: "Pending", priceList: "Pending"},
+                {name: "Diamond Brew", country: "USA", owner: "Chris", discovery: "Too Early", specSheets: "Not Started", priceList: "Not Started"},
+                {name: "Goodles", country: "USA", owner: "Danny", discovery: "Analysis", specSheets: "In Process", priceList: "Pending"},
+                {name: "Potential Brand", country: "Various", owner: "TBD", discovery: "Pipeline", specSheets: "Future", priceList: "Future"}
             ],
             projects: [
-                {name: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
-                {name: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
-                {name: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo"},
-                {name: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Danny", probability: "Hi"},
-                {name: "Happy Family", country: "Canada", distributor: "AMG", owner: "Danny", probability: "Hi"},
-                {name: "Dannon", country: "Australia", distributor: "Butter Field Vallis", owner: "Chris", probability: "Medium"},
-                {name: "Casbah", country: "Caribbean", distributor: "Colomer & Suarez", owner: "Facu", probability: "Hi"}
-            ]
+                // High probability projects
+                {name: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Facu", probability: "Hi", presented: "Done", sop: 1000000, soc: 50000},
+                {name: "Yellow Bird", country: "Peru", distributor: "Power Nature", owner: "Danny", probability: "Hi", presented: "Done", sop: 25000, soc: 1250},
+                {name: "Yellow Bird", country: "Australia", distributor: "Stellar Distributor", owner: "Danny", probability: "Hi", presented: "Done", sop: 200000, soc: 10000},
+                
+                // Medium probability projects  
+                {name: "Yellow Bird", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", presented: "Done", sop: 50000, soc: 2500},
+                {name: "Wavers", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", presented: "Done", sop: 30000, soc: 1500},
+                {name: "Fruzel", country: "Bermuda", distributor: "AMG", owner: "Danny", probability: "Med", presented: "Done", sop: 40000, soc: 2000},
+                {name: "Yellow Bird", country: "Caribbean", distributor: "Butter Field Vallis", owner: "Danny", probability: "Med", presented: "Done", sop: 75000, soc: 3750},
+                {name: "Wavers", country: "Caribbean", distributor: "Butter Field Vallis", owner: "Danny", probability: "Med", presented: "Done", sop: 45000, soc: 2250},
+                {name: "Yellow Bird", country: "Puerto Rico", distributor: "Colomer & Suarez", owner: "Danny", probability: "Med", presented: "Done", sop: 100000, soc: 5000},
+                
+                // Low probability projects
+                {name: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "CP Ram", country: "USA", distributor: "Direct", owner: "Chris", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Vermints", country: "USA", distributor: "Direct", owner: "Chris", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Horizon Organic", country: "Panama", distributor: "Eatics", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Panama", distributor: "Eatics", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Wavers", country: "Panama", distributor: "Eatics", owner: "Danny", probability: "Lo", presented: "Done", sop: 0, soc: 0},
+                {name: "Horizon Organic", country: "Israel", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Israel", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Wavers", country: "Israel", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "South Korea", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Wavers", country: "South Korea", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Thailand", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Wavers", country: "Thailand", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Chile", distributor: "Colomer & Suarez", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Wavers", country: "Chile", distributor: "Colomer & Suarez", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "India", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Jordan", distributor: "TBD", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0},
+                {name: "Yellow Bird", country: "Dominican Republic", distributor: "CP Group", owner: "Danny", probability: "Lo", presented: "Pending", sop: 0, soc: 0}
+            ],
+            countries: ["USA", "Mexico", "Philippines", "Taiwan", "Hungary", "Vietnam", "Canada", "Australia", "Bermuda", "Panama", "Peru", "Caribbean", "Puerto Rico", "Israel", "South Korea", "Thailand", "Chile", "India", "Jordan", "Dominican Republic"],
+            distributors: ["Linkage Foods", "Eatics", "AMG", "Butter Field Vallis", "Colomer & Suarez", "Power Nature", "Stellar Distributor", "CP Group", "Direct"],
+            owners: ["Danny", "Facu", "Chris"],
+            financials: {
+                targetSOP: 15482000,
+                targetSOC: 774100,
+                currentSOP: 15482000,
+                currentSOC: 774100
+            }
         };
 
         var isRecording = false;
+        var voiceMemory = [];
 
         // Microphone function
         function micClick() {
@@ -163,16 +211,10 @@
                 status.innerHTML = '✅ Processing...';
                 
                 setTimeout(function() {
-                    var demo = "Update on Dannon project: Linkage Foods confirmed order increase to 5 pallets for Q2 delivery. Philippines market looking strong.";
+                    var demo = "Update on Yellow Bird: confirmed 3 pallets delivery to Australia via Stellar Distributor for October 1st. Also, Danny mentioned Philippines projects with Linkage Foods are progressing well.";
                     transcript.innerHTML = '"' + demo + '"';
                     
-                    document.getElementById('results').innerHTML = 
-                        '<div><strong>🎤 Voice Update Processed</strong></div>' +
-                        '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">' +
-                        '<strong>Detected:</strong> Dannon, Philippines, Linkage Foods, 5 pallets, Q2<br>' +
-                        '✅ Information stored and ready for queries!' +
-                        '</div>';
-                    
+                    processVoiceInput(demo);
                     status.innerHTML = 'Voice processed! Click to record again';
                 }, 2000);
             } else {
@@ -194,72 +236,136 @@
             var html = '<div><strong>🏢 Supplier Portfolio (' + data.suppliers.length + ' total)</strong></div>';
             html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
             
-            data.suppliers.forEach(function(supplier) {
-                html += '• <strong>' + supplier.name + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.status + '<br>';
+            // Group by status
+            var activeSuppliers = data.suppliers.filter(function(s) { return s.discovery === 'Done'; });
+            var inProgressSuppliers = data.suppliers.filter(function(s) { return s.discovery !== 'Done'; });
+            
+            html += '<strong>✅ Active Suppliers (' + activeSuppliers.length + '):</strong><br>';
+            activeSuppliers.forEach(function(supplier) {
+                html += '• <strong>' + supplier.name + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - All docs complete<br>';
+            });
+            
+            if (inProgressSuppliers.length > 0) {
+                html += '<br><strong>🚧 In Progress (' + inProgressSuppliers.length + '):</strong><br>';
+                inProgressSuppliers.forEach(function(supplier) {
+                    html += '• <strong>' + supplier.name + '</strong> (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.discovery + '<br>';
+                });
+            }
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Show projects with real financial data
+        function showProjects() {
+            console.log('📊 Showing projects');
+            var hiProb = data.projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = data.projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = data.projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            // Calculate revenue for each category
+            var hiRevenue = hiProb.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+            var medRevenue = medProb.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + data.projects.length + ' total projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            
+            html += '<strong>📊 Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRevenue.toLocaleString() + ' revenue)<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRevenue.toLocaleString() + ' revenue)<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline development)<br><br>';
+            
+            html += '<strong>🔥 High Priority Projects:</strong><br>';
+            hiProb.forEach(function(project) {
+                html += '• <strong>' + project.name + '</strong> in ' + project.country + ' via ' + project.distributor + ' - $' + (project.sop || 0).toLocaleString() + '<br>';
+            });
+            
+            html += '<br><strong>⚡ Medium Priority Projects:</strong><br>';
+            medProb.slice(0, 5).forEach(function(project) {
+                html += '• ' + project.name + ' in ' + project.country + ' via ' + project.distributor + ' - $' + (project.sop || 0).toLocaleString() + '<br>';
+            });
+            
+            if (medProb.length > 5) {
+                html += '• ... and ' + (medProb.length - 5) + ' more medium probability projects<br>';
+            }
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Show Danny's complete portfolio
+        function showDanny() {
+            console.log('📊 Showing Danny portfolio');
+            var dannySuppliers = data.suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = data.projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRevenue = dannyProjects.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            
+            html += '<strong>📊 Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue Pipeline: $' + dannyRevenue.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Danny\'s Suppliers (' + dannySuppliers.length + '):</strong><br>';
+            dannySuppliers.forEach(function(supplier) {
+                html += '• ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.discovery + '<br>';
+            });
+            
+            html += '<br><strong>🎯 Danny\'s High-Value Projects:</strong><br>';
+            var highValueProjects = dannyProjects.filter(function(p) { return (p.sop || 0) > 0; });
+            highValueProjects.forEach(function(project) {
+                html += '• ' + project.name + ' in ' + project.country + ' - ' + project.probability + ' probability - $' + (project.sop || 0).toLocaleString() + '<br>';
+            });
+            
+            html += '<br><strong>📍 Geographic Reach:</strong><br>';
+            var dannyCountries = [...new Set(dannyProjects.map(function(p) { return p.country; }))];
+            html += dannyCountries.join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Show enhanced financial data
+        function showFinancial() {
+            console.log('📊 Showing financial');
+            var totalRevenue = data.projects.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+            var totalCosts = data.projects.reduce(function(sum, p) { return sum + (p.soc || 0); }, 0);
+            var hiProbRevenue = data.projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+            var medProbRevenue = data.projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            
+            html += '<strong>🎯 Annual Targets:</strong><br>';
+            html += '• SOP Target: $' + data.financials.targetSOP.toLocaleString() + '<br>';
+            html += '• SOC Target: $' + data.financials.targetSOC.toLocaleString() + '<br>';
+            html += '• Current Pipeline: $' + totalRevenue.toLocaleString() + '<br>';
+            html += '• Target Achievement: ' + Math.round((totalRevenue / data.financials.targetSOP) * 100) + '%<br><br>';
+            
+            html += '<strong>💎 Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiProbRevenue.toLocaleString() + ' (' + Math.round((hiProbRevenue / totalRevenue) * 100) + '%)<br>';
+            html += '• Medium Probability: $' + medProbRevenue.toLocaleString() + ' (' + Math.round((medProbRevenue / totalRevenue) * 100) + '%)<br>';
+            html += '• Low Probability: Pipeline development<br><br>';
+            
+            html += '<strong>🌍 Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + data.suppliers.length + '<br>';
+            html += '• Total Projects: ' + data.projects.length + '<br>';
+            html += '• Countries: ' + data.countries.length + ' markets<br>';
+            html += '• Distribution Partners: ' + data.distributors.length + '<br><br>';
+            
+            html += '<strong>🔥 Top Revenue Projects:</strong><br>';
+            var topProjects = data.projects.filter(function(p) { return (p.sop || 0) > 0; }).sort(function(a, b) { return (b.sop || 0) - (a.sop || 0); });
+            topProjects.slice(0, 5).forEach(function(project) {
+                html += '• ' + project.name + ' (' + project.country + ') - $' + (project.sop || 0).toLocaleString() + '<br>';
             });
             
             html += '</div>';
             document.getElementById('results').innerHTML = html;
         }
 
-        // Show projects
-        function showProjects() {
-            console.log('📊 Showing projects');
-            var hiProb = data.projects.filter(function(p) { return p.probability === 'Hi'; });
-            var medProb = data.projects.filter(function(p) { return p.probability === 'Medium'; });
-            var loProb = data.projects.filter(function(p) { return p.probability === 'Lo'; });
-
-            var html = '<div><strong>🎯 Project Pipeline</strong></div>';
-            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-            html += '<strong>Pipeline Summary:</strong><br>';
-            html += '• High Probability: ' + hiProb.length + ' projects<br>';
-            html += '• Medium Probability: ' + medProb.length + ' projects<br>';
-            html += '• Low Probability: ' + loProb.length + ' projects<br><br>';
-            html += '<strong>High Priority Projects:</strong><br>';
-            hiProb.forEach(function(project) {
-                html += '• ' + project.name + ' in ' + project.country + (project.distributor ? ' via ' + project.distributor : '') + '<br>';
-            });
-            html += '</div>';
-            document.getElementById('results').innerHTML = html;
-        }
-
-        // Show Danny's portfolio
-        function showDanny() {
-            console.log('📊 Showing Danny portfolio');
-            var dannySuppliers = data.suppliers.filter(function(s) { return s.owner === 'Danny'; });
-            var dannyProjects = data.projects.filter(function(p) { return p.owner === 'Danny'; });
-
-            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
-            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-            html += '<strong>Suppliers (' + dannySuppliers.length + '):</strong><br>';
-            dannySuppliers.forEach(function(supplier) {
-                html += '• ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.status + '<br>';
-            });
-            html += '<br><strong>Projects (' + dannyProjects.length + '):</strong><br>';
-            dannyProjects.forEach(function(project) {
-                html += '• ' + project.name + ' in ' + project.country + ' - ' + project.probability + ' probability<br>';
-            });
-            html += '</div>';
-            document.getElementById('results').innerHTML = html;
-        }
-
-        // Show financial
-        function showFinancial() {
-            console.log('📊 Showing financial');
-            var html = '<div><strong>💰 Financial Targets 2025</strong></div>';
-            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-            html += '<strong>Annual Targets:</strong><br>';
-            html += '• SOP Target: $5,825,000<br>';
-            html += '• SOC Target: $291,250<br>';
-            html += '• Total Projects: 46<br>';
-            html += '• Active Suppliers: ' + data.suppliers.length + '<br><br>';
-            html += '<strong>Geographic Coverage:</strong> 18+ countries<br>';
-            html += '<strong>Distribution Partners:</strong> 6 active distributors';
-            html += '</div>';
-            document.getElementById('results').innerHTML = html;
-        }
-
-        // Search function
+        // Enhanced search function
         function searchData(query) {
             console.log('🔍 Searching for:', query);
             var lowerQuery = query.toLowerCase();
@@ -269,8 +375,9 @@
             data.suppliers.forEach(function(supplier) {
                 if (supplier.name.toLowerCase().includes(lowerQuery) || 
                     supplier.owner.toLowerCase().includes(lowerQuery) ||
-                    supplier.country.toLowerCase().includes(lowerQuery)) {
-                    results.push('🏢 Supplier: ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.owner);
+                    supplier.country.toLowerCase().includes(lowerQuery) ||
+                    supplier.discovery.toLowerCase().includes(lowerQuery)) {
+                    results.push('🏢 Supplier: ' + supplier.name + ' (' + supplier.country + ') - ' + supplier.owner + ' - ' + supplier.discovery);
                 }
             });
 
@@ -279,10 +386,25 @@
                 if (project.name.toLowerCase().includes(lowerQuery) || 
                     project.owner.toLowerCase().includes(lowerQuery) ||
                     project.country.toLowerCase().includes(lowerQuery) ||
-                    project.probability.toLowerCase().includes(lowerQuery)) {
-                    results.push('🎯 Project: ' + project.name + ' in ' + project.country + ' - ' + project.probability);
+                    project.probability.toLowerCase().includes(lowerQuery) ||
+                    (project.distributor && project.distributor.toLowerCase().includes(lowerQuery))) {
+                    var revenue = (project.sop || 0) > 0 ? ' - $' + (project.sop || 0).toLocaleString() : '';
+                    results.push('🎯 Project: ' + project.name + ' in ' + project.country + ' - ' + project.probability + ' probability' + revenue);
                 }
             });
+
+            // Special searches
+            if (lowerQuery.includes('yellow bird') || lowerQuery.includes('yellowbird')) {
+                var yellowBirdProjects = data.projects.filter(function(p) { return p.name.toLowerCase().includes('yellow bird'); });
+                var yellowBirdRevenue = yellowBirdProjects.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+                results.unshift('🐦 Yellow Bird Portfolio: ' + yellowBirdProjects.length + ' projects, $' + yellowBirdRevenue.toLocaleString() + ' revenue');
+            }
+
+            if (lowerQuery.includes('high probability') || lowerQuery.includes('hi prob')) {
+                var hiProjects = data.projects.filter(function(p) { return p.probability === 'Hi'; });
+                var hiRevenue = hiProjects.reduce(function(sum, p) { return sum + (p.sop || 0); }, 0);
+                results.unshift('🔥 High Probability: ' + hiProjects.length + ' projects, $' + hiRevenue.toLocaleString() + ' revenue');
+            }
 
             var html = '<div><strong>🔍 Search Results for: "' + query + '"</strong></div>';
             if (results.length > 0) {
@@ -294,36 +416,7 @@
                 html += '</div>';
             } else {
                 html += '<div style="background: rgba(255, 165, 2, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                html += 'No results found. Try: "Danny", "Philippines", "high probability", "Dannon"';
-                html += '</div>';
-            }
-
-            document.getElementById('results').innerHTML = html;
-        }
-
-        // Initialize everything when page loads
-        window.addEventListener('load', function() {
-            console.log('✅ Dashboard loaded with', data.suppliers.length, 'suppliers and', data.projects.length, 'projects');
-
-            // Connect microphone button
-            document.getElementById('micBtn').addEventListener('click', micClick);
-
-            // Connect search box
-            document.getElementById('searchBox').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    searchData(this.value.trim());
-                    this.value = '';
-                }
-            });
-
-            // Connect all buttons
-            document.getElementById('suppliersBtn').addEventListener('click', showSuppliers);
-            document.getElementById('projectsBtn').addEventListener('click', showProjects);
-            document.getElementById('dannyBtn').addEventListener('click', showDanny);
-            document.getElementById('financialBtn').addEventListener('click', showFinancial);
-
-            console.log('🎯 All buttons connected and ready!');
-        });
-    </script>
-</body>
-</html>
+                html += 'No results found. Try searching for:<br>';
+                html += '• <strong>People:</strong> Danny, Facu, Chris<br>';
+                html += '• <strong>Countries:</strong> Philippines, Mexico, USA, Australia<br>';
+                html
