@@ -612,6 +612,70 @@
         }
 
         function processVoiceInput(transcript) {
+            // Determine if this is a query or an update based on content
+            const isQuery = isVoiceQuery(transcript);
+            
+            if (isQuery) {
+                // Process as a query
+                processVoiceQuery(transcript);
+            } else {
+                // Process as an update/debrief
+                processVoiceUpdate(transcript);
+            }
+        }
+
+        function isVoiceQuery(transcript) {
+            const lowerTranscript = transcript.toLowerCase();
+            const queryPatterns = [
+                // Question words
+                /\b(what|where|when|why|how|who)\b/,
+                // Question phrases
+                /\b(show me|tell me|give me|find|search)\b/,
+                // Direct questions
+                /\b(how many|how much|what is|where are|when is)\b/,
+                // Query-specific terms
+                /\b(status|report|update|pending|budget|timeline)\b.*\?/,
+                // Question ending
+                /\?$/
+            ];
+
+            return queryPatterns.some(pattern => pattern.test(lowerTranscript));
+        }
+
+        function processVoiceQuery(transcript) {
+            const responseArea = document.getElementById('responseArea');
+            
+            // Show that we're processing a query
+            responseArea.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong>🎤 Voice Query:</strong> "${transcript}"
+                </div>
+                <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px;">
+                    🔍 Processing your question...
+                </div>
+            `;
+
+            // Process the query using our smart query system
+            setTimeout(() => {
+                const response = smartQuery(transcript);
+                responseArea.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🎤 Voice Query:</strong> "${transcript}"
+                    </div>
+                    ${response}
+                `;
+            }, 1000);
+
+            // Update voice status
+            document.getElementById('voiceStatus').innerHTML = `
+                <div>✅ Voice query processed!</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; color: #54a0ff;">
+                    Ask another question or record an update
+                </div>
+            `;
+        }
+
+        function processVoiceUpdate(transcript) {
             // Store the voice input with timestamp
             const voiceEntry = {
                 timestamp: new Date(),
@@ -634,7 +698,7 @@
             const responseArea = document.getElementById('responseArea');
             responseArea.innerHTML = `
                 <div style="margin-bottom: 15px;">
-                    <strong>🎤 Voice Input Processed:</strong> "${transcript.substring(0, 100)}..."
+                    <strong>🎤 Voice Update Recorded:</strong> "${transcript.substring(0, 100)}..."
                 </div>
                 <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                     <strong>AI Analysis Detected:</strong><br>
@@ -645,6 +709,14 @@
                     ✅ Information stored and ready for queries
                 </div>
                 <div class="timestamp">Processed at ${new Date().toLocaleTimeString()}</div>
+            `;
+
+            // Update voice status
+            document.getElementById('voiceStatus').innerHTML = `
+                <div>✅ Update recorded!</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; color: #2ed573;">
+                    Information saved - ask questions about it anytime
+                </div>
             `;
 
             console.log('Voice memory updated:', voiceMemory);
