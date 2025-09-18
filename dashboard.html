@@ -1,4 +1,127 @@
-<!DOCTYPE html>
+function smartQuery(query) {
+            const lowerQuery = query.toLowerCase();
+            let response = '';
+
+            // Search voice memory for relevant information
+            const relevantVoiceInputs = voiceMemory.filter(entry => {
+                return entry.text.toLowerCase().includes(lowerQuery) ||
+                       lowerQuery.split(' ').some(word => entry.text.toLowerCase().includes(word));
+            });
+
+            // Enhanced query patterns for your actual business
+            if (lowerQuery.includes('supplier') || lowerQuery.includes('brand')) {
+                response = searchSuppliers(query);
+            } else if (lowerQuery.includes('project') || lowerQuery.includes('probability')) {
+                response = searchProjects(query);  
+            } else if (lowerQuery.includes('owner') || (lowerQuery.includes('danny') || lowerQuery.includes('facu') || lowerQuery.includes('chris'))) {
+                response = searchByOwner(query);
+            } else if (lowerQuery.includes('country') || lowerQuery.includes('philippines') || lowerQuery.includes('usa') || lowerQuery.includes('mexico')) {
+                response = searchByCountry(query);
+            } else if (lowerQuery.includes('distributor') || lowerQuery.includes('linkage') || lowerQuery.includes('eatics')) {
+                response = searchDistributors(query);
+            } else if (lowerQuery.includes('yellow') && (lowerQuery.includes('bird') || lowerQuery.includes('pallet'))) {
+                response = searchForYellowBird();
+            } else if (lowerQuery.includes('bahamas') || lowerQuery.includes('bahama')) {
+                response = generateEnhancedBahamasReport();
+            } else if (lowerQuery.includes('pending') || lowerQuery.includes('status')) {
+                response = generateBusinessStatusReport();
+            } else if (lowerQuery.includes('timeline') || lowerQuery.includes('schedule')) {
+                response = generateTimelineReport();
+            } else if (lowerQuery.includes('budget') || lowerQuery.includes('money') || lowerQuery.includes('sop') || lowerQuery.includes('soc')) {
+                response = generateFinancialReport();
+            } else {
+                // General search through voice memory and business data
+                response = searchBusinessData(query, relevantVoiceInputs);
+            }
+
+            return response;
+        }
+
+        function searchSuppliers(query) {
+            const lowerQuery = query.toLowerCase();
+            const matchingSuppliers = dashboardData.suppliers.filter(supplier => 
+                supplier.brand.toLowerCase().includes(lowerQuery) ||
+                supplier.country.toLowerCase().includes(lowerQuery) ||
+                supplier.owner.toLowerCase().includes(lowerQuery)
+            );
+
+            if (matchingSuppliers.length > 0) {
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>🏢 Supplier Search Results</strong>
+                    </div>
+                    
+                    <div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>Found ${matchingSuppliers.length} matching suppliers:</strong>
+                    </div>
+
+                    ${matchingSuppliers.map(supplier => `
+                        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                            <strong>Brand:</strong> ${supplier.brand}<br>
+                            <strong>Country:</strong> ${supplier.country}<br>
+                            <strong>Owner:</strong> ${supplier.owner}<br>
+                            <strong>Status:</strong> Discovery: ${supplier.discovery}, Specs: ${supplier.specSheets}, Pricing: ${supplier.priceList}
+                        </div>
+                    `).join('')}
+
+                    <div class="timestamp">Search completed ${new Date().toLocaleString()}</div>
+                `;
+            } else {
+                return `
+                    <div style="background: rgba(255,107,107,0.2); padding: 15px; border-radius: 10px;">
+                        <strong>No suppliers found matching: "${query}"</strong><br>
+                        Try searching for: Casbah, Dannon, Fruzel, Happy Family, or by owner (Danny, Facu, Chris)
+                    </div>
+                `;
+            }
+        }
+
+        function searchProjects(query) {
+            const lowerQuery = query.toLowerCase();
+            const matchingProjects = dashboardData.projects.filter(project =>
+                project.brand.toLowerCase().includes(lowerQuery) ||
+                project.country.toLowerCase().includes(lowerQuery) ||
+                project.distributor.toLowerCase().includes(lowerQuery) ||
+                project.probability.toLowerCase().includes(lowerQuery)
+            );
+
+            return `
+                <div style="margin-bottom: 15px;">
+                    <strong>🎯 Project Search Results</strong>
+                </div>
+                
+                <div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>Found ${matchingProjects.length} matching projects:</strong>
+                </div>
+
+                ${matchingProjects.map(project => `
+                    <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                        <strong>${project.brand}</strong> in ${project.country}<br>
+                        <strong>Distributor:</strong> ${project.distributor || 'TBD'}<br>
+                        <strong>Owner:</strong> ${project.owner}<br>
+                        <strong>Probability:</strong> <span style="color: ${project.probability === 'Hi' ? '#2ed573' : project.probability === 'Lo' ? '#ff6b6b' : '#ffa502'}">${project.probability}</span><br>
+                        <strong>Status:</strong> ${project.presented ? 'Presented ✅' : 'Not presented'} ${project.valueChain ? 'Value Chain ✅' : ''}
+                    </div>
+                `).join('')}
+
+                <div class="timestamp">Updated ${new Date().toLocaleString()}</div>
+            `;
+        }
+
+        function searchByOwner(query) {
+            const lowerQuery = query.toLowerCase();
+            const owner = dashboardData.owners.find(o => lowerQuery.includes(o.toLowerCase()));
+            
+            if (owner) {
+                const ownerSuppliers = dashboardData.suppliers.filter(s => s.owner === owner);
+                const ownerProjects = dashboardData.projects.filter(p => p.owner === owner);
+                
+                return `
+                    <div style="margin-bottom: 15px;">
+                        <strong>👤 ${owner}'s Portfolio</strong>
+                    </div>
+                    
+                    <div style="backgroun<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -281,8 +404,11 @@
             </div>
 
             <div class="query-section">
-                <h2>🔍 Ask Anything</h2>
-                <input type="text" class="query-input" id="queryInput" placeholder="Ask about your projects... 'Where are we on Bahamas?'">
+                <h2>🔍 Ask Questions</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">
+                    Type OR use voice (microphone button) to ask questions
+                </p>
+                <input type="text" class="query-input" id="queryInput" placeholder="Type: 'How many Yellow Bird pallets?' or use voice →">
                 
                 <div class="quick-queries">
                     <button class="quick-query-btn" data-query="bahamas">📍 Where are we on Bahamas?</button>
@@ -292,7 +418,7 @@
                 </div>
 
                 <div class="response-area" id="responseArea">
-                    <div style="opacity: 0.6;">Ask a question to see AI-organized insights...</div>
+                    <div style="opacity: 0.6;">Ask a question (voice or text) to see AI-organized insights...</div>
                 </div>
             </div>
         </div>
@@ -396,10 +522,38 @@
         let recognition = null;
         let voiceMemory = []; // Store all voice inputs for querying
 
-        // Project data - will be updated with voice inputs
+        // Real project data from your Excel dashboard
+        const dashboardData = {
+            suppliers: [
+                {brand: "Casbah", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Dannon", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Fruzel", country: "Taiwan", owner: "Chris", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "Happy Family", country: "USA", owner: "Danny", discovery: "Done", specSheets: "Done", priceList: "Done"},
+                {brand: "CP Ram", country: "USA", owner: "Facu", discovery: "Done", specSheets: "Done", priceList: "Done"}
+            ],
+            projects: [
+                {brand: "Horizon Organic", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
+                {brand: "Dannon", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done", valueChain: "Done"},
+                {brand: "Casbah", country: "Philippines", distributor: "Linkage Foods", owner: "Danny", probability: "Lo", presented: "Done"},
+                {brand: "Horizon Organic", country: "Mexico", distributor: "Eatics", owner: "Danny", probability: "Hi", presented: "Done"},
+                {brand: "CP Ram", country: "USA", owner: "Danny", probability: "Lo", presented: "Done"}
+            ],
+            owners: ["Danny", "Facu", "Chris"],
+            countries: ["USA", "Philippines", "Mexico", "Taiwan", "Canada", "Australia", "Caribbean"],
+            distributors: ["Linkage Foods", "Eatics", "AMG", "Butter Field Vallis"],
+            retailers: ["Costco", "Dollar General", "Healthy Options"],
+            metadata: {
+                totalSuppliers: 19,
+                activeProjects: 46,
+                targetSOP: 5825000,
+                targetSOC: 291250
+            }
+        };
+
+        // Legacy project data for backwards compatibility
         const projectData = {
             bahamas: {
-                status: "In Progress - Behind Schedule",
+                status: "In Progress - Behind Schedule", 
                 progress: "65% complete",
                 budget: "$850k spent of $1.2M budget",
                 timeline: "2 weeks behind original schedule",
@@ -412,7 +566,7 @@
                 ],
                 risks: "Permit delays could extend timeline by additional 3-4 weeks",
                 nextSteps: "Follow up with local authorities, prepare alternative timeline",
-                voiceNotes: [] // Store voice-specific information
+                voiceNotes: []
             }
         };
 
