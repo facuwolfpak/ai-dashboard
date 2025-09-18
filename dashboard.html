@@ -117,11 +117,13 @@
             background: rgba(46, 213, 115, 0.8);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 8px 15px;
+            border-radius: 8px;
             cursor: pointer;
             margin: 5px;
             transition: all 0.3s ease;
+            font-size: 0.8rem;
+            display: none; /* Hidden by default */
         }
 
         .test-btn:hover {
@@ -190,14 +192,20 @@
         <div class="main-grid">
             <div class="voice-section">
                 <h2>🎤 Voice Interface</h2>
-                
-                <!-- Test button to verify JavaScript is working -->
-                <button class="test-btn" onclick="testFunction()">🔧 Test JavaScript</button>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">
+                    Record business updates OR ask questions with your voice
+                </p>
                 
                 <button class="record-btn" onclick="microphoneClick()">
                     🎤
                 </button>
-                <div class="status" id="voiceStatus">Click microphone to test</div>
+                <div class="status" id="voiceStatus">Click to start recording</div>
+                
+                <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; font-size: 0.85rem;">
+                    <strong>💡 Voice Examples:</strong><br>
+                    <strong>Updates:</strong> "Dannon project got approved..."<br>
+                    <strong>Queries:</strong> "Show me Danny's projects" or "Philippines status"
+                </div>
                 
                 <div class="transcript" id="transcript">
                     Transcript will appear here...
@@ -205,33 +213,34 @@
             </div>
 
             <div class="query-section">
-                <h2>🔍 Ask Questions</h2>
-                
-                <!-- Test input -->
-                <button class="test-btn" onclick="testSearch()">🔧 Test Search</button>
+                <h2>🔍 Business Intelligence</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">
+                    Search your supplier and project data
+                </p>
                 
                 <input type="text" class="query-input" id="queryInput" 
-                       placeholder="Type something and press Enter..."
+                       placeholder="Search: 'Danny projects', 'Philippines suppliers', 'high probability'..."
                        onkeypress="handleKeyPress(event)">
                 
                 <div class="quick-queries">
                     <button class="quick-query-btn" onclick="quickQuery('suppliers')">
-                        🏢 Test Suppliers
+                        🏢 Supplier Portfolio
                     </button>
                     <button class="quick-query-btn" onclick="quickQuery('projects')">
-                        🎯 Test Projects
+                        🎯 Project Pipeline
                     </button>
                     <button class="quick-query-btn" onclick="quickQuery('danny')">
-                        👤 Test Danny
+                        👤 Danny's Portfolio
                     </button>
                     <button class="quick-query-btn" onclick="quickQuery('financial')">
-                        💰 Test Financial
+                        💰 2025 Targets
                     </button>
                 </div>
 
                 <div class="response-area" id="responseArea">
                     <div style="opacity: 0.6;">
-                        🔧 Testing Mode: Click any button above to test functionality
+                        🎯 <strong>Ready!</strong> Use voice recording or search to explore your business data.<br><br>
+                        <strong>Try asking:</strong> "Show me high probability projects" or "Danny's suppliers"
                     </div>
                 </div>
             </div>
@@ -277,10 +286,10 @@
         // Voice memory for storing voice inputs
         var voiceMemory = [];
 
-        // Test function to verify JavaScript is working
+        // Test function to verify JavaScript is working (keep for debugging)
         function testFunction() {
             alert('✅ JavaScript is working!');
-            document.getElementById('responseArea').innerHTML = '<div style="color: #2ed573;"><strong>✅ SUCCESS!</strong> JavaScript is working with real business data!</div>';
+            document.getElementById('responseArea').innerHTML = '<div style="color: #2ed573;"><strong>✅ SUCCESS!</strong> Business dashboard loaded with ' + businessData.suppliers.length + ' suppliers and ' + businessData.projects.length + ' projects!</div>';
             console.log('JavaScript test successful with business data loaded');
         }
 
