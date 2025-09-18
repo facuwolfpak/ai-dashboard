@@ -414,9 +414,110 @@
             }
         };
 
-        // Main functions
+        // Initialize speech recognition
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isRecording = true;
+                    updateRecordingState();
+                    document.getElementById('voiceStatus').textContent = '🎤 Listening... Speak now';
+                    console.log('Real speech recognition started');
+                };
+
+                recognition.onresult = function(event) {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    
+                    document.getElementById('transcript').style.display = 'block';
+                    document.getElementById('transcript').innerHTML = `<div>"${transcript}"</div>`;
+                    
+                    if (event.results[event.results.length - 1].isFinal) {
+                        document.getElementById('voiceStatus').textContent = '✅ Processing your input...';
+                        setTimeout(() => processVoiceInput(transcript), 1000);
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    isRecording = false;
+                    updateRecordingState();
+                    
+                    if (event.error === 'not-allowed') {
+                        document.getElementById('voiceStatus').innerHTML = `
+                            <div style="color: #ff6b6b; margin-bottom: 10px;">🚫 Microphone access denied</div>
+                            <div style="font-size: 0.9rem; line-height: 1.4;">
+                                Click the 🔒 lock icon in your address bar to allow microphone access, then try again.
+                            </div>
+                        `;
+                    } else if (event.error === 'no-speech') {
+                        document.getElementById('voiceStatus').textContent = '🔇 No speech detected. Click to try again.';
+                    } else {
+                        document.getElementById('voiceStatus').textContent = `❌ Error: ${event.error}. Click to try again.`;
+                    }
+                };
+
+                recognition.onend = function() {
+                    isRecording = false;
+                    updateRecordingState();
+                    if (document.getElementById('voiceStatus').textContent.includes('Listening')) {
+                        document.getElementById('voiceStatus').textContent = 'Click to start recording';
+                    }
+                    console.log('Speech recognition ended');
+                };
+
+                console.log('✅ Speech recognition initialized');
+                return true;
+            }
+            console.log('❌ Speech recognition not supported');
+            return false;
+        }
+
+        function updateRecordingState() {
+            const btn = document.getElementById('recordBtn');
+            const status = document.getElementById('voiceStatus');
+            
+            if (isRecording) {
+                btn.classList.add('recording');
+            } else {
+                btn.classList.remove('recording');
+                if (status.textContent.includes('Listening')) {
+                    status.textContent = 'Click to start recording';
+                }
+            }
+        }
+
+        function startRecording() {
+            if (!recognition) {
+                // Fallback to demo if speech recognition not available
+                startVoiceDemo();
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+                return;
+            }
+
+            try {
+                document.getElementById('voiceStatus').textContent = 'Starting microphone...';
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                document.getElementById('voiceStatus').textContent = 'Error starting microphone. Trying demo...';
+                setTimeout(startVoiceDemo, 1000);
+            }
+        }
+
         function startVoiceDemo() {
-            console.log('Starting voice demo...');
+            console.log('Starting voice demo fallback...');
             document.getElementById('voiceStatus').textContent = 'Demo: Simulating voice input...';
             document.getElementById('transcript').style.display = 'block';
             
@@ -433,8 +534,8 @@
                         processVoiceInput(sampleTranscript);
                         document.getElementById('voiceStatus').innerHTML = `
                             <div>✅ Demo complete!</div>
-                            <div style="font-size: 0.8rem; margin-top: 5px;">
-                                To use real voice: Enable microphone in browser settings
+                            <div style="font-size: 0.8rem; margin-top: 5px; color: #ffa502;">
+                                For real voice: Allow microphone access in browser settings
                             </div>
                         `;
                     }, 1000);
@@ -567,12 +668,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, setting up dashboard...');
             
+            // Initialize speech recognition first
+            const speechAvailable = initializeSpeechRecognition();
+            
             // Set up microphone button
             const recordBtn = document.getElementById('recordBtn');
             if (recordBtn) {
                 recordBtn.addEventListener('click', function() {
                     console.log('Microphone button clicked!');
-                    startVoiceDemo();
+                    startRecording();
                 });
                 console.log('✅ Microphone button ready');
             }
