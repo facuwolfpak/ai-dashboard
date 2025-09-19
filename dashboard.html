@@ -44,7 +44,7 @@
         }
 
         .import-box {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
             border-radius: 16px;
             padding: 1.5rem;
             display: flex;
@@ -52,12 +52,12 @@
             gap: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #0f172a;
+            color: white;
         }
 
         .import-box:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
         }
 
         .import-box i {
@@ -72,7 +72,7 @@
 
         .import-text p {
             margin: 0;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .import-status {
@@ -398,10 +398,10 @@
     <!-- Excel Import Section -->
     <div class="import-section">
         <div class="import-box" onclick="document.getElementById('excelInput').click();">
-            <i class="fas fa-file-excel"></i>
+            <i class="fas fa-check-circle"></i>
             <div class="import-text">
-                <strong>Import Excel Dashboard</strong>
-                <p>Upload your Excel file with multiple sheets - we'll automatically organize suppliers, distributors, and retailers</p>
+                <strong>Your DASHBOARD 2025.xlsx Data Loaded</strong>
+                <p>15 suppliers, 15 distributors, 7 retailers, and 19 active relationships imported. Click to reimport or update.</p>
             </div>
             <input type="file" id="excelInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
         </div>
@@ -527,92 +527,518 @@
     </div>
 
     <script>
-        // Data storage
-        let suppliers = [];
-        let distributors = [];
-        let retailers = [];
-        let relationships = []; // Track which suppliers are working with which distributors/retailers
+        // Real data extracted from DASHBOARD 2025.xlsx
+        let suppliers = [
+            {
+                id: 1,
+                name: "Casbah",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 2,
+                name: "Dannon",
+                country: "USA", 
+                contact: "Danny",
+                email: "",
+                status: "active",
+                notes: "Owner: Danny",
+                pendingItems: []
+            },
+            {
+                id: 3,
+                name: "Fruzel",
+                country: "Taiwan",
+                contact: "Chris",
+                email: "",
+                status: "active",
+                notes: "Owner: Chris",
+                pendingItems: []
+            },
+            {
+                id: 4,
+                name: "Happy Family",
+                country: "USA",
+                contact: "Danny",
+                email: "",
+                status: "active",
+                notes: "Owner: Danny",
+                pendingItems: []
+            },
+            {
+                id: 5,
+                name: "Horizon Organic",
+                country: "USA",
+                contact: "Danny",
+                email: "",
+                status: "active",
+                notes: "Owner: Danny",
+                pendingItems: []
+            },
+            {
+                id: 6,
+                name: "International Delight",
+                country: "USA",
+                contact: "Danny",
+                email: "",
+                status: "active",
+                notes: "Owner: Danny",
+                pendingItems: []
+            },
+            {
+                id: 7,
+                name: "Mill & Folks",
+                country: "Hungary",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 8,
+                name: "Root Foods",
+                country: "Vietnam",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 9,
+                name: "Vermints",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "pending",
+                notes: "Owner: Facu",
+                pendingItems: ["Spec Sheets", "Price List"]
+            },
+            {
+                id: 10,
+                name: "Yellow Bird",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 11,
+                name: "Wavers",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 12,
+                name: "Organic Valley",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 13,
+                name: "Nature's Bakery",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 14,
+                name: "Tate's",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            },
+            {
+                id: 15,
+                name: "Sol-ti",
+                country: "USA",
+                contact: "Facu",
+                email: "",
+                status: "active",
+                notes: "Owner: Facu",
+                pendingItems: []
+            }
+        ];
 
-        // Sample data to start with
-        function initSampleData() {
-            suppliers = [
-                {
-                    id: 1,
-                    name: "GreenLife Supplements",
-                    country: "USA",
-                    contact: "Sarah Johnson",
-                    email: "sarah@greenlife.com",
-                    status: "active",
-                    notes: "Organic supplement manufacturer",
-                    pendingItems: ["Product certification", "Label approval", "Pricing finalization"]
-                },
-                {
-                    id: 2,
-                    name: "TechFlow Electronics",
-                    country: "South Korea",
-                    contact: "Kim Min-jun",
-                    email: "kim@techflow.kr",
-                    status: "negotiating",
-                    notes: "Consumer electronics manufacturer",
-                    pendingItems: ["Contract review", "Sample shipment", "Regulatory documentation"]
-                }
-            ];
+        let distributors = [
+            {
+                id: 1001,
+                name: "Linkage Foods",
+                country: "Philippines",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Philippines - 3 brands in pipeline"
+            },
+            {
+                id: 1002,
+                name: "Eatics",
+                country: "Mexico",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Mexico - High probability deals"
+            },
+            {
+                id: 1003,
+                name: "Butter Field Vallis",
+                country: "Bermuda",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Bermuda - 3 brands in pipeline"
+            },
+            {
+                id: 1004,
+                name: "Felipe Motta",
+                country: "Panama",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Panama"
+            },
+            {
+                id: 1005,
+                name: "Power Nature",
+                country: "Peru",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Peru - 3 brands in pipeline"
+            },
+            {
+                id: 1006,
+                name: "AMG",
+                country: "Caribbean",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Caribbean"
+            },
+            {
+                id: 1007,
+                name: "Plaza Provision",
+                country: "Puerto Rico",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Puerto Rico"
+            },
+            {
+                id: 1008,
+                name: "Loud n Clear",
+                country: "Israel",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Israel"
+            },
+            {
+                id: 1009,
+                name: "Winning",
+                country: "South Korea",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in South Korea - 2 brands in pipeline"
+            },
+            {
+                id: 1010,
+                name: "Protteina",
+                country: "Chile",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Chile"
+            },
+            {
+                id: 1011,
+                name: "Stellar Distributor",
+                country: "Australia",
+                contact: "Not specified",
+                email: "",
+                status: "active",
+                notes: "Active in Australia - High probability deals"
+            },
+            {
+                id: 1012,
+                name: "Alvarez y Sanchez",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential partner"
+            },
+            {
+                id: 1013,
+                name: "Colomer & Suarez",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential partner"
+            },
+            {
+                id: 1014,
+                name: "CP Group",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential partner"
+            },
+            {
+                id: 1015,
+                name: "GMT",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential partner"
+            }
+        ];
 
-            distributors = [
-                {
-                    id: 1,
-                    name: "European Health Distribution",
-                    country: "Germany",
-                    contact: "Hans Mueller",
-                    email: "hans@ehd.de",
-                    status: "active",
-                    notes: "Leading health product distributor in EU"
-                },
-                {
-                    id: 2,
-                    name: "Pacific Trade Partners",
-                    country: "Australia",
-                    contact: "Emma Wilson",
-                    email: "emma@pacifictrade.au",
-                    status: "pending",
-                    notes: "Electronics and lifestyle products"
-                }
-            ];
+        let retailers = [
+            {
+                id: 2001,
+                name: "Costco HQ",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2002,
+                name: "Costco",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2003,
+                name: "Dollar General",
+                country: "USA",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2004,
+                name: "Healthy Options",
+                country: "Multiple",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2005,
+                name: "Publix",
+                country: "USA",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2006,
+                name: "Wholefoods",
+                country: "USA",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            },
+            {
+                id: 2007,
+                name: "Tops",
+                country: "USA",
+                contact: "Not specified",
+                email: "",
+                status: "pending",
+                notes: "From lookup list - potential target"
+            }
+        ];
 
-            retailers = [
-                {
-                    id: 1,
-                    name: "Healthy Living Stores",
-                    country: "Germany",
-                    contact: "Maria Schmidt",
-                    email: "maria@healthyliving.de",
-                    status: "active",
-                    notes: "Chain of 150 health stores across Germany"
-                }
-            ];
-
-            // Sample relationships (supplier_id, distributor_id, retailer_id, status, progress)
-            relationships = [
-                {
-                    supplierId: 1,
-                    distributorId: 1,
-                    retailerId: 1,
-                    status: "negotiating",
-                    progress: "Contract review stage",
-                    pendingItems: ["Final pricing", "Delivery terms"]
-                },
-                {
-                    supplierId: 2,
-                    distributorId: 2,
-                    retailerId: null,
-                    status: "pending",
-                    progress: "Initial discussions",
-                    pendingItems: ["Product samples", "Market analysis"]
-                }
-            ];
-
-            renderAll();
-        }
+        let relationships = [
+            {
+                supplierId: 5, // Horizon Organic
+                distributorId: 1001, // Linkage Foods
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Philippines market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 2, // Dannon
+                distributorId: 1001, // Linkage Foods
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Philippines market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 1, // Casbah
+                distributorId: 1001, // Linkage Foods
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Philippines market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 5, // Horizon Organic
+                distributorId: 1002, // Eatics
+                retailerId: null,
+                status: "negotiating",
+                progress: "Hi probability - Mexico market",
+                pendingItems: []
+            },
+            {
+                supplierId: 10, // Yellow Bird
+                distributorId: 1003, // Butter Field Vallis
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Bermuda market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 11, // Wavers
+                distributorId: 1003, // Butter Field Vallis
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Bermuda market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 3, // Fruzel
+                distributorId: 1003, // Butter Field Vallis
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Bermuda market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 5, // Horizon Organic
+                distributorId: 1004, // Felipe Motta
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Panama market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 1, // Casbah
+                distributorId: 1004, // Felipe Motta
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Panama market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 10, // Yellow Bird
+                distributorId: 1005, // Power Nature
+                retailerId: null,
+                status: "negotiating",
+                progress: "Hi probability - Peru market",
+                pendingItems: []
+            },
+            {
+                supplierId: 4, // Happy Family
+                distributorId: 1005, // Power Nature
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Peru market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 7, // Mill & Folks
+                distributorId: 1005, // Power Nature
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Peru market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 12, // Organic Valley
+                distributorId: 1006, // AMG
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Caribbean market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 10, // Yellow Bird
+                distributorId: 1008, // Loud n Clear
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Israel market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 6, // International Delight
+                distributorId: 1009, // Winning
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - South Korea market",
+                pendingItems: ["SOP Agreement"]
+            },
+            {
+                supplierId: 4, // Happy Family
+                distributorId: 1009, // Winning
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - South Korea market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 15, // Sol-ti
+                distributorId: 1010, // Protteina
+                retailerId: null,
+                status: "on-hold",
+                progress: "Lo probability - Chile market",
+                pendingItems: ["Presentation"]
+            },
+            {
+                supplierId: 10, // Yellow Bird
+                distributorId: 1011, // Stellar Distributor
+                retailerId: null,
+                status: "negotiating",
+                progress: "Hi probability - Australia market",
+                pendingItems: []
+            },
+            {
+                supplierId: 6, // International Delight
+                distributorId: 1011, // Stellar Distributor
+                retailerId: null,
+                status: "pending",
+                progress: "Med probability - Australia market",
+                pendingItems: ["SOP Agreement"]
+            }
+        ];
 
         // Render functions
         function renderSuppliers() {
@@ -1125,8 +1551,8 @@
             });
         }
 
-        // Initialize the dashboard
-        initSampleData();
+        // Initialize the dashboard with real data
+        renderAll();
     </script>
 </body>
 </html>
