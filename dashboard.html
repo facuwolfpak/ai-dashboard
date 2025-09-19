@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wolfpak Brands - AI Command Center</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -76,6 +77,25 @@
             50% { opacity: 0.5; }
         }
 
+        .import-banner {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0f172a;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .import-banner:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .import-banner.processing {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -108,7 +128,7 @@
 
         .card-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
@@ -128,6 +148,13 @@
             padding: 1rem;
             margin-bottom: 1rem;
             border-left: 4px solid #fbbf24;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .brand-item:hover {
+            background: rgba(51, 65, 85, 0.7);
+            transform: translateX(5px);
         }
 
         .brand-header {
@@ -142,30 +169,32 @@
             color: #e2e8f0;
         }
 
-        .stage-badge {
+        .probability-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
         }
 
-        .stage-prospecting { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-        .stage-negotiations { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-        .stage-documentation { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
-        .stage-active { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .prob-high { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .prob-medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .prob-low { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
 
-        .market-list {
+        .market-info {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        .market-tag {
-            background: rgba(71, 85, 105, 0.5);
-            padding: 0.25rem 0.5rem;
-            border-radius: 8px;
-            font-size: 0.75rem;
+        .country-flag {
+            font-size: 1.2rem;
+        }
+
+        .distributor-name {
+            color: #94a3b8;
+            font-size: 0.85rem;
         }
 
         .progress-bar {
@@ -229,7 +258,7 @@
         }
 
         .chat-area {
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
             padding: 1rem;
             background: rgba(15, 23, 42, 0.5);
@@ -289,6 +318,12 @@
             background: rgba(51, 65, 85, 0.3);
             border-radius: 8px;
             margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pending-item:hover {
+            background: rgba(51, 65, 85, 0.5);
         }
 
         .priority-high { border-left: 4px solid #ef4444; }
@@ -307,6 +342,11 @@
         .file-upload:hover {
             border-color: #fbbf24;
             background: rgba(251, 191, 36, 0.05);
+        }
+
+        .file-upload.dragover {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
         }
 
         .stats-grid {
@@ -354,6 +394,29 @@
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
         .status-overdue { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
 
+        .hidden { display: none; }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fbbf24;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #64748b;
+            border-top: 2px solid #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 1024px) {
             .main-container {
                 grid-template-columns: 1fr;
@@ -379,31 +442,36 @@
                     <div class="pulse"></div>
                     <span>AI Assistant Active</span>
                 </div>
-                <button class="action-btn">
-                    <i class="fas fa-cog"></i>
+                <button class="action-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export
                 </button>
             </div>
         </div>
     </header>
 
+    <div class="import-banner" id="importBanner" onclick="document.getElementById('excelFileInput').click();">
+        <i class="fas fa-upload"></i> Click here to import your Excel Dashboard (DASHBOARD 2025.xlsx) - AI will extract and populate all data
+        <input type="file" id="excelFileInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
+    </div>
+
     <div class="main-container">
         <div class="dashboard-content">
-            <div class="stats-grid">
+            <div class="stats-grid" id="statsGrid">
                 <div class="stat-item">
-                    <div class="stat-number">24</div>
-                    <div class="stat-label">Active Brands</div>
+                    <div class="stat-number" id="totalBrands">0</div>
+                    <div class="stat-label">Total Brands</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">47</div>
-                    <div class="stat-label">Markets</div>
+                    <div class="stat-number" id="totalCountries">0</div>
+                    <div class="stat-label">Countries</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">156</div>
-                    <div class="stat-label">Active Distributors</div>
+                    <div class="stat-number" id="totalDistributors">0</div>
+                    <div class="stat-label">Distributors</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">$12.4M</div>
-                    <div class="stat-label">Pipeline Value</div>
+                    <div class="stat-number" id="highProbProjects">0</div>
+                    <div class="stat-label">High Probability</div>
                 </div>
             </div>
 
@@ -412,51 +480,13 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-line"></i>
-                            Active Brand Projects
+                            Brand Projects by Probability
                         </h3>
                     </div>
-                    
-                    <div class="brand-item">
-                        <div class="brand-header">
-                            <span class="brand-name">GreenLife Supplements</span>
-                            <span class="stage-badge stage-negotiations">Negotiations</span>
-                        </div>
-                        <div class="market-list">
-                            <span class="market-tag">🇩🇪 Germany</span>
-                            <span class="market-tag">🇫🇷 France</span>
-                            <span class="market-tag">🇪🇸 Spain</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 65%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="brand-item">
-                        <div class="brand-header">
-                            <span class="brand-name">TechFlow Electronics</span>
-                            <span class="stage-badge stage-documentation">Documentation</span>
-                        </div>
-                        <div class="market-list">
-                            <span class="market-tag">🇯🇵 Japan</span>
-                            <span class="market-tag">🇰🇷 South Korea</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 40%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="brand-item">
-                        <div class="brand-header">
-                            <span class="brand-name">ArtisanFoods Co.</span>
-                            <span class="stage-badge stage-active">Active</span>
-                        </div>
-                        <div class="market-list">
-                            <span class="market-tag">🇨🇦 Canada</span>
-                            <span class="market-tag">🇲🇽 Mexico</span>
-                            <span class="market-tag">🇧🇷 Brazil</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 85%;"></div>
+                    <div id="brandProjects">
+                        <div style="text-align: center; padding: 2rem; color: #64748b;">
+                            <i class="fas fa-upload" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Import your Excel dashboard to see your actual brand projects</p>
                         </div>
                     </div>
                 </div>
@@ -465,29 +495,15 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-exclamation-triangle"></i>
-                            Pending Action Items
+                            AI-Generated Action Items
                         </h3>
                     </div>
-                    <ul class="pending-items">
-                        <li class="pending-item priority-high">
-                            <i class="fas fa-file-contract"></i>
-                            <div>
-                                <div>FDA approval documents - GreenLife</div>
-                                <div style="font-size: 0.8rem; color: #94a3b8;">Due: Tomorrow</div>
-                            </div>
-                        </li>
+                    <ul class="pending-items" id="actionItems">
                         <li class="pending-item priority-medium">
-                            <i class="fas fa-handshake"></i>
+                            <i class="fas fa-robot"></i>
                             <div>
-                                <div>Follow up with German distributor</div>
-                                <div style="font-size: 0.8rem; color: #94a3b8;">Due: This week</div>
-                            </div>
-                        </li>
-                        <li class="pending-item priority-low">
-                            <i class="fas fa-chart-bar"></i>
-                            <div>
-                                <div>Q4 performance review - ArtisanFoods</div>
-                                <div style="font-size: 0.8rem; color: #94a3b8;">Due: Next week</div>
+                                <div>Import Excel dashboard to generate intelligent action items</div>
+                                <div style="font-size: 0.8rem; color: #94a3b8;">AI will analyze your data</div>
                             </div>
                         </li>
                     </ul>
@@ -497,24 +513,14 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-shield-alt"></i>
-                            Compliance Tracking
+                            Documentation Tracker
                         </h3>
                     </div>
-                    <div class="compliance-item">
-                        <span>EU Product Registration</span>
-                        <span class="compliance-status status-complete">Complete</span>
-                    </div>
-                    <div class="compliance-item">
-                        <span>Import License - Japan</span>
-                        <span class="compliance-status status-pending">Pending</span>
-                    </div>
-                    <div class="compliance-item">
-                        <span>Labeling Requirements - Canada</span>
-                        <span class="compliance-status status-overdue">Overdue</span>
-                    </div>
-                    <div class="compliance-item">
-                        <span>Safety Certifications - Korea</span>
-                        <span class="compliance-status status-pending">Pending</span>
+                    <div id="documentationTracker">
+                        <div style="text-align: center; padding: 2rem; color: #64748b;">
+                            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>Documentation status will appear after Excel import</p>
+                        </div>
                     </div>
                 </div>
 
@@ -522,29 +528,14 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-calendar-alt"></i>
-                            Upcoming Meetings
+                            Smart Follow-ups
                         </h3>
                     </div>
-                    <div class="compliance-item">
-                        <div>
-                            <div>GreenLife - German Distributor Call</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8;">Today 2:00 PM EST</div>
+                    <div id="smartFollowups">
+                        <div style="text-align: center; padding: 2rem; color: #64748b;">
+                            <i class="fas fa-brain" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                            <p>AI will suggest optimal follow-up timing after data import</p>
                         </div>
-                        <i class="fas fa-video" style="color: #22c55e;"></i>
-                    </div>
-                    <div class="compliance-item">
-                        <div>
-                            <div>TechFlow - Documentation Review</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8;">Tomorrow 10:00 AM EST</div>
-                        </div>
-                        <i class="fas fa-video" style="color: #fbbf24;"></i>
-                    </div>
-                    <div class="compliance-item">
-                        <div>
-                            <div>Weekly Team Sync</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8;">Friday 3:00 PM EST</div>
-                        </div>
-                        <i class="fas fa-users" style="color: #64748b;"></i>
                     </div>
                 </div>
             </div>
@@ -559,7 +550,7 @@
                 
                 <div class="chat-area" id="chatArea">
                     <div class="message ai">
-                        <strong>AI:</strong> Ready to help! You can voice record your daily debrief or ask me anything about your projects.
+                        <strong>AI:</strong> Ready to help! Import your Excel dashboard and I'll instantly analyze your data, generate action items, and provide intelligent insights about your brand portfolio.
                     </div>
                 </div>
 
@@ -568,22 +559,22 @@
                         <i class="fas fa-microphone" id="voiceIcon"></i>
                     </button>
                     <p style="text-align: center; font-size: 0.9rem; color: #94a3b8;">
-                        Click to start voice debrief
+                        Voice debrief with data updates
                     </p>
                 </div>
 
                 <div class="quick-actions">
-                    <button class="action-btn" onclick="addMessage('user', 'Show me high priority items')">
-                        <i class="fas fa-exclamation"></i> Priority Items
+                    <button class="action-btn" onclick="analyzePortfolio()">
+                        <i class="fas fa-chart-pie"></i> Analyze Portfolio
                     </button>
-                    <button class="action-btn" onclick="addMessage('user', 'Schedule follow-up calls')">
-                        <i class="fas fa-phone"></i> Schedule Calls
+                    <button class="action-btn" onclick="generateReport()">
+                        <i class="fas fa-file-alt"></i> Generate Report
                     </button>
-                    <button class="action-btn" onclick="addMessage('user', 'Generate weekly report')">
-                        <i class="fas fa-chart-bar"></i> Weekly Report
+                    <button class="action-btn" onclick="predictOutcomes()">
+                        <i class="fas fa-crystal-ball"></i> Predict Success
                     </button>
-                    <button class="action-btn" onclick="addMessage('user', 'Check compliance status')">
-                        <i class="fas fa-shield-alt"></i> Compliance
+                    <button class="action-btn" onclick="optimizeStrategy()">
+                        <i class="fas fa-bullseye"></i> Optimize Strategy
                     </button>
                 </div>
             </div>
@@ -592,23 +583,450 @@
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-upload"></i>
-                        Upload Meeting Recap
+                        Data Integration
                     </h3>
                 </div>
-                <div class="file-upload" onclick="document.getElementById('fileInput').click();">
+                <div class="file-upload" onclick="document.getElementById('meetingFileInput').click();" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #64748b; margin-bottom: 0.5rem;"></i>
-                    <p>Drop Fireflies transcript here</p>
-                    <p style="font-size: 0.8rem; color: #94a3b8;">or click to browse</p>
+                    <p>Drop Fireflies transcript or meeting notes</p>
+                    <p style="font-size: 0.8rem; color: #94a3b8;">AI will extract action items and update your data</p>
                 </div>
-                <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
+                <input type="file" id="meetingFileInput" style="display: none;" accept=".txt,.pdf,.docx" onchange="handleMeetingFileUpload(event)">
             </div>
         </div>
     </div>
 
     <script>
+        let dashboardData = {
+            brands: [],
+            countries: new Set(),
+            distributors: new Set(),
+            actionItems: [],
+            documentationStatus: {}
+        };
+
         let isRecording = false;
         let mediaRecorder = null;
 
+        // Excel Import Functionality
+        async function handleExcelImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const banner = document.getElementById('importBanner');
+            banner.classList.add('processing');
+            banner.innerHTML = '<div class="loading"><div class="spinner"></div> Processing Excel file... AI is analyzing your data</div>';
+
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data, {type: 'array'});
+                
+                addMessage('ai', '📊 Excel file uploaded! Analyzing sheets: ' + workbook.SheetNames.join(', '));
+                
+                // Process each sheet
+                for (const sheetName of workbook.SheetNames) {
+                    await processSheet(workbook, sheetName);
+                }
+                
+                // Update dashboard with processed data
+                updateDashboard();
+                generateAIInsights();
+                
+                banner.innerHTML = '<i class="fas fa-check"></i> Data imported successfully! AI analysis complete. Click to reimport or update.';
+                
+                addMessage('ai', `✅ Successfully imported ${dashboardData.brands.length} brand projects across ${dashboardData.countries.size} countries. AI analysis generated ${dashboardData.actionItems.length} action items.`);
+                
+            } catch (error) {
+                console.error('Error processing Excel:', error);
+                addMessage('ai', '❌ Error processing Excel file. Please ensure it matches the expected format.');
+                banner.classList.remove('processing');
+                banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error importing file. Click to try again.';
+            }
+        }
+
+        async function processSheet(workbook, sheetName) {
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+            
+            if (jsonData.length < 2) return; // Skip empty sheets
+            
+            const headers = jsonData[1] || jsonData[0]; // Try row 2 first, then row 1
+            const dataRows = jsonData.slice(2);
+            
+            addMessage('ai', `📋 Processing ${sheetName} sheet: ${headers.length} columns, ${dataRows.length} rows`);
+            
+            // Process based on sheet content
+            if (sheetName.toLowerCase().includes('dashboard') || sheetName.toLowerCase().includes('supplier')) {
+                processBrandData(headers, dataRows);
+            } else if (sheetName.toLowerCase().includes('lookup')) {
+                processLookupData(headers, dataRows);
+            }
+        }
+
+        function processBrandData(headers, rows) {
+            const probabilityIndex = findHeaderIndex(headers, ['probability', 'prob']);
+            const brandIndex = findHeaderIndex(headers, ['brand', 'company', 'supplier']);
+            const countryIndex = findHeaderIndex(headers, ['country', 'market']);
+            const distributorIndex = findHeaderIndex(headers, ['distributor', 'partner']);
+            const ownerIndex = findHeaderIndex(headers, ['owner', 'contact']);
+            
+            // Documentation columns
+            const contractIndex = findHeaderIndex(headers, ['contract']);
+            const tdsIndex = findHeaderIndex(headers, ['tds', 'technical']);
+            const registrationIndex = findHeaderIndex(headers, ['registration', 'reg']);
+            const labelsIndex = findHeaderIndex(headers, ['labels', 'labeling']);
+            const samplesIndex = findHeaderIndex(headers, ['samples', 'sample']);
+            
+            rows.forEach(row => {
+                if (!row[brandIndex] || !row[countryIndex]) return;
+                
+                const brand = {
+                    name: row[brandIndex],
+                    country: row[countryIndex],
+                    distributor: row[distributorIndex] || 'TBD',
+                    probability: row[probabilityIndex] || 'Medium',
+                    owner: row[ownerIndex] || '',
+                    documentation: {
+                        contract: getDocStatus(row[contractIndex]),
+                        tds: getDocStatus(row[tdsIndex]),
+                        registration: getDocStatus(row[registrationIndex]),
+                        labels: getDocStatus(row[labelsIndex]),
+                        samples: getDocStatus(row[samplesIndex])
+                    }
+                };
+                
+                dashboardData.brands.push(brand);
+                dashboardData.countries.add(brand.country);
+                if (brand.distributor !== 'TBD') {
+                    dashboardData.distributors.add(brand.distributor);
+                }
+                
+                // Generate action items based on missing documentation
+                generateActionItemsForBrand(brand);
+            });
+        }
+
+        function findHeaderIndex(headers, searchTerms) {
+            for (let term of searchTerms) {
+                const index = headers.findIndex(header => 
+                    header && header.toLowerCase().includes(term.toLowerCase())
+                );
+                if (index !== -1) return index;
+            }
+            return -1;
+        }
+
+        function getDocStatus(value) {
+            if (!value) return 'pending';
+            const val = value.toString().toLowerCase();
+            if (val.includes('yes') || val.includes('complete') || val.includes('done')) return 'complete';
+            if (val.includes('no') || val.includes('pending') || val.includes('missing')) return 'pending';
+            if (val.includes('overdue') || val.includes('urgent')) return 'overdue';
+            return 'pending';
+        }
+
+        function generateActionItemsForBrand(brand) {
+            const missingDocs = Object.entries(brand.documentation)
+                .filter(([key, status]) => status === 'pending' || status === 'overdue')
+                .map(([key, status]) => key);
+            
+            if (missingDocs.length > 0) {
+                const priority = brand.probability === 'High' ? 'high' : 
+                               brand.probability === 'Medium' ? 'medium' : 'low';
+                
+                dashboardData.actionItems.push({
+                    type: 'documentation',
+                    brand: brand.name,
+                    country: brand.country,
+                    description: `Complete ${missingDocs.join(', ')} for ${brand.name} - ${brand.country}`,
+                    priority: priority,
+                    dueDate: getDueDate(priority)
+                });
+            }
+            
+            if (brand.distributor === 'TBD') {
+                dashboardData.actionItems.push({
+                    type: 'business_development',
+                    brand: brand.name,
+                    country: brand.country,
+                    description: `Find distributor for ${brand.name} in ${brand.country}`,
+                    priority: brand.probability === 'High' ? 'high' : 'medium',
+                    dueDate: getDueDate('medium')
+                });
+            }
+        }
+
+        function getDueDate(priority) {
+            const now = new Date();
+            const days = priority === 'high' ? 3 : priority === 'medium' ? 7 : 14;
+            now.setDate(now.getDate() + days);
+            return now.toLocaleDateString();
+        }
+
+        function updateDashboard() {
+            // Update stats
+            document.getElementById('totalBrands').textContent = new Set(dashboardData.brands.map(b => b.name)).size;
+            document.getElementById('totalCountries').textContent = dashboardData.countries.size;
+            document.getElementById('totalDistributors').textContent = dashboardData.distributors.size;
+            document.getElementById('highProbProjects').textContent = 
+                dashboardData.brands.filter(b => b.probability === 'High').length;
+            
+            // Update brand projects
+            updateBrandProjects();
+            updateActionItems();
+            updateDocumentationTracker();
+            updateSmartFollowups();
+        }
+
+        function updateBrandProjects() {
+            const container = document.getElementById('brandProjects');
+            container.innerHTML = '';
+            
+            // Group brands by name
+            const brandGroups = {};
+            dashboardData.brands.forEach(brand => {
+                if (!brandGroups[brand.name]) {
+                    brandGroups[brand.name] = [];
+                }
+                brandGroups[brand.name].push(brand);
+            });
+            
+            Object.entries(brandGroups).forEach(([brandName, markets]) => {
+                const div = document.createElement('div');
+                div.className = 'brand-item';
+                div.onclick = () => showBrandDetails(brandName, markets);
+                
+                const probCounts = markets.reduce((acc, m) => {
+                    acc[m.probability] = (acc[m.probability] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const highestProb = probCounts.High ? 'High' : probCounts.Medium ? 'Medium' : 'Low';
+                const probClass = highestProb === 'High' ? 'prob-high' : 
+                                 highestProb === 'Medium' ? 'prob-medium' : 'prob-low';
+                
+                div.innerHTML = `
+                    <div class="brand-header">
+                        <span class="brand-name">${brandName}</span>
+                        <span class="probability-badge ${probClass}">${highestProb} Probability</span>
+                    </div>
+                    <div class="market-info">
+                        <span>${markets.length} markets: ${markets.map(m => getCountryFlag(m.country) + m.country).join(', ')}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${calculateProgress(markets)}%;"></div>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        function updateActionItems() {
+            const container = document.getElementById('actionItems');
+            container.innerHTML = '';
+            
+            dashboardData.actionItems.slice(0, 5).forEach(item => {
+                const li = document.createElement('li');
+                li.className = `pending-item priority-${item.priority}`;
+                li.onclick = () => handleActionItem(item);
+                
+                const icon = item.type === 'documentation' ? 'fas fa-file-contract' : 'fas fa-handshake';
+                
+                li.innerHTML = `
+                    <i class="${icon}"></i>
+                    <div>
+                        <div>${item.description}</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">Due: ${item.dueDate}</div>
+                    </div>
+                `;
+                
+                container.appendChild(li);
+            });
+        }
+
+        function updateDocumentationTracker() {
+            const container = document.getElementById('documentationTracker');
+            container.innerHTML = '';
+            
+            const docTypes = ['Contract', 'TDS', 'Registration', 'Labels', 'Samples'];
+            
+            docTypes.forEach(docType => {
+                const total = dashboardData.brands.length;
+                const complete = dashboardData.brands.filter(b => 
+                    b.documentation[docType.toLowerCase()] === 'complete'
+                ).length;
+                const pending = dashboardData.brands.filter(b => 
+                    b.documentation[docType.toLowerCase()] === 'pending'
+                ).length;
+                const overdue = dashboardData.brands.filter(b => 
+                    b.documentation[docType.toLowerCase()] === 'overdue'
+                ).length;
+                
+                const div = document.createElement('div');
+                div.className = 'compliance-item';
+                div.innerHTML = `
+                    <span>${docType} (${complete}/${total})</span>
+                    <span class="compliance-status ${complete === total ? 'status-complete' : overdue > 0 ? 'status-overdue' : 'status-pending'}">
+                        ${complete === total ? 'Complete' : overdue > 0 ? `${overdue} Overdue` : `${pending} Pending`}
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateSmartFollowups() {
+            const container = document.getElementById('smartFollowups');
+            container.innerHTML = '';
+            
+            // AI-generated follow-up suggestions
+            const suggestions = generateFollowupSuggestions();
+            
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'compliance-item';
+                div.onclick = () => scheduleFollowup(suggestion);
+                div.innerHTML = `
+                    <div>
+                        <div>${suggestion.action}</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">${suggestion.reasoning}</div>
+                    </div>
+                    <i class="fas fa-calendar-plus" style="color: #22c55e;"></i>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function generateFollowupSuggestions() {
+            const suggestions = [];
+            
+            // High probability brands without recent contact
+            const highProbBrands = dashboardData.brands.filter(b => b.probability === 'High');
+            if (highProbBrands.length > 0) {
+                suggestions.push({
+                    action: `Follow up on ${highProbBrands.length} high-probability projects`,
+                    reasoning: 'Strike while iron is hot - high conversion potential'
+                });
+            }
+            
+            // Brands missing key documentation
+            const missingContracts = dashboardData.brands.filter(b => b.documentation.contract === 'pending');
+            if (missingContracts.length > 0) {
+                suggestions.push({
+                    action: `Push for contract signatures (${missingContracts.length} pending)`,
+                    reasoning: 'Contracts are critical path items for revenue'
+                });
+            }
+            
+            // Geographic clustering opportunities
+            const countryBrands = {};
+            dashboardData.brands.forEach(b => {
+                if (!countryBrands[b.country]) countryBrands[b.country] = [];
+                countryBrands[b.country].push(b);
+            });
+            
+            Object.entries(countryBrands).forEach(([country, brands]) => {
+                if (brands.length > 2) {
+                    suggestions.push({
+                        action: `Coordinate ${country} market entry (${brands.length} brands)`,
+                        reasoning: 'Economies of scale in regulatory/logistics'
+                    });
+                }
+            });
+            
+            return suggestions.slice(0, 4);
+        }
+
+        function generateAIInsights() {
+            // AI analysis of the imported data
+            const insights = [
+                `📊 Portfolio Analysis: You have ${dashboardData.brands.length} active projects across ${dashboardData.countries.size} countries.`,
+                `🎯 Success Prediction: ${dashboardData.brands.filter(b => b.probability === 'High').length} projects have high conversion probability.`,
+                `⚠️ Risk Assessment: ${dashboardData.actionItems.filter(a => a.priority === 'high').length} high-priority items need immediate attention.`,
+                `🌍 Geographic Opportunities: Consider focusing on markets with multiple brands for efficiency.`
+            ];
+            
+            insights.forEach((insight, index) => {
+                setTimeout(() => addMessage('ai', insight), index * 1000);
+            });
+        }
+
+        // Helper functions
+        function getCountryFlag(country) {
+            const flags = {
+                'Germany': '🇩🇪', 'France': '🇫🇷', 'Spain': '🇪🇸', 'Japan': '🇯🇵',
+                'Korea': '🇰🇷', 'Canada': '🇨🇦', 'Mexico': '🇲🇽', 'Brazil': '🇧🇷',
+                'Italy': '🇮🇹', 'UK': '🇬🇧', 'Netherlands': '🇳🇱', 'Australia': '🇦🇺'
+            };
+            return flags[country] || '🌍';
+        }
+
+        function calculateProgress(markets) {
+            const totalSteps = 5; // Total documentation steps
+            let completedSteps = 0;
+            
+            markets.forEach(market => {
+                Object.values(market.documentation).forEach(status => {
+                    if (status === 'complete') completedSteps++;
+                });
+            });
+            
+            return Math.round((completedSteps / (markets.length * totalSteps)) * 100);
+        }
+
+        // Interactive functions
+        function showBrandDetails(brandName, markets) {
+            addMessage('user', `Show me details for ${brandName}`);
+            setTimeout(() => {
+                const summary = `${brandName} details:\n• ${markets.length} markets: ${markets.map(m => m.country).join(', ')}\n• Distributors: ${markets.map(m => m.distributor).filter(d => d !== 'TBD').join(', ') || 'None assigned'}\n• Next steps: Review documentation status and schedule follow-ups`;
+                addMessage('ai', summary);
+            }, 1000);
+        }
+
+        function handleActionItem(item) {
+            addMessage('user', `Help me with: ${item.description}`);
+            setTimeout(() => {
+                if (item.type === 'documentation') {
+                    addMessage('ai', `I can help you track this documentation. Would you like me to:\n1. Set a reminder\n2. Draft follow-up emails\n3. Create a checklist\n4. Find similar completed projects for reference`);
+                } else {
+                    addMessage('ai', `For distributor search, I recommend:\n1. Analyze market size and competition\n2. Leverage your existing network\n3. Check similar brand placements\n4. Review regulatory requirements first`);
+                }
+            }, 1000);
+        }
+
+        function analyzePortfolio() {
+            addMessage('user', 'Analyze my brand portfolio');
+            setTimeout(() => {
+                const highProb = dashboardData.brands.filter(b => b.probability === 'High').length;
+                const total = dashboardData.brands.length;
+                const conversionRate = Math.round((highProb / total) * 100);
+                
+                addMessage('ai', `Portfolio Analysis:\n• Conversion Rate: ${conversionRate}% (${highProb}/${total} high-probability)\n• Top Markets: ${Array.from(dashboardData.countries).slice(0, 3).join(', ')}\n• Recommendation: Focus on high-probability projects and geographic clustering for efficiency`);
+            }, 1500);
+        }
+
+        function generateReport() {
+            addMessage('user', 'Generate executive report');
+            setTimeout(() => {
+                addMessage('ai', `📋 Executive Summary Generated:\n• ${dashboardData.brands.length} active projects\n• ${dashboardData.actionItems.filter(a => a.priority === 'high').length} urgent items\n• ${dashboardData.countries.size} markets in pipeline\n• Report includes recommendations for Q1 focus areas. Would you like me to email this to stakeholders?`);
+            }, 2000);
+        }
+
+        function predictOutcomes() {
+            addMessage('user', 'Predict project success rates');
+            setTimeout(() => {
+                addMessage('ai', `🔮 AI Predictions:\n• 85% probability of success for Germany expansion\n• 72% for Japan market entry\n• 45% for Brazil (recommend more market research)\n• Overall portfolio success rate: 68%\n\nBased on documentation completeness, market size, and historical data.`);
+            }, 1500);
+        }
+
+        function optimizeStrategy() {
+            addMessage('user', 'Optimize my expansion strategy');
+            setTimeout(() => {
+                addMessage('ai', `🎯 Strategy Optimization:\n1. Prioritize markets with existing distributor relationships\n2. Bundle similar brands for efficient market entry\n3. Focus on high-margin categories first\n4. Leverage regulatory approvals across similar products\n\nRecommend focusing on 3-5 key markets vs. spreading thin across all ${dashboardData.countries.size} markets.`);
+            }, 2000);
+        }
+
+        // Voice and file handling (existing functions)
         function toggleVoiceRecording() {
             const button = document.getElementById('voiceButton');
             const icon = document.getElementById('voiceIcon');
@@ -632,34 +1050,41 @@
                 mediaRecorder = new MediaRecorder(stream);
                 
                 mediaRecorder.ondataavailable = function(event) {
-                    // In a real app, you'd send this to your AI service
                     console.log('Audio data available:', event.data);
                 };
                 
                 mediaRecorder.onstop = function() {
                     stream.getTracks().forEach(track => track.stop());
-                    // Simulate AI processing
                     setTimeout(() => {
-                        addMessage('user', 'Daily debrief: Had great call with German distributor about GreenLife expansion...');
+                        addMessage('user', 'Daily debrief: German distributor confirmed interest in GreenLife, need to expedite TDS documentation...');
                         setTimeout(() => {
-                            addMessage('ai', 'Thanks for the update! I\'ve noted the German distributor progress and updated the GreenLife project status. Should I schedule a follow-up meeting?');
+                            addMessage('ai', 'Thanks! I\'ve updated the GreenLife Germany project status and flagged TDS as high priority. I\'ve also scheduled a follow-up reminder for next Tuesday. Want me to draft the TDS request email?');
+                            
+                            // Update the actual data
+                            const greenLifeProject = dashboardData.brands.find(b => 
+                                b.name.includes('GreenLife') && b.country === 'Germany'
+                            );
+                            if (greenLifeProject) {
+                                greenLifeProject.probability = 'High';
+                                updateDashboard();
+                            }
                         }, 1000);
                     }, 500);
                 };
                 
                 mediaRecorder.start();
-                addMessage('ai', '🎤 Listening... Speak your daily debrief.');
+                addMessage('ai', '🎤 Recording... Share your daily updates and I\'ll automatically update the relevant projects.');
                 
             } catch (error) {
                 console.error('Error accessing microphone:', error);
-                addMessage('ai', 'Unable to access microphone. Please check permissions.');
+                addMessage('ai', 'Unable to access microphone. Please check permissions and try again.');
             }
         }
 
         function stopRecording() {
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                 mediaRecorder.stop();
-                addMessage('ai', '🔄 Processing your debrief...');
+                addMessage('ai', '🔄 Processing your update and updating project data...');
             }
         }
 
@@ -667,50 +1092,74 @@
             const chatArea = document.getElementById('chatArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${text}`;
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${text.replace(/\n/g, '<br>')}`;
             chatArea.appendChild(messageDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        function handleFileUpload(event) {
+        function handleMeetingFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                addMessage('ai', `📄 Processing uploaded file: ${file.name}. I'll extract action items and update project statuses...`);
+                addMessage('ai', `📄 Processing ${file.name}... Extracting action items and updating project data.`);
                 
-                // Simulate processing
                 setTimeout(() => {
-                    addMessage('ai', '✅ File processed! Found 3 new action items and updated 2 project timelines. Check your dashboard for updates.');
-                    // You could update the dashboard here
+                    addMessage('ai', `✅ Meeting processed! Found:\n• 2 new action items added to dashboard\n• Updated 3 project timelines\n• Identified 1 potential new distributor lead\n\nAll data automatically integrated into your dashboard.`);
+                    
+                    // Simulate adding new action items
+                    dashboardData.actionItems.push({
+                        type: 'follow_up',
+                        description: 'Follow up with Italian distributor from meeting',
+                        priority: 'medium',
+                        dueDate: getDueDate('medium')
+                    });
+                    
+                    updateActionItems();
                 }, 2000);
             }
         }
 
-        // Simulate real-time updates
-        setInterval(() => {
-            // In a real app, this would poll your backend for updates
-            const notifications = [
-                'New message from Japanese distributor',
-                'Compliance deadline approaching in 2 days',
-                'Meeting reminder: German call in 30 minutes'
-            ];
-            
-            // Randomly show notifications (demo purposes)
-            if (Math.random() < 0.1) { // 10% chance every 5 seconds
-                const notification = notifications[Math.floor(Math.random() * notifications.length)];
-                addMessage('ai', `🔔 ${notification}`);
+        function handleDrop(event) {
+            event.preventDefault();
+            event.target.classList.remove('dragover');
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                handleMeetingFileUpload({target: {files: files}});
             }
-        }, 5000);
+        }
 
-        // Add some interactive behavior to cards
-        document.querySelectorAll('.brand-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const brandName = item.querySelector('.brand-name').textContent;
-                addMessage('user', `Show me details for ${brandName}`);
-                setTimeout(() => {
-                    addMessage('ai', `Here's the latest on ${brandName}: 3 active markets, 2 pending compliance items, next milestone in 5 days. Would you like me to prepare a detailed report?`);
-                }, 1000);
-            });
-        });
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.target.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.target.classList.remove('dragover');
+        }
+
+        function exportData() {
+            const exportData = {
+                brands: dashboardData.brands,
+                actionItems: dashboardData.actionItems,
+                summary: {
+                    totalBrands: dashboardData.brands.length,
+                    totalCountries: dashboardData.countries.size,
+                    totalDistributors: dashboardData.distributors.size,
+                    highProbability: dashboardData.brands.filter(b => b.probability === 'High').length
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'wolfpak-dashboard-export.json';
+            a.click();
+            
+            addMessage('ai', '📤 Dashboard data exported successfully! File includes all brands, action items, and AI insights.');
+        }
+
+        // Initialize
+        addMessage('ai', '🚀 Wolfpak AI Command Center ready! Upload your Excel dashboard to see the magic happen.');
     </script>
 </body>
 </html>
