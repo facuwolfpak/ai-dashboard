@@ -269,10 +269,230 @@
                 html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
                 html += '<strong>📊 Portfolio Overview:</strong><br>';
                 html += '• Total Projects: ' + yellowProjects.length + '<br>';
-                html += '• Total Revenue: $' + totalRevenue.toLocaleString() + '<br><br>';
+                html += '• Total Revenue: 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + totalRevenue.toLocaleString() + '<br><br>';
                 html += '<strong>🌍 Global Projects:</strong><br>';
                 yellowProjects.forEach(function(p) {
-                    var status = p.revenue > 0 ? '$' + p.revenue.toLocaleString() + ' - ' + p.probability : 'Pipeline';
+                    var status = p.revenue > 0 ? '
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + p.revenue.toLocaleString() + ' - ' + p.probability : 'Pipeline';
                     html += '• ' + p.country + ' via ' + p.distributor + ' - ' + status + '<br>';
                 });
                 
@@ -285,6 +505,486 @@
                     });
                 }
                 html += '</div>';
+                
+            // Special owner searches - handle all name variations
+            } else if (lowerQuery.includes('chris') || lowerQuery.includes('christopher')) {
+                showOwnerPortfolio('Chris');
+                return;
+            } else if (lowerQuery.includes('facu') || lowerQuery.includes('facundo')) {
+                showOwnerPortfolio('Facu');
+                return;
+            } else if (lowerQuery.includes('danny') || lowerQuery.includes('daniel')) {
+                showOwnerPortfolio('Danny');
+                return;
+            
+            // Status searches
+            } else if (lowerQuery.includes('status') || lowerQuery.includes('portfolio')) {
+                var html = '<div><strong>📊 Complete Business Status</strong></div>';
+                html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+                html += '<strong>👥 Team Portfolios:</strong><br><br>';
+                
+                // Danny's status
+                var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+                var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+                var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+                html += '<strong>👤 Danny:</strong> ' + dannySuppliers.length + ' suppliers, ' + dannyProjects.length + ' projects, 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + dannyRev.toLocaleString() + ' revenue<br>';
+                
+                // Facu's status  
+                var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+                var facuProjects = projects.filter(function(p) { return p.owner === 'Facu'; });
+                var facuRev = facuProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+                html += '<strong>👤 Facu:</strong> ' + facuSuppliers.length + ' suppliers, ' + facuProjects.length + ' projects, 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + facuRev.toLocaleString() + ' revenue<br>';
+                
+                // Chris's status
+                var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+                var chrisProjects = projects.filter(function(p) { return p.owner === 'Chris'; });
+                var chrisRev = chrisProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+                html += '<strong>👤 Chris:</strong> ' + chrisSuppliers.length + ' suppliers, ' + chrisProjects.length + ' projects, 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + chrisRev.toLocaleString() + ' revenue<br><br>';
+                
+                var totalRev = dannyRev + facuRev + chrisRev;
+                html += '<strong>🎯 Total Portfolio:</strong> ' + suppliers.length + ' suppliers, ' + projects.length + ' projects, 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + totalRev.toLocaleString() + ' total revenue';
+                html += '</div>';
+                
             } else {
                 // Regular search
                 var results = [];
@@ -298,8 +998,120 @@
                 projects.forEach(function(p) {
                     if (p.name.toLowerCase().includes(lowerQuery) || 
                         p.country.toLowerCase().includes(lowerQuery) ||
+                        p.owner.toLowerCase().includes(lowerQuery) ||
+                        p.distributor.toLowerCase().includes(lowerQuery) ||
                         p.probability.toLowerCase().includes(lowerQuery)) {
-                        var rev = p.revenue > 0 ? ' - $' + p.revenue.toLocaleString() : '';
+                        var rev = p.revenue > 0 ? ' - 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + p.revenue.toLocaleString() : '';
                         results.push('🎯 ' + p.name + ' in ' + p.country + ' - ' + p.probability + rev);
                     }
                 });
@@ -312,13 +1124,273 @@
                     html += '</div>';
                 } else {
                     html += '<div style="background: rgba(255, 165, 2, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
-                    html += 'No results. Try: "Yellow Bird", "Danny", "high probability", "Philippines"';
+                    html += '<strong>No results found.</strong><br><br>';
+                    html += '<strong>Try searching for:</strong><br>';
+                    html += '• <strong>People:</strong> "Chris", "Facu", "Danny"<br>';
+                    html += '• <strong>Brands:</strong> "Yellow Bird", "Horizon Organic", "Dannon"<br>';
+                    html += '• <strong>Countries:</strong> "Philippines", "Mexico", "Australia"<br>';
+                    html += '• <strong>Status:</strong> "high probability", "status", "portfolio"';
                     html += '</div>';
                 }
             }
             
             document.getElementById('results').innerHTML = html;
             document.getElementById('searchInput').value = '';
+        }
+
+        // New function to show owner portfolio
+        function showOwnerPortfolio(owner) {
+            var ownerSuppliers = suppliers.filter(function(s) { return s.owner === owner; });
+            var ownerProjects = projects.filter(function(p) { return p.owner === owner; });
+            var ownerRev = ownerProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 ' + owner + '\'s Complete Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            
+            html += '<strong>📊 Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + ownerSuppliers.length + '<br>';
+            html += '• Projects: ' + ownerProjects.length + '<br>';
+            html += '• Total Revenue: 
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + ownerRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 ' + owner + '\'s Suppliers (' + ownerSuppliers.length + '):</strong><br>';
+            ownerSuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            
+            if (ownerProjects.length > 0) {
+                html += '<br><strong>🎯 ' + owner + '\'s Projects (' + ownerProjects.length + '):</strong><br>';
+                ownerProjects.forEach(function(p) {
+                    var status = p.revenue > 0 ? '
+
+        // Button handlers
+        function showSuppliers() {
+            console.log('Showing suppliers');
+            var html = '<div><strong>🏢 Supplier Portfolio (' + suppliers.length + ' suppliers)</strong></div>';
+            html += '<div style="background: rgba(46, 213, 115, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>By Owner:</strong><br>';
+            
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var facuSuppliers = suppliers.filter(function(s) { return s.owner === 'Facu'; });
+            var chrisSuppliers = suppliers.filter(function(s) { return s.owner === 'Chris'; });
+            
+            html += '<strong>Danny (' + dannySuppliers.length + '):</strong> ';
+            html += dannySuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Facu (' + facuSuppliers.length + '):</strong> ';
+            html += facuSuppliers.map(function(s) { return s.name; }).join(', ') + '<br><br>';
+            html += '<strong>Chris (' + chrisSuppliers.length + '):</strong> ';
+            html += chrisSuppliers.map(function(s) { return s.name; }).join(', ');
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showProjects() {
+            console.log('Showing projects');
+            var hiProb = projects.filter(function(p) { return p.probability === 'Hi'; });
+            var medProb = projects.filter(function(p) { return p.probability === 'Med'; });
+            var loProb = projects.filter(function(p) { return p.probability === 'Lo'; });
+
+            var hiRev = hiProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = medProb.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>🎯 Project Pipeline (' + projects.length + ' projects)</strong></div>';
+            html += '<div style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Pipeline Summary:</strong><br>';
+            html += '• High Probability: ' + hiProb.length + ' projects ($' + hiRev.toLocaleString() + ')<br>';
+            html += '• Medium Probability: ' + medProb.length + ' projects ($' + medRev.toLocaleString() + ')<br>';
+            html += '• Low Probability: ' + loProb.length + ' projects (pipeline)<br><br>';
+            
+            html += '<strong>🔥 High Priority:</strong><br>';
+            hiProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '<br><strong>⚡ Medium Priority:</strong><br>';
+            medProb.forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showDanny() {
+            console.log('Showing Danny');
+            var dannySuppliers = suppliers.filter(function(s) { return s.owner === 'Danny'; });
+            var dannyProjects = projects.filter(function(p) { return p.owner === 'Danny'; });
+            var dannyRev = dannyProjects.reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>👤 Danny\'s Portfolio</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Portfolio Summary:</strong><br>';
+            html += '• Suppliers: ' + dannySuppliers.length + '<br>';
+            html += '• Projects: ' + dannyProjects.length + '<br>';
+            html += '• Revenue: $' + dannyRev.toLocaleString() + '<br><br>';
+            
+            html += '<strong>🏢 Suppliers:</strong><br>';
+            dannySuppliers.forEach(function(s) {
+                html += '• ' + s.name + ' (' + s.country + ')<br>';
+            });
+            html += '<br><strong>🎯 Revenue Projects:</strong><br>';
+            dannyProjects.filter(function(p) { return p.revenue > 0; }).forEach(function(p) {
+                html += '• ' + p.name + ' in ' + p.country + ' - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function showFinancial() {
+            console.log('Showing financial');
+            var totalRev = projects.reduce(function(s, p) { return s + p.revenue; }, 0);
+            var hiRev = projects.filter(function(p) { return p.probability === 'Hi'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+            var medRev = projects.filter(function(p) { return p.probability === 'Med'; }).reduce(function(s, p) { return s + p.revenue; }, 0);
+
+            var html = '<div><strong>💰 Financial Dashboard 2025</strong></div>';
+            html += '<div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">';
+            html += '<strong>Revenue Targets:</strong><br>';
+            html += '• Target SOP: $15,482,000<br>';
+            html += '• Current Pipeline: $' + totalRev.toLocaleString() + '<br><br>';
+            html += '<strong>Revenue Breakdown:</strong><br>';
+            html += '• High Probability: $' + hiRev.toLocaleString() + '<br>';
+            html += '• Medium Probability: $' + medRev.toLocaleString() + '<br><br>';
+            html += '<strong>Business Scale:</strong><br>';
+            html += '• Active Suppliers: ' + suppliers.length + '<br>';
+            html += '• Total Projects: ' + projects.length + '<br>';
+            html += '• Geographic Reach: 20+ countries<br><br>';
+            html += '<strong>🔥 Top Projects:</strong><br>';
+            var topProjects = projects.filter(function(p) { return p.revenue > 0; }).sort(function(a, b) { return b.revenue - a.revenue; });
+            topProjects.slice(0, 5).forEach(function(p) {
+                html += '• ' + p.name + ' (' + p.country + ') - $' + p.revenue.toLocaleString() + '<br>';
+            });
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            console.log('✅ Dashboard ready!', suppliers.length, 'suppliers,', projects.length, 'projects');
+        };
+    </script>
+</body>
+</html> + p.revenue.toLocaleString() + ' - ' + p.probability : p.probability + ' probability';
+                    html += '• ' + p.name + ' in ' + p.country + ' - ' + status + '<br>';
+                });
+                
+                // Show countries
+                var countries = [...new Set(ownerProjects.map(function(p) { return p.country; }))];
+                html += '<br><strong>🌍 Geographic Reach:</strong> ' + countries.join(', ');
+            }
+            
+            html += '</div>';
+            document.getElementById('results').innerHTML = html;
         }
 
         // Button handlers
