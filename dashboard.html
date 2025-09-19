@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolfpak Brands - AI Command Center</title>
+    <title>Wolfpak Brands - Business Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -18,396 +18,80 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
             min-height: 100vh;
+            padding: 2rem;
         }
 
         .header {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #334155;
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fbbf24;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .ai-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid #22c55e;
-            border-radius: 50px;
-            font-size: 0.9rem;
-        }
-
-        .pulse {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .import-banner {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            padding: 1rem 2rem;
-            text-align: center;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .import-banner:hover {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .import-banner.processing {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 2rem;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: #fbbf24;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.1);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #fbbf24;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .brand-item {
-            background: rgba(51, 65, 85, 0.5);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #fbbf24;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .brand-item:hover {
-            background: rgba(51, 65, 85, 0.7);
-            transform: translateX(5px);
-        }
-
-        .brand-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .brand-name {
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .probability-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .prob-high { background: rgba(34, 197, 94, 0.2); color: #86efac; }
-        .prob-medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-        .prob-low { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-
-        .market-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .country-flag {
-            font-size: 1.2rem;
-        }
-
-        .distributor-name {
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(71, 85, 105, 0.5);
-            border-radius: 3px;
-            margin-top: 0.5rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
-            transition: width 0.3s ease;
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .ai-assistant {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 1.5rem;
-            height: fit-content;
-        }
-
-        .voice-input {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .voice-button {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 auto;
-        }
-
-        .voice-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.3);
-        }
-
-        .voice-button.recording {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            animation: pulse 1s infinite;
-        }
-
-        .chat-area {
-            max-height: 250px;
-            overflow-y: auto;
-            padding: 1rem;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .message {
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-        }
-
-        .message.user {
-            background: rgba(251, 191, 36, 0.1);
-            border-left: 3px solid #fbbf24;
-        }
-
-        .message.ai {
-            background: rgba(34, 197, 94, 0.1);
-            border-left: 3px solid #22c55e;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .action-btn {
-            padding: 0.75rem;
-            background: rgba(71, 85, 105, 0.5);
-            border: 1px solid #64748b;
-            border-radius: 8px;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .action-btn:hover {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: #fbbf24;
-        }
-
-        .pending-items {
-            list-style: none;
-        }
-
-        .pending-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: rgba(51, 65, 85, 0.3);
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .pending-item:hover {
-            background: rgba(51, 65, 85, 0.5);
-        }
-
-        .priority-high { border-left: 4px solid #ef4444; }
-        .priority-medium { border-left: 4px solid #f59e0b; }
-        .priority-low { border-left: 4px solid #22c55e; }
-
-        .file-upload {
-            border: 2px dashed #64748b;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload:hover {
-            border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.05);
-        }
-
-        .file-upload.dragover {
-            border-color: #22c55e;
-            background: rgba(34, 197, 94, 0.05);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 1rem;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 8px;
-        }
-
-        .stat-number {
             font-size: 2rem;
             font-weight: bold;
             color: #fbbf24;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #94a3b8;
-        }
-
-        .compliance-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            background: rgba(51, 65, 85, 0.3);
-            border-radius: 8px;
             margin-bottom: 0.5rem;
         }
 
-        .compliance-status {
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
         }
 
-        .status-complete { background: rgba(34, 197, 94, 0.2); color: #86efac; }
-        .status-pending { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-        .status-overdue { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .import-section {
+            max-width: 1400px;
+            margin: 0 auto 2rem auto;
+        }
 
-        .hidden { display: none; }
-
-        .loading {
+        .import-box {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 16px;
+            padding: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #fbbf24;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #0f172a;
+        }
+
+        .import-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+        }
+
+        .import-box i {
+            font-size: 2.5rem;
+        }
+
+        .import-text strong {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .import-text p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .import-status {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #22c55e;
+            margin-top: 1rem;
         }
 
         .spinner {
             width: 20px;
             height: 20px;
-            border: 2px solid #64748b;
-            border-top: 2px solid #fbbf24;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-top: 2px solid #22c55e;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -417,749 +101,1032 @@
             100% { transform: rotate(360deg); }
         }
 
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-box {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #475569;
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 600px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fbbf24;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-button {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .item-card {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #fbbf24;
+        }
+
+        .item-card:hover {
+            background: rgba(51, 65, 85, 0.8);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.2);
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+        }
+
+        .item-details {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .status-negotiating { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .status-on-hold { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #475569;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .close-button:hover {
+            color: #e2e8f0;
+        }
+
+        .brand-status-item {
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid #fbbf24;
+        }
+
+        .brand-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-status-name {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .progress-info {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .pending-list {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .pending-item {
+            padding: 0.25rem 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .pending-item::before {
+            content: "• ";
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid #64748b;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border: none;
+            border-radius: 8px;
+            color: #0f172a;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: rgba(71, 85, 105, 0.5);
+            border: 1px solid #64748b;
+            border-radius: 8px;
+            color: #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
         @media (max-width: 1024px) {
-            .main-container {
+            .main-grid {
                 grid-template-columns: 1fr;
-                padding: 1rem;
+                gap: 1.5rem;
             }
             
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            body {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 1rem;
+                width: 95%;
             }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-wolf-pack-battalion"></i>
-                <span>Wolfpak Brands</span>
-                <span style="font-size: 0.8rem; color: #64748b;">AI Command Center</span>
-            </div>
-            <div class="header-controls">
-                <div class="ai-status">
-                    <div class="pulse"></div>
-                    <span>AI Assistant Active</span>
-                </div>
-                <button class="action-btn" onclick="exportData()">
-                    <i class="fas fa-download"></i> Export
-                </button>
-            </div>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-wolf-pack-battalion"></i>
+            Wolfpak Brands
         </div>
-    </header>
-
-    <div class="import-banner" id="importBanner" onclick="document.getElementById('excelFileInput').click();">
-        <i class="fas fa-upload"></i> Click here to import your Excel Dashboard (DASHBOARD 2025.xlsx) - AI will extract and populate all data
-        <input type="file" id="excelFileInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
+        <div class="subtitle">Business Dashboard - Connecting Suppliers, Distributors & Retailers</div>
     </div>
 
-    <div class="main-container">
-        <div class="dashboard-content">
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-item">
-                    <div class="stat-number" id="totalBrands">0</div>
-                    <div class="stat-label">Total Brands</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="totalCountries">0</div>
-                    <div class="stat-label">Countries</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="totalDistributors">0</div>
-                    <div class="stat-label">Distributors</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="highProbProjects">0</div>
-                    <div class="stat-label">High Probability</div>
-                </div>
+    <!-- Excel Import Section -->
+    <div class="import-section">
+        <div class="import-box" onclick="document.getElementById('excelInput').click();">
+            <i class="fas fa-file-excel"></i>
+            <div class="import-text">
+                <strong>Import Excel Dashboard</strong>
+                <p>Upload your Excel file with multiple sheets - we'll automatically organize suppliers, distributors, and retailers</p>
             </div>
+            <input type="file" id="excelInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
+        </div>
+        <div class="import-status" id="importStatus" style="display: none;">
+            <div class="spinner"></div>
+            <span>Processing Excel file...</span>
+        </div>
+    </div>
 
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Brand Projects by Probability
-                        </h3>
-                    </div>
-                    <div id="brandProjects">
-                        <div style="text-align: center; padding: 2rem; color: #64748b;">
-                            <i class="fas fa-upload" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <p>Import your Excel dashboard to see your actual brand projects</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            AI-Generated Action Items
-                        </h3>
-                    </div>
-                    <ul class="pending-items" id="actionItems">
-                        <li class="pending-item priority-medium">
-                            <i class="fas fa-robot"></i>
-                            <div>
-                                <div>Import Excel dashboard to generate intelligent action items</div>
-                                <div style="font-size: 0.8rem; color: #94a3b8;">AI will analyze your data</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-shield-alt"></i>
-                            Documentation Tracker
-                        </h3>
-                    </div>
-                    <div id="documentationTracker">
-                        <div style="text-align: center; padding: 2rem; color: #64748b;">
-                            <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <p>Documentation status will appear after Excel import</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-calendar-alt"></i>
-                            Smart Follow-ups
-                        </h3>
-                    </div>
-                    <div id="smartFollowups">
-                        <div style="text-align: center; padding: 2rem; color: #64748b;">
-                            <i class="fas fa-brain" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <p>AI will suggest optimal follow-up timing after data import</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="main-grid">
+        <!-- Brands/Suppliers Section -->
+        <div class="section-box">
+            <h2 class="section-title">
+                <i class="fas fa-industry"></i>
+                Brands / Suppliers
+            </h2>
+            <button class="add-button" onclick="openAddModal('supplier')">
+                <i class="fas fa-plus"></i> Add New Supplier
+            </button>
+            <div class="item-list" id="supplierList">
+                <!-- Suppliers will be populated here -->
             </div>
         </div>
 
-        <div class="sidebar">
-            <div class="ai-assistant">
-                <h3 class="card-title">
-                    <i class="fas fa-robot"></i>
-                    AI Assistant
-                </h3>
-                
-                <div class="chat-area" id="chatArea">
-                    <div class="message ai">
-                        <strong>AI:</strong> Ready to help! Import your Excel dashboard and I'll instantly analyze your data, generate action items, and provide intelligent insights about your brand portfolio.
-                    </div>
-                </div>
-
-                <div class="voice-input">
-                    <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()">
-                        <i class="fas fa-microphone" id="voiceIcon"></i>
-                    </button>
-                    <p style="text-align: center; font-size: 0.9rem; color: #94a3b8;">
-                        Voice debrief with data updates
-                    </p>
-                </div>
-
-                <div class="quick-actions">
-                    <button class="action-btn" onclick="analyzePortfolio()">
-                        <i class="fas fa-chart-pie"></i> Analyze Portfolio
-                    </button>
-                    <button class="action-btn" onclick="generateReport()">
-                        <i class="fas fa-file-alt"></i> Generate Report
-                    </button>
-                    <button class="action-btn" onclick="predictOutcomes()">
-                        <i class="fas fa-crystal-ball"></i> Predict Success
-                    </button>
-                    <button class="action-btn" onclick="optimizeStrategy()">
-                        <i class="fas fa-bullseye"></i> Optimize Strategy
-                    </button>
-                </div>
+        <!-- Distributors Section -->
+        <div class="section-box">
+            <h2 class="section-title">
+                <i class="fas fa-truck"></i>
+                Distributors
+            </h2>
+            <button class="add-button" onclick="openAddModal('distributor')">
+                <i class="fas fa-plus"></i> Add New Distributor
+            </button>
+            <div class="item-list" id="distributorList">
+                <!-- Distributors will be populated here -->
             </div>
+        </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-upload"></i>
-                        Data Integration
-                    </h3>
+        <!-- Retailers Section -->
+        <div class="section-box">
+            <h2 class="section-title">
+                <i class="fas fa-store"></i>
+                Retailers
+            </h2>
+            <button class="add-button" onclick="openAddModal('retailer')">
+                <i class="fas fa-plus"></i> Add New Retailer
+            </button>
+            <div class="item-list" id="retailerList">
+                <!-- Retailers will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add New Item</h3>
+                <button class="close-button" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="addForm">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="itemName" required>
                 </div>
-                <div class="file-upload" onclick="document.getElementById('meetingFileInput').click();" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #64748b; margin-bottom: 0.5rem;"></i>
-                    <p>Drop Fireflies transcript or meeting notes</p>
-                    <p style="font-size: 0.8rem; color: #94a3b8;">AI will extract action items and update your data</p>
+                <div class="form-group">
+                    <label class="form-label">Country/Region</label>
+                    <input type="text" class="form-input" id="itemCountry" placeholder="e.g., Germany, USA, Global">
                 </div>
-                <input type="file" id="meetingFileInput" style="display: none;" accept=".txt,.pdf,.docx" onchange="handleMeetingFileUpload(event)">
+                <div class="form-group">
+                    <label class="form-label">Contact Person</label>
+                    <input type="text" class="form-input" id="itemContact">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="itemEmail">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="itemStatus">
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="negotiating">Negotiating</option>
+                        <option value="on-hold">On Hold</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="itemNotes" placeholder="Additional information..."></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Add Item</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Distributor Details Modal -->
+    <div class="modal" id="distributorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="distributorModalTitle">Distributor Details</h3>
+                <button class="close-button" onclick="closeDistributorModal()">&times;</button>
+            </div>
+            <div id="distributorDetails">
+                <!-- Distributor brand details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Details Modal -->
+    <div class="modal" id="supplierModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="supplierModalTitle">Supplier Details</h3>
+                <button class="close-button" onclick="closeSupplierModal()">&times;</button>
+            </div>
+            <div id="supplierDetails">
+                <!-- Supplier details will be populated here -->
             </div>
         </div>
     </div>
 
     <script>
-        let dashboardData = {
-            brands: [],
-            countries: new Set(),
-            distributors: new Set(),
-            actionItems: [],
-            documentationStatus: {}
-        };
+        // Data storage
+        let suppliers = [];
+        let distributors = [];
+        let retailers = [];
+        let relationships = []; // Track which suppliers are working with which distributors/retailers
 
-        let isRecording = false;
-        let mediaRecorder = null;
+        // Sample data to start with
+        function initSampleData() {
+            suppliers = [
+                {
+                    id: 1,
+                    name: "GreenLife Supplements",
+                    country: "USA",
+                    contact: "Sarah Johnson",
+                    email: "sarah@greenlife.com",
+                    status: "active",
+                    notes: "Organic supplement manufacturer",
+                    pendingItems: ["Product certification", "Label approval", "Pricing finalization"]
+                },
+                {
+                    id: 2,
+                    name: "TechFlow Electronics",
+                    country: "South Korea",
+                    contact: "Kim Min-jun",
+                    email: "kim@techflow.kr",
+                    status: "negotiating",
+                    notes: "Consumer electronics manufacturer",
+                    pendingItems: ["Contract review", "Sample shipment", "Regulatory documentation"]
+                }
+            ];
 
-        // Excel Import Functionality
+            distributors = [
+                {
+                    id: 1,
+                    name: "European Health Distribution",
+                    country: "Germany",
+                    contact: "Hans Mueller",
+                    email: "hans@ehd.de",
+                    status: "active",
+                    notes: "Leading health product distributor in EU"
+                },
+                {
+                    id: 2,
+                    name: "Pacific Trade Partners",
+                    country: "Australia",
+                    contact: "Emma Wilson",
+                    email: "emma@pacifictrade.au",
+                    status: "pending",
+                    notes: "Electronics and lifestyle products"
+                }
+            ];
+
+            retailers = [
+                {
+                    id: 1,
+                    name: "Healthy Living Stores",
+                    country: "Germany",
+                    contact: "Maria Schmidt",
+                    email: "maria@healthyliving.de",
+                    status: "active",
+                    notes: "Chain of 150 health stores across Germany"
+                }
+            ];
+
+            // Sample relationships (supplier_id, distributor_id, retailer_id, status, progress)
+            relationships = [
+                {
+                    supplierId: 1,
+                    distributorId: 1,
+                    retailerId: 1,
+                    status: "negotiating",
+                    progress: "Contract review stage",
+                    pendingItems: ["Final pricing", "Delivery terms"]
+                },
+                {
+                    supplierId: 2,
+                    distributorId: 2,
+                    retailerId: null,
+                    status: "pending",
+                    progress: "Initial discussions",
+                    pendingItems: ["Product samples", "Market analysis"]
+                }
+            ];
+
+            renderAll();
+        }
+
+        // Render functions
+        function renderSuppliers() {
+            const container = document.getElementById('supplierList');
+            
+            if (suppliers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-industry"></i>
+                        <p>No suppliers added yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = suppliers.map(supplier => {
+                const supplierRelationships = relationships.filter(r => r.supplierId === supplier.id);
+                const activeDeals = supplierRelationships.length;
+                
+                return `
+                    <div class="item-card" onclick="showSupplierDetails(${supplier.id})">
+                        <div class="item-name">${supplier.name}</div>
+                        <div class="item-details">
+                            📍 ${supplier.country} | 👤 ${supplier.contact}<br>
+                            🤝 ${activeDeals} active deal${activeDeals !== 1 ? 's' : ''} | 📋 ${supplier.pendingItems.length} pending items
+                        </div>
+                        <span class="status-badge status-${supplier.status}">${supplier.status.toUpperCase()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDistributors() {
+            const container = document.getElementById('distributorList');
+            
+            if (distributors.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-truck"></i>
+                        <p>No distributors added yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = distributors.map(distributor => {
+                const distributorRelationships = relationships.filter(r => r.distributorId === distributor.id);
+                const brandsCount = distributorRelationships.length;
+                
+                return `
+                    <div class="item-card" onclick="showDistributorDetails(${distributor.id})">
+                        <div class="item-name">${distributor.name}</div>
+                        <div class="item-details">
+                            📍 ${distributor.country} | 👤 ${distributor.contact}<br>
+                            🏷️ ${brandsCount} brand${brandsCount !== 1 ? 's' : ''} in pipeline
+                        </div>
+                        <span class="status-badge status-${distributor.status}">${distributor.status.toUpperCase()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRetailers() {
+            const container = document.getElementById('retailerList');
+            
+            if (retailers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-store"></i>
+                        <p>No retailers added yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = retailers.map(retailer => {
+                const retailerRelationships = relationships.filter(r => r.retailerId === retailer.id);
+                const brandsCount = retailerRelationships.length;
+                
+                return `
+                    <div class="item-card">
+                        <div class="item-name">${retailer.name}</div>
+                        <div class="item-details">
+                            📍 ${retailer.country} | 👤 ${retailer.contact}<br>
+                            🏷️ ${brandsCount} brand${brandsCount !== 1 ? 's' : ''} being sold
+                        </div>
+                        <span class="status-badge status-${retailer.status}">${retailer.status.toUpperCase()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAll() {
+            renderSuppliers();
+            renderDistributors();
+            renderRetailers();
+        }
+
+        // Modal functions
+        function openAddModal(type) {
+            const modal = document.getElementById('addModal');
+            const title = document.getElementById('modalTitle');
+            
+            title.textContent = `Add New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            modal.dataset.type = type;
+            modal.classList.add('show');
+            
+            // Clear form
+            document.getElementById('addForm').reset();
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        function showDistributorDetails(distributorId) {
+            const distributor = distributors.find(d => d.id === distributorId);
+            const distributorRelationships = relationships.filter(r => r.distributorId === distributorId);
+            
+            const modal = document.getElementById('distributorModal');
+            const title = document.getElementById('distributorModalTitle');
+            const details = document.getElementById('distributorDetails');
+            
+            title.textContent = `${distributor.name} - Brand Pipeline`;
+            
+            if (distributorRelationships.length === 0) {
+                details.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-handshake"></i>
+                        <p>No brands currently in pipeline with this distributor</p>
+                    </div>
+                `;
+            } else {
+                details.innerHTML = distributorRelationships.map(relationship => {
+                    const supplier = suppliers.find(s => s.id === relationship.supplierId);
+                    const retailer = relationship.retailerId ? retailers.find(r => r.id === relationship.retailerId) : null;
+                    
+                    return `
+                        <div class="brand-status-item">
+                            <div class="brand-status-header">
+                                <span class="brand-status-name">${supplier.name}</span>
+                                <span class="status-badge status-${relationship.status}">${relationship.status.toUpperCase()}</span>
+                            </div>
+                            <div class="progress-info">
+                                📈 Progress: ${relationship.progress}
+                                ${retailer ? `<br>🏪 End Retailer: ${retailer.name}` : ''}
+                            </div>
+                            ${relationship.pendingItems.length > 0 ? `
+                                <div>
+                                    <strong>Pending Items:</strong>
+                                    <ul class="pending-list">
+                                        ${relationship.pendingItems.map(item => `<li class="pending-item">${item}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeDistributorModal() {
+            document.getElementById('distributorModal').classList.remove('show');
+        }
+
+        function showSupplierDetails(supplierId) {
+            const supplier = suppliers.find(s => s.id === supplierId);
+            const supplierRelationships = relationships.filter(r => r.supplierId === supplierId);
+            
+            const modal = document.getElementById('supplierModal');
+            const title = document.getElementById('supplierModalTitle');
+            const details = document.getElementById('supplierDetails');
+            
+            title.textContent = `${supplier.name} - Overview`;
+            
+            details.innerHTML = `
+                <div class="brand-status-item">
+                    <div class="brand-status-header">
+                        <span class="brand-status-name">Pending from Supplier</span>
+                    </div>
+                    ${supplier.pendingItems.length > 0 ? `
+                        <ul class="pending-list">
+                            ${supplier.pendingItems.map(item => `<li class="pending-item">${item}</li>`).join('')}
+                        </ul>
+                    ` : '<p class="progress-info">✅ No pending items</p>'}
+                </div>
+                
+                <div class="brand-status-item">
+                    <div class="brand-status-header">
+                        <span class="brand-status-name">Distribution Network</span>
+                    </div>
+                    ${supplierRelationships.length > 0 ? 
+                        supplierRelationships.map(relationship => {
+                            const distributor = distributors.find(d => d.id === relationship.distributorId);
+                            const retailer = relationship.retailerId ? retailers.find(r => r.id === relationship.retailerId) : null;
+                            
+                            return `
+                                <div class="progress-info">
+                                    🚛 <strong>${distributor.name}</strong> (${distributor.country})
+                                    ${retailer ? `<br>   └─ 🏪 ${retailer.name}` : ''}
+                                    <br>   📊 Status: <span class="status-badge status-${relationship.status}">${relationship.status.toUpperCase()}</span>
+                                </div>
+                            `;
+                        }).join('')
+                        : '<p class="progress-info">No active distribution partnerships</p>'
+                    }
+                </div>
+            `;
+            
+            modal.classList.add('show');
+        }
+
+        function closeSupplierModal() {
+            document.getElementById('supplierModal').classList.remove('show');
+        }
+
+        // Form submission
+        document.getElementById('addForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('addModal').dataset.type;
+            const formData = {
+                id: Date.now(), // Simple ID generation
+                name: document.getElementById('itemName').value,
+                country: document.getElementById('itemCountry').value,
+                contact: document.getElementById('itemContact').value,
+                email: document.getElementById('itemEmail').value,
+                status: document.getElementById('itemStatus').value,
+                notes: document.getElementById('itemNotes').value
+            };
+            
+            if (type === 'supplier') {
+                formData.pendingItems = []; // Initialize empty pending items
+                suppliers.push(formData);
+            } else if (type === 'distributor') {
+                distributors.push(formData);
+            } else if (type === 'retailer') {
+                retailers.push(formData);
+            }
+            
+            renderAll();
+            closeModal();
+        });
+
+        // Excel Import Functionality - Customized for Wolfpak DASHBOARD 2025.xlsx
         async function handleExcelImport(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const banner = document.getElementById('importBanner');
-            banner.classList.add('processing');
-            banner.innerHTML = '<div class="loading"><div class="spinner"></div> Processing Excel file... AI is analyzing your data</div>';
+            const statusElement = document.getElementById('importStatus');
+            statusElement.style.display = 'flex';
+            statusElement.innerHTML = '<div class="spinner"></div><span>Reading your DASHBOARD 2025.xlsx file...</span>';
 
             try {
                 const data = await file.arrayBuffer();
                 const workbook = XLSX.read(data, {type: 'array'});
                 
-                addMessage('ai', '📊 Excel file uploaded! Analyzing sheets: ' + workbook.SheetNames.join(', '));
-                
-                // Process each sheet
-                for (const sheetName of workbook.SheetNames) {
-                    await processSheet(workbook, sheetName);
+                statusElement.innerHTML = '<div class="spinner"></div><span>Processing: ' + workbook.SheetNames.join(', ') + '</span>';
+
+                // Clear existing data
+                suppliers = [];
+                distributors = [];
+                retailers = [];
+                relationships = [];
+
+                // Process each sheet according to Wolfpak structure
+                if (workbook.Sheets["Supplier"]) {
+                    suppliers = parseWolfpakSuppliers(workbook.Sheets["Supplier"]);
+                    statusElement.innerHTML = '<div class="spinner"></div><span>Imported ' + suppliers.length + ' suppliers...</span>';
                 }
+
+                if (workbook.Sheets["DashBoard"]) {
+                    const dashboardData = parseWolfpakDashboard(workbook.Sheets["DashBoard"]);
+                    distributors = distributors.concat(dashboardData.distributors);
+                    retailers = retailers.concat(dashboardData.retailers);
+                    relationships = relationships.concat(dashboardData.relationships);
+                    statusElement.innerHTML = '<div class="spinner"></div><span>Imported ' + relationships.length + ' active deals...</span>';
+                }
+
+                if (workbook.Sheets["Look Up List"]) {
+                    const lookupData = parseWolfpakLookup(workbook.Sheets["Look Up List"]);
+                    // Add additional distributors and retailers from lookup
+                    distributors = distributors.concat(lookupData.distributors);
+                    retailers = retailers.concat(lookupData.retailers);
+                    statusElement.innerHTML = '<div class="spinner"></div><span>Added lookup data...</span>';
+                }
+
+                // Remove duplicates
+                suppliers = removeDuplicates(suppliers, 'name');
+                distributors = removeDuplicates(distributors, 'name');
+                retailers = removeDuplicates(retailers, 'name');
+
+                // Update the dashboard
+                renderAll();
                 
-                // Update dashboard with processed data
-                updateDashboard();
-                generateAIInsights();
+                statusElement.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>Import complete! ${suppliers.length} suppliers, ${distributors.length} distributors, ${retailers.length} retailers, ${relationships.length} active deals</span>
+                `;
                 
-                banner.innerHTML = '<i class="fas fa-check"></i> Data imported successfully! AI analysis complete. Click to reimport or update.';
-                
-                addMessage('ai', `✅ Successfully imported ${dashboardData.brands.length} brand projects across ${dashboardData.countries.size} countries. AI analysis generated ${dashboardData.actionItems.length} action items.`);
-                
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 5000);
+
             } catch (error) {
-                console.error('Error processing Excel:', error);
-                addMessage('ai', '❌ Error processing Excel file. Please ensure it matches the expected format.');
-                banner.classList.remove('processing');
-                banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error importing file. Click to try again.';
+                console.error('Error importing Excel:', error);
+                statusElement.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <span style="color: #ef4444;">Error importing file: ${error.message}</span>
+                `;
             }
         }
 
-        async function processSheet(workbook, sheetName) {
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+        // Parse Supplier sheet - specific to Wolfpak format
+        function parseWolfpakSuppliers(sheet) {
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            const suppliers = [];
             
-            if (jsonData.length < 2) return; // Skip empty sheets
-            
-            const headers = jsonData[1] || jsonData[0]; // Try row 2 first, then row 1
-            const dataRows = jsonData.slice(2);
-            
-            addMessage('ai', `📋 Processing ${sheetName} sheet: ${headers.length} columns, ${dataRows.length} rows`);
-            
-            // Process based on sheet content
-            if (sheetName.toLowerCase().includes('dashboard') || sheetName.toLowerCase().includes('supplier')) {
-                processBrandData(headers, dataRows);
-            } else if (sheetName.toLowerCase().includes('lookup')) {
-                processLookupData(headers, dataRows);
-            }
-        }
-
-        function processBrandData(headers, rows) {
-            const probabilityIndex = findHeaderIndex(headers, ['probability', 'prob']);
-            const brandIndex = findHeaderIndex(headers, ['brand', 'company', 'supplier']);
-            const countryIndex = findHeaderIndex(headers, ['country', 'market']);
-            const distributorIndex = findHeaderIndex(headers, ['distributor', 'partner']);
-            const ownerIndex = findHeaderIndex(headers, ['owner', 'contact']);
-            
-            // Documentation columns
-            const contractIndex = findHeaderIndex(headers, ['contract']);
-            const tdsIndex = findHeaderIndex(headers, ['tds', 'technical']);
-            const registrationIndex = findHeaderIndex(headers, ['registration', 'reg']);
-            const labelsIndex = findHeaderIndex(headers, ['labels', 'labeling']);
-            const samplesIndex = findHeaderIndex(headers, ['samples', 'sample']);
-            
-            rows.forEach(row => {
-                if (!row[brandIndex] || !row[countryIndex]) return;
+            // Headers are in row 2 (index 1): Brand, Country, Owner, Discovery, Spec Sheets, Price List, etc.
+            for (let row = 2; row <= range.e.r; row++) {
+                const brandCell = sheet[XLSX.utils.encode_cell({r: row, c: 0})]; // Brand
+                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 1})]; // Country  
+                const ownerCell = sheet[XLSX.utils.encode_cell({r: row, c: 2})]; // Owner
+                const discoveryCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Discovery
+                const specSheetsCell = sheet[XLSX.utils.encode_cell({r: row, c: 4})]; // Spec Sheets
+                const priceListCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Price List
+                const externalDeckCell = sheet[XLSX.utils.encode_cell({r: row, c: 6})]; // External Deck
+                const internalDeckCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // Internal Deck
+                const ndaCell = sheet[XLSX.utils.encode_cell({r: row, c: 8})]; // NDA
+                const brokerContractCell = sheet[XLSX.utils.encode_cell({r: row, c: 9})]; // Broker Contract
+                const tdsCell = sheet[XLSX.utils.encode_cell({r: row, c: 10})]; // TDS
                 
-                const brand = {
-                    name: row[brandIndex],
-                    country: row[countryIndex],
-                    distributor: row[distributorIndex] || 'TBD',
-                    probability: row[probabilityIndex] || 'Medium',
-                    owner: row[ownerIndex] || '',
-                    documentation: {
-                        contract: getDocStatus(row[contractIndex]),
-                        tds: getDocStatus(row[tdsIndex]),
-                        registration: getDocStatus(row[registrationIndex]),
-                        labels: getDocStatus(row[labelsIndex]),
-                        samples: getDocStatus(row[samplesIndex])
-                    }
-                };
+                if (!brandCell || !brandCell.v) continue;
                 
-                dashboardData.brands.push(brand);
-                dashboardData.countries.add(brand.country);
-                if (brand.distributor !== 'TBD') {
-                    dashboardData.distributors.add(brand.distributor);
-                }
+                // Build pending items list
+                const pendingItems = [];
+                if (!discoveryCell || discoveryCell.v !== "Done") pendingItems.push("Discovery");
+                if (!specSheetsCell || specSheetsCell.v !== "Done") pendingItems.push("Spec Sheets");
+                if (!priceListCell || priceListCell.v !== "Done") pendingItems.push("Price List");
+                if (!externalDeckCell || externalDeckCell.v !== "Done") pendingItems.push("External Deck");
+                if (!internalDeckCell || internalDeckCell.v !== "Done") pendingItems.push("Internal Deck");
+                if (!ndaCell || ndaCell.v !== "Done") pendingItems.push("NDA");
+                if (!brokerContractCell || brokerContractCell.v !== "Done") pendingItems.push("Broker Contract");
+                if (!tdsCell || tdsCell.v !== "Done") pendingItems.push("TDS");
                 
-                // Generate action items based on missing documentation
-                generateActionItemsForBrand(brand);
-            });
-        }
-
-        function findHeaderIndex(headers, searchTerms) {
-            for (let term of searchTerms) {
-                const index = headers.findIndex(header => 
-                    header && header.toLowerCase().includes(term.toLowerCase())
-                );
-                if (index !== -1) return index;
-            }
-            return -1;
-        }
-
-        function getDocStatus(value) {
-            if (!value) return 'pending';
-            const val = value.toString().toLowerCase();
-            if (val.includes('yes') || val.includes('complete') || val.includes('done')) return 'complete';
-            if (val.includes('no') || val.includes('pending') || val.includes('missing')) return 'pending';
-            if (val.includes('overdue') || val.includes('urgent')) return 'overdue';
-            return 'pending';
-        }
-
-        function generateActionItemsForBrand(brand) {
-            const missingDocs = Object.entries(brand.documentation)
-                .filter(([key, status]) => status === 'pending' || status === 'overdue')
-                .map(([key, status]) => key);
-            
-            if (missingDocs.length > 0) {
-                const priority = brand.probability === 'High' ? 'high' : 
-                               brand.probability === 'Medium' ? 'medium' : 'low';
-                
-                dashboardData.actionItems.push({
-                    type: 'documentation',
-                    brand: brand.name,
-                    country: brand.country,
-                    description: `Complete ${missingDocs.join(', ')} for ${brand.name} - ${brand.country}`,
-                    priority: priority,
-                    dueDate: getDueDate(priority)
+                suppliers.push({
+                    id: Date.now() + row,
+                    name: brandCell.v,
+                    country: countryCell ? countryCell.v : 'Not specified',
+                    contact: ownerCell ? ownerCell.v : 'Not specified',
+                    email: '',
+                    status: pendingItems.length === 0 ? 'active' : 'pending',
+                    notes: `Owner: ${ownerCell ? ownerCell.v : 'TBD'}`,
+                    pendingItems: pendingItems
                 });
             }
             
-            if (brand.distributor === 'TBD') {
-                dashboardData.actionItems.push({
-                    type: 'business_development',
-                    brand: brand.name,
-                    country: brand.country,
-                    description: `Find distributor for ${brand.name} in ${brand.country}`,
-                    priority: brand.probability === 'High' ? 'high' : 'medium',
-                    dueDate: getDueDate('medium')
-                });
-            }
+            return suppliers;
         }
 
-        function getDueDate(priority) {
-            const now = new Date();
-            const days = priority === 'high' ? 3 : priority === 'medium' ? 7 : 14;
-            now.setDate(now.getDate() + days);
-            return now.toLocaleDateString();
-        }
-
-        function updateDashboard() {
-            // Update stats
-            document.getElementById('totalBrands').textContent = new Set(dashboardData.brands.map(b => b.name)).size;
-            document.getElementById('totalCountries').textContent = dashboardData.countries.size;
-            document.getElementById('totalDistributors').textContent = dashboardData.distributors.size;
-            document.getElementById('highProbProjects').textContent = 
-                dashboardData.brands.filter(b => b.probability === 'High').length;
+        // Parse Dashboard sheet - specific to Wolfpak format  
+        function parseWolfpakDashboard(sheet) {
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            const distributors = [];
+            const retailers = [];
+            const relationships = [];
+            const distributorMap = new Map();
+            const retailerMap = new Map();
             
-            // Update brand projects
-            updateBrandProjects();
-            updateActionItems();
-            updateDocumentationTracker();
-            updateSmartFollowups();
-        }
-
-        function updateBrandProjects() {
-            const container = document.getElementById('brandProjects');
-            container.innerHTML = '';
-            
-            // Group brands by name
-            const brandGroups = {};
-            dashboardData.brands.forEach(brand => {
-                if (!brandGroups[brand.name]) {
-                    brandGroups[brand.name] = [];
-                }
-                brandGroups[brand.name].push(brand);
-            });
-            
-            Object.entries(brandGroups).forEach(([brandName, markets]) => {
-                const div = document.createElement('div');
-                div.className = 'brand-item';
-                div.onclick = () => showBrandDetails(brandName, markets);
+            // Headers in row 2: Probability, Brand, Country, Distributor, Retailer, Owner, SOP, SOC, etc.
+            for (let row = 2; row <= range.e.r; row++) {
+                const probCell = sheet[XLSX.utils.encode_cell({r: row, c: 0})]; // Probability
+                const brandCell = sheet[XLSX.utils.encode_cell({r: row, c: 1})]; // Brand
+                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 2})]; // Country
+                const distributorCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Distributor
+                const retailerCell = sheet[XLSX.utils.encode_cell({r: row, c: 4})]; // Retailer
+                const ownerCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Owner
+                const sopCell = sheet[XLSX.utils.encode_cell({r: row, c: 6})]; // SOP
+                const socCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // SOC
+                const presentedCell = sheet[XLSX.utils.encode_cell({r: row, c: 8})]; // Presented
                 
-                const probCounts = markets.reduce((acc, m) => {
-                    acc[m.probability] = (acc[m.probability] || 0) + 1;
-                    return acc;
-                }, {});
+                if (!brandCell || !brandCell.v || !distributorCell || !distributorCell.v) continue;
                 
-                const highestProb = probCounts.High ? 'High' : probCounts.Medium ? 'Medium' : 'Low';
-                const probClass = highestProb === 'High' ? 'prob-high' : 
-                                 highestProb === 'Medium' ? 'prob-medium' : 'prob-low';
+                const distributor = distributorCell.v;
+                const retailer = retailerCell ? retailerCell.v : '';
+                const country = countryCell ? countryCell.v : '';
+                const probability = probCell ? probCell.v : 'Med';
                 
-                div.innerHTML = `
-                    <div class="brand-header">
-                        <span class="brand-name">${brandName}</span>
-                        <span class="probability-badge ${probClass}">${highestProb} Probability</span>
-                    </div>
-                    <div class="market-info">
-                        <span>${markets.length} markets: ${markets.map(m => getCountryFlag(m.country) + m.country).join(', ')}</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${calculateProgress(markets)}%;"></div>
-                    </div>
-                `;
-                
-                container.appendChild(div);
-            });
-        }
-
-        function updateActionItems() {
-            const container = document.getElementById('actionItems');
-            container.innerHTML = '';
-            
-            dashboardData.actionItems.slice(0, 5).forEach(item => {
-                const li = document.createElement('li');
-                li.className = `pending-item priority-${item.priority}`;
-                li.onclick = () => handleActionItem(item);
-                
-                const icon = item.type === 'documentation' ? 'fas fa-file-contract' : 'fas fa-handshake';
-                
-                li.innerHTML = `
-                    <i class="${icon}"></i>
-                    <div>
-                        <div>${item.description}</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">Due: ${item.dueDate}</div>
-                    </div>
-                `;
-                
-                container.appendChild(li);
-            });
-        }
-
-        function updateDocumentationTracker() {
-            const container = document.getElementById('documentationTracker');
-            container.innerHTML = '';
-            
-            const docTypes = ['Contract', 'TDS', 'Registration', 'Labels', 'Samples'];
-            
-            docTypes.forEach(docType => {
-                const total = dashboardData.brands.length;
-                const complete = dashboardData.brands.filter(b => 
-                    b.documentation[docType.toLowerCase()] === 'complete'
-                ).length;
-                const pending = dashboardData.brands.filter(b => 
-                    b.documentation[docType.toLowerCase()] === 'pending'
-                ).length;
-                const overdue = dashboardData.brands.filter(b => 
-                    b.documentation[docType.toLowerCase()] === 'overdue'
-                ).length;
-                
-                const div = document.createElement('div');
-                div.className = 'compliance-item';
-                div.innerHTML = `
-                    <span>${docType} (${complete}/${total})</span>
-                    <span class="compliance-status ${complete === total ? 'status-complete' : overdue > 0 ? 'status-overdue' : 'status-pending'}">
-                        ${complete === total ? 'Complete' : overdue > 0 ? `${overdue} Overdue` : `${pending} Pending`}
-                    </span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function updateSmartFollowups() {
-            const container = document.getElementById('smartFollowups');
-            container.innerHTML = '';
-            
-            // AI-generated follow-up suggestions
-            const suggestions = generateFollowupSuggestions();
-            
-            suggestions.forEach(suggestion => {
-                const div = document.createElement('div');
-                div.className = 'compliance-item';
-                div.onclick = () => scheduleFollowup(suggestion);
-                div.innerHTML = `
-                    <div>
-                        <div>${suggestion.action}</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">${suggestion.reasoning}</div>
-                    </div>
-                    <i class="fas fa-calendar-plus" style="color: #22c55e;"></i>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function generateFollowupSuggestions() {
-            const suggestions = [];
-            
-            // High probability brands without recent contact
-            const highProbBrands = dashboardData.brands.filter(b => b.probability === 'High');
-            if (highProbBrands.length > 0) {
-                suggestions.push({
-                    action: `Follow up on ${highProbBrands.length} high-probability projects`,
-                    reasoning: 'Strike while iron is hot - high conversion potential'
-                });
-            }
-            
-            // Brands missing key documentation
-            const missingContracts = dashboardData.brands.filter(b => b.documentation.contract === 'pending');
-            if (missingContracts.length > 0) {
-                suggestions.push({
-                    action: `Push for contract signatures (${missingContracts.length} pending)`,
-                    reasoning: 'Contracts are critical path items for revenue'
-                });
-            }
-            
-            // Geographic clustering opportunities
-            const countryBrands = {};
-            dashboardData.brands.forEach(b => {
-                if (!countryBrands[b.country]) countryBrands[b.country] = [];
-                countryBrands[b.country].push(b);
-            });
-            
-            Object.entries(countryBrands).forEach(([country, brands]) => {
-                if (brands.length > 2) {
-                    suggestions.push({
-                        action: `Coordinate ${country} market entry (${brands.length} brands)`,
-                        reasoning: 'Economies of scale in regulatory/logistics'
+                // Track unique distributors
+                if (!distributorMap.has(distributor)) {
+                    distributorMap.set(distributor, {
+                        id: Date.now() + distributors.length,
+                        name: distributor,
+                        country: country,
+                        contact: 'Not specified',
+                        email: '',
+                        status: 'active',
+                        notes: `Active in ${country}`
                     });
                 }
-            });
+                
+                // Track unique retailers
+                if (retailer && !retailerMap.has(retailer)) {
+                    retailerMap.set(retailer, {
+                        id: Date.now() + retailers.length + 1000,
+                        name: retailer,
+                        country: country,
+                        contact: 'Not specified', 
+                        email: '',
+                        status: 'active',
+                        notes: `Active in ${country}`
+                    });
+                }
+                
+                // Create relationship
+                const pendingItems = [];
+                if (!presentedCell || presentedCell.v !== "Done") pendingItems.push("Presentation");
+                if (!sopCell || !sopCell.v) pendingItems.push("SOP Agreement");
+                if (!socCell || !socCell.v) pendingItems.push("SOC Documentation");
+                
+                relationships.push({
+                    supplierId: findSupplierIdByName(brandCell.v),
+                    distributorId: distributorMap.get(distributor).id,
+                    retailerId: retailer ? retailerMap.get(retailer).id : null,
+                    status: mapProbabilityToStatus(probability),
+                    progress: `${probability} probability - ${country} market`,
+                    pendingItems: pendingItems
+                });
+            }
             
-            return suggestions.slice(0, 4);
+            return {
+                distributors: Array.from(distributorMap.values()),
+                retailers: Array.from(retailerMap.values()),
+                relationships: relationships
+            };
         }
 
-        function generateAIInsights() {
-            // AI analysis of the imported data
-            const insights = [
-                `📊 Portfolio Analysis: You have ${dashboardData.brands.length} active projects across ${dashboardData.countries.size} countries.`,
-                `🎯 Success Prediction: ${dashboardData.brands.filter(b => b.probability === 'High').length} projects have high conversion probability.`,
-                `⚠️ Risk Assessment: ${dashboardData.actionItems.filter(a => a.priority === 'high').length} high-priority items need immediate attention.`,
-                `🌍 Geographic Opportunities: Consider focusing on markets with multiple brands for efficiency.`
-            ];
+        // Parse Look Up List sheet - specific to Wolfpak format
+        function parseWolfpakLookup(sheet) {
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            const distributors = [];
+            const retailers = [];
+            const distributorSet = new Set();
+            const retailerSet = new Set();
             
-            insights.forEach((insight, index) => {
-                setTimeout(() => addMessage('ai', insight), index * 1000);
-            });
+            // Headers in row 2: [blank], Supplier, [blank], Country, [blank], Distributor, [blank], Retailer, [blank], Owner
+            for (let row = 2; row <= range.e.r; row++) {
+                const distributorCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Distributor
+                const retailerCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // Retailer
+                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Country
+                
+                // Add distributors
+                if (distributorCell && distributorCell.v && !distributorSet.has(distributorCell.v)) {
+                    distributorSet.add(distributorCell.v);
+                    distributors.push({
+                        id: Date.now() + distributors.length + 2000,
+                        name: distributorCell.v,
+                        country: countryCell ? countryCell.v : 'Multiple',
+                        contact: 'Not specified',
+                        email: '',
+                        status: 'pending',
+                        notes: 'From lookup list - not yet in active pipeline'
+                    });
+                }
+                
+                // Add retailers
+                if (retailerCell && retailerCell.v && !retailerSet.has(retailerCell.v)) {
+                    retailerSet.add(retailerCell.v);
+                    retailers.push({
+                        id: Date.now() + retailers.length + 3000,
+                        name: retailerCell.v,
+                        country: countryCell ? countryCell.v : 'Multiple',
+                        contact: 'Not specified',
+                        email: '',
+                        status: 'pending',
+                        notes: 'From lookup list - potential target'
+                    });
+                }
+            }
+            
+            return { distributors, retailers };
         }
 
         // Helper functions
-        function getCountryFlag(country) {
-            const flags = {
-                'Germany': '🇩🇪', 'France': '🇫🇷', 'Spain': '🇪🇸', 'Japan': '🇯🇵',
-                'Korea': '🇰🇷', 'Canada': '🇨🇦', 'Mexico': '🇲🇽', 'Brazil': '🇧🇷',
-                'Italy': '🇮🇹', 'UK': '🇬🇧', 'Netherlands': '🇳🇱', 'Australia': '🇦🇺'
-            };
-            return flags[country] || '🌍';
+        function findSupplierIdByName(name) {
+            const supplier = suppliers.find(s => s.name.toLowerCase() === name.toLowerCase());
+            return supplier ? supplier.id : Date.now();
         }
 
-        function calculateProgress(markets) {
-            const totalSteps = 5; // Total documentation steps
-            let completedSteps = 0;
-            
-            markets.forEach(market => {
-                Object.values(market.documentation).forEach(status => {
-                    if (status === 'complete') completedSteps++;
-                });
+        function mapProbabilityToStatus(probability) {
+            if (!probability) return 'pending';
+            const prob = probability.toString().toLowerCase();
+            if (prob.includes('hi')) return 'negotiating';
+            if (prob.includes('med')) return 'pending';
+            if (prob.includes('lo')) return 'on-hold';
+            return 'pending';
+        }
+
+        function removeDuplicates(array, key) {
+            const seen = new Set();
+            return array.filter(item => {
+                const keyValue = item[key].toLowerCase();
+                if (seen.has(keyValue)) {
+                    return false;
+                }
+                seen.add(keyValue);
+                return true;
             });
-            
-            return Math.round((completedSteps / (markets.length * totalSteps)) * 100);
         }
 
-        // Interactive functions
-        function showBrandDetails(brandName, markets) {
-            addMessage('user', `Show me details for ${brandName}`);
-            setTimeout(() => {
-                const summary = `${brandName} details:\n• ${markets.length} markets: ${markets.map(m => m.country).join(', ')}\n• Distributors: ${markets.map(m => m.distributor).filter(d => d !== 'TBD').join(', ') || 'None assigned'}\n• Next steps: Review documentation status and schedule follow-ups`;
-                addMessage('ai', summary);
-            }, 1000);
-        }
-
-        function handleActionItem(item) {
-            addMessage('user', `Help me with: ${item.description}`);
-            setTimeout(() => {
-                if (item.type === 'documentation') {
-                    addMessage('ai', `I can help you track this documentation. Would you like me to:\n1. Set a reminder\n2. Draft follow-up emails\n3. Create a checklist\n4. Find similar completed projects for reference`);
-                } else {
-                    addMessage('ai', `For distributor search, I recommend:\n1. Analyze market size and competition\n2. Leverage your existing network\n3. Check similar brand placements\n4. Review regulatory requirements first`);
-                }
-            }, 1000);
-        }
-
-        function analyzePortfolio() {
-            addMessage('user', 'Analyze my brand portfolio');
-            setTimeout(() => {
-                const highProb = dashboardData.brands.filter(b => b.probability === 'High').length;
-                const total = dashboardData.brands.length;
-                const conversionRate = Math.round((highProb / total) * 100);
-                
-                addMessage('ai', `Portfolio Analysis:\n• Conversion Rate: ${conversionRate}% (${highProb}/${total} high-probability)\n• Top Markets: ${Array.from(dashboardData.countries).slice(0, 3).join(', ')}\n• Recommendation: Focus on high-probability projects and geographic clustering for efficiency`);
-            }, 1500);
-        }
-
-        function generateReport() {
-            addMessage('user', 'Generate executive report');
-            setTimeout(() => {
-                addMessage('ai', `📋 Executive Summary Generated:\n• ${dashboardData.brands.length} active projects\n• ${dashboardData.actionItems.filter(a => a.priority === 'high').length} urgent items\n• ${dashboardData.countries.size} markets in pipeline\n• Report includes recommendations for Q1 focus areas. Would you like me to email this to stakeholders?`);
-            }, 2000);
-        }
-
-        function predictOutcomes() {
-            addMessage('user', 'Predict project success rates');
-            setTimeout(() => {
-                addMessage('ai', `🔮 AI Predictions:\n• 85% probability of success for Germany expansion\n• 72% for Japan market entry\n• 45% for Brazil (recommend more market research)\n• Overall portfolio success rate: 68%\n\nBased on documentation completeness, market size, and historical data.`);
-            }, 1500);
-        }
-
-        function optimizeStrategy() {
-            addMessage('user', 'Optimize my expansion strategy');
-            setTimeout(() => {
-                addMessage('ai', `🎯 Strategy Optimization:\n1. Prioritize markets with existing distributor relationships\n2. Bundle similar brands for efficient market entry\n3. Focus on high-margin categories first\n4. Leverage regulatory approvals across similar products\n\nRecommend focusing on 3-5 key markets vs. spreading thin across all ${dashboardData.countries.size} markets.`);
-            }, 2000);
-        }
-
-        // Voice and file handling (existing functions)
-        function toggleVoiceRecording() {
-            const button = document.getElementById('voiceButton');
-            const icon = document.getElementById('voiceIcon');
-            
-            if (!isRecording) {
-                startRecording();
-                button.classList.add('recording');
-                icon.className = 'fas fa-stop';
-                isRecording = true;
-            } else {
-                stopRecording();
-                button.classList.remove('recording');
-                icon.className = 'fas fa-microphone';
-                isRecording = false;
-            }
-        }
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = function(event) {
-                    console.log('Audio data available:', event.data);
-                };
-                
-                mediaRecorder.onstop = function() {
-                    stream.getTracks().forEach(track => track.stop());
-                    setTimeout(() => {
-                        addMessage('user', 'Daily debrief: German distributor confirmed interest in GreenLife, need to expedite TDS documentation...');
-                        setTimeout(() => {
-                            addMessage('ai', 'Thanks! I\'ve updated the GreenLife Germany project status and flagged TDS as high priority. I\'ve also scheduled a follow-up reminder for next Tuesday. Want me to draft the TDS request email?');
-                            
-                            // Update the actual data
-                            const greenLifeProject = dashboardData.brands.find(b => 
-                                b.name.includes('GreenLife') && b.country === 'Germany'
-                            );
-                            if (greenLifeProject) {
-                                greenLifeProject.probability = 'High';
-                                updateDashboard();
-                            }
-                        }, 1000);
-                    }, 500);
-                };
-                
-                mediaRecorder.start();
-                addMessage('ai', '🎤 Recording... Share your daily updates and I\'ll automatically update the relevant projects.');
-                
-            } catch (error) {
-                console.error('Error accessing microphone:', error);
-                addMessage('ai', 'Unable to access microphone. Please check permissions and try again.');
-            }
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                addMessage('ai', '🔄 Processing your update and updating project data...');
-            }
-        }
-
-        function addMessage(sender, text) {
-            const chatArea = document.getElementById('chatArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${text.replace(/\n/g, '<br>')}`;
-            chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
-
-        function handleMeetingFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                addMessage('ai', `📄 Processing ${file.name}... Extracting action items and updating project data.`);
-                
-                setTimeout(() => {
-                    addMessage('ai', `✅ Meeting processed! Found:\n• 2 new action items added to dashboard\n• Updated 3 project timelines\n• Identified 1 potential new distributor lead\n\nAll data automatically integrated into your dashboard.`);
-                    
-                    // Simulate adding new action items
-                    dashboardData.actionItems.push({
-                        type: 'follow_up',
-                        description: 'Follow up with Italian distributor from meeting',
-                        priority: 'medium',
-                        dueDate: getDueDate('medium')
-                    });
-                    
-                    updateActionItems();
-                }, 2000);
-            }
-        }
-
-        function handleDrop(event) {
-            event.preventDefault();
-            event.target.classList.remove('dragover');
-            const files = event.dataTransfer.files;
-            if (files.length > 0) {
-                handleMeetingFileUpload({target: {files: files}});
-            }
-        }
-
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.target.classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.target.classList.remove('dragover');
-        }
-
-        function exportData() {
-            const exportData = {
-                brands: dashboardData.brands,
-                actionItems: dashboardData.actionItems,
-                summary: {
-                    totalBrands: dashboardData.brands.length,
-                    totalCountries: dashboardData.countries.size,
-                    totalDistributors: dashboardData.distributors.size,
-                    highProbability: dashboardData.brands.filter(b => b.probability === 'High').length
-                }
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'wolfpak-dashboard-export.json';
-            a.click();
-            
-            addMessage('ai', '📤 Dashboard data exported successfully! File includes all brands, action items, and AI insights.');
-        }
-
-        // Initialize
-        addMessage('ai', '🚀 Wolfpak AI Command Center ready! Upload your Excel dashboard to see the magic happen.');
+        // Initialize the dashboard
+        initSampleData();
     </script>
 </body>
 </html>
