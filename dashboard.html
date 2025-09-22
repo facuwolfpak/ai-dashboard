@@ -244,8 +244,8 @@
             <h2 style="margin-bottom: 1.5rem;">Product Search</h2>
             <form class="search-form" id="searchForm">
                 <div class="form-group">
-                    <label for="product">Product Name</label>
-                    <input type="text" id="product" placeholder="e.g., Organic Olive Oil, Greek Yogurt" required>
+                    <label for="product">Product Category</label>
+                    <input type="text" id="product" placeholder="e.g., Hot Sauce, Greek Yogurt, Energy Drinks" required>
                 </div>
                 <div class="form-group">
                     <label for="country">Country</label>
@@ -303,44 +303,47 @@
     </div>
 
     <script>
-        // Competitor mapping - shows actual competing brands/products
-        const competitorMap = {
-            // Hot Sauces & Sriracha
-            "sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce"],
-            "yellowbird sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Secret Aardvark Habanero", "Trident Sriracha Sauce"],
-            "yellowbird blue agave sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Secret Aardvark Habanero", "Trident Sriracha Sauce"],
-            "hot sauce": ["Tabasco Original", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce", "Crystal Hot Sauce"],
+        // Category-based competitor mapping - shows all major brands in each category
+        const categoryMap = {
+            // Sauces & Condiments
+            "hot sauce": ["Tabasco Original", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce", "Crystal Hot Sauce", "Louisiana Hot Sauce", "Texas Pete", "Sriracha Huy Fong", "Yellowbird Habanero", "Secret Aardvark Habanero", "Trident Sriracha", "Melinda's Original Habanero"],
+            "sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Yellowbird Sriracha", "Trident Sriracha Sauce", "Roland Sriracha", "Lee Kum Kee Sriracha", "Shark Brand Sriracha", "Flying Goose Sriracha"],
+            "bbq sauce": ["Sweet Baby Ray's", "KC Masterpiece", "Stubb's Original", "Bull's-Eye", "Open Pit", "Kraft Original", "Famous Dave's", "Jack Daniel's BBQ Sauce"],
+            "ketchup": ["Heinz Tomato Ketchup", "Hunt's Tomato Ketchup", "French's Tomato Ketchup", "Del Monte Ketchup", "Simply Heinz", "Organic Ketchup Annie's", "365 Organic Ketchup"],
             
             // Beverages
-            "coca cola": ["Pepsi Cola", "Dr Pepper", "Sprite", "Mountain Dew", "7UP"],
-            "pepsi": ["Coca Cola", "Dr Pepper", "Mountain Dew", "Sprite", "RC Cola"],
-            "sprite": ["7UP", "Sierra Mist", "Coca Cola", "Pepsi", "Ginger Ale"],
+            "energy drinks": ["Red Bull Original", "Monster Energy", "Rockstar Energy", "Bang Energy", "Celsius", "5-Hour Energy", "NOS Energy", "Full Throttle", "Amp Energy", "Reign Total Body Fuel"],
+            "cola": ["Coca Cola Classic", "Pepsi Cola", "Dr Pepper", "RC Cola", "Mexican Coke", "Pepsi Zero Sugar", "Diet Coke", "Coke Zero"],
+            "sports drinks": ["Gatorade Thirst Quencher", "Powerade", "BodyArmor", "Propel", "Vitamin Water", "Smartwater", "Coconut Water Vita Coco"],
+            "coffee": ["Folgers Classic Roast", "Maxwell House", "Dunkin' Original", "Starbucks Pike Place", "Green Mountain Coffee", "Lavazza", "Illy Ground Coffee", "Eight O'Clock Coffee"],
+            
+            // Dairy & Alternatives
+            "greek yogurt": ["Chobani Greek Yogurt", "Fage Total Greek", "Oikos Triple Zero", "Two Good Greek Yogurt", "Dannon Light & Fit Greek", "Siggi's Skyr", "Wallaby Organic Greek", "Cabot Greek Yogurt"],
+            "almond milk": ["Almond Breeze", "Silk Almond Milk", "So Delicious Almond", "Blue Diamond Almond Breeze", "Califia Farms Almond", "Elmhurst Almond Milk", "Simple Truth Almond"],
+            "cheese": ["Kraft Singles", "Sargento Sliced", "Tillamook Cheddar", "Cabot Vermont Cheddar", "Cracker Barrel Cheese", "Boar's Head Cheese", "Organic Valley Cheese"],
             
             // Oils & Cooking
-            "olive oil": ["Bertolli Extra Virgin Olive Oil", "California Olive Ranch", "Colavita", "Pompeian", "Filippo Berio"],
-            "organic olive oil": ["California Olive Ranch Organic", "Spectrum Organic", "Colavita Organic", "Cobram Estate", "Lucini Italia"],
-            "canola oil": ["Wesson Canola Oil", "Crisco Pure Canola Oil", "Mazola Canola Oil", "Great Value Canola Oil", "Smart Balance"],
-            
-            // Dairy
-            "greek yogurt": ["Chobani Greek Yogurt", "Fage Total Greek Yogurt", "Oikos Triple Zero", "Two Good Greek Yogurt", "Dannon Light & Fit"],
-            "almond milk": ["Almond Breeze", "Silk Almond Milk", "So Delicious", "Blue Diamond", "Califia Farms"],
-            "milk": ["Horizon Organic Milk", "Fairlife Ultra-Filtered", "Organic Valley", "Great Value Milk", "Lactaid"],
+            "olive oil": ["Bertolli Extra Virgin", "California Olive Ranch", "Colavita Extra Virgin", "Pompeian Extra Virgin", "Filippo Berio", "Lucini Italia Premium", "Kirkland Signature Organic"],
+            "cooking oil": ["Wesson Vegetable Oil", "Crisco Pure Vegetable", "Mazola Corn Oil", "Smart Balance Oil", "Spectrum Organic", "LouAna Pure Coconut Oil"],
             
             // Snacks
-            "potato chips": ["Lay's Classic", "Pringles Original", "Kettle Brand", "Cape Cod", "Ruffles"],
-            "cookies": ["Oreo Cookies", "Chips Ahoy!", "Pepperidge Farm", "Keebler Fudge Stripes", "Nabisco Nutter Butter"],
+            "potato chips": ["Lay's Classic", "Pringles Original", "Kettle Brand", "Cape Cod", "Ruffles", "Doritos Nacho Cheese", "Cheetos Crunchy", "Fritos Original"],
+            "cookies": ["Oreo Original", "Chips Ahoy!", "Pepperidge Farm Milano", "Keebler Fudge Stripes", "Nabisco Nutter Butter", "Famous Amos Bite Size", "Archway Soft Iced"],
+            "crackers": ["Ritz Original", "Cheez-Its Original", "Goldfish Cheddar", "Triscuit Original", "Wheat Thins Original", "Town House Crackers"],
             
-            // Cereals
-            "cheerios": ["Honey Nut Cheerios", "Lucky Charms", "Frosted Flakes", "Corn Flakes", "Rice Krispies"],
-            "corn flakes": ["Kellogg's Corn Flakes", "Post Toasties", "Great Value Corn Flakes", "Nature's Path Organic", "Barbara's Corn Flakes"],
+            // Breakfast & Cereals
+            "cereal": ["Cheerios Original", "Frosted Flakes", "Lucky Charms", "Corn Flakes Kellogg's", "Rice Krispies", "Special K Original", "Honey Nut Cheerios", "Cinnamon Toast Crunch", "Froot Loops"],
+            "oatmeal": ["Quaker Instant Oatmeal", "McCann's Steel Cut Oats", "Bob's Red Mill Oats", "Nature's Path Organic", "Kodiak Cakes Oatmeal"],
             
-            // Health/Organic
-            "protein bars": ["Quest Protein Bars", "KIND Bars", "RXBAR", "Clif Bar", "Pure Protein"],
-            "green tea": ["Lipton Green Tea", "Bigelow Green Tea", "Twinings Green Tea", "Arizona Green Tea", "Celestial Seasonings"],
-            "quinoa": ["Ancient Harvest Quinoa", "Bob's Red Mill Quinoa", "Lundberg Organic Quinoa", "TruRoots Quinoa", "Seeds of Change"],
+            // Health & Organic
+            "protein bars": ["Quest Protein Bar", "KIND Bars", "RXBAR", "Clif Bar", "Pure Protein", "ONE Protein Bar", "Think! Protein Bar", "PowerBar Protein Plus"],
+            "vitamins": ["Centrum Multivitamin", "One A Day", "Nature Made", "Vitafusion Gummies", "Garden of Life", "Rainbow Light", "Mega Food"],
             
-            // Default competitors for unknown products
-            "default": ["Premium Brand Classic", "Select Choice Original", "Organic Valley Select", "Store Brand Premium", "Market Choice"]
+            // International/Specialty
+            "asian sauces": ["Kikkoman Soy Sauce", "Lee Kum Kee Oyster Sauce", "Maggi Seasoning", "Sriracha Huy Fong", "Sambal Oelek", "Fish Sauce Red Boat", "Miso Paste Hikari"],
+            
+            // Default for unknown categories
+            "default": ["Premium Brand A", "Select Choice B", "Organic Valley C", "Store Brand D", "Market Choice E", "Quality Brand F", "Fresh Select G", "Pure Choice H"]
         };
 
         // Mock data with competitor products and links
