@@ -305,8 +305,14 @@
     <script>
         // Competitor mapping - shows actual competing brands/products
         const competitorMap = {
+            // Hot Sauces & Sriracha
+            "sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce"],
+            "yellowbird sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Secret Aardvark Habanero", "Trident Sriracha Sauce"],
+            "yellowbird blue agave sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Cholula Original", "Secret Aardvark Habanero", "Trident Sriracha Sauce"],
+            "hot sauce": ["Tabasco Original", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce", "Crystal Hot Sauce"],
+            
             // Beverages
-            "coca cola": ["Pepsi", "Dr Pepper", "Sprite", "Mountain Dew", "7UP"],
+            "coca cola": ["Pepsi Cola", "Dr Pepper", "Sprite", "Mountain Dew", "7UP"],
             "pepsi": ["Coca Cola", "Dr Pepper", "Mountain Dew", "Sprite", "RC Cola"],
             "sprite": ["7UP", "Sierra Mist", "Coca Cola", "Pepsi", "Ginger Ale"],
             
@@ -334,7 +340,7 @@
             "quinoa": ["Ancient Harvest Quinoa", "Bob's Red Mill Quinoa", "Lundberg Organic Quinoa", "TruRoots Quinoa", "Seeds of Change"],
             
             // Default competitors for unknown products
-            "default": ["Brand A Premium", "Brand B Select", "Brand C Organic", "Store Brand Classic", "Premium Choice"]
+            "default": ["Premium Brand Classic", "Select Choice Original", "Organic Valley Select", "Store Brand Premium", "Market Choice"]
         };
 
         // Mock data with competitor products and links
@@ -422,17 +428,25 @@
             const results = [];
             
             // Get competitors for the searched product
-            const searchKey = product.toLowerCase();
-            let competitors = competitorMap[searchKey] || competitorMap["default"];
+            const searchKey = product.toLowerCase().trim();
+            let competitors = null;
             
-            // Check for partial matches (e.g., if someone searches "olive oil" but we have "organic olive oil")
-            if (competitors === competitorMap["default"]) {
+            // Check for exact matches first
+            if (competitorMap[searchKey]) {
+                competitors = competitorMap[searchKey];
+            } else {
+                // Check for partial matches (e.g., if someone searches "yellowbird blue agave sriracha" match with "sriracha")
                 for (const [key, value] of Object.entries(competitorMap)) {
-                    if (key !== "default" && (searchKey.includes(key) || key.includes(searchKey))) {
+                    if (key !== "default" && (searchKey.includes(key) || key.includes(searchKey.split(' ').pop()))) {
                         competitors = value;
                         break;
                     }
                 }
+            }
+            
+            // Fall back to default if no match found
+            if (!competitors) {
+                competitors = competitorMap["default"];
             }
             
             // Generate 4-7 competitor results
@@ -445,24 +459,49 @@
                 const hasDiscount = Math.random() > 0.5;
                 const currency = getCurrency(country);
                 
-                // Generate realistic product URLs
-                const storeSlug = store.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                // Generate more realistic store-specific URLs
+                let storeUrl = '';
                 const productSlug = competitor.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-                const productUrl = `https://www.${storeSlug}.com/products/${productSlug}-${Math.floor(Math.random() * 10000)}`;
+                
+                if (store.includes('Coles')) {
+                    storeUrl = `https://www.coles.com.au/product/${productSlug}-${Math.floor(Math.random() * 9000000) + 1000000}`;
+                } else if (store.includes('Woolworths')) {
+                    storeUrl = `https://www.woolworths.com.au/shop/productdetails/${Math.floor(Math.random() * 900000) + 100000}/${productSlug}`;
+                } else if (store.includes('Walmart')) {
+                    storeUrl = `https://www.walmart.com/ip/${productSlug}/${Math.floor(Math.random() * 900000000) + 100000000}`;
+                } else if (store.includes('Kroger')) {
+                    storeUrl = `https://www.kroger.com/p/${productSlug}/${Math.floor(Math.random() * 90000000000) + 10000000000}`;
+                } else {
+                    const storeSlug = store.toLowerCase().replace(/\s+/g, '').replace(/[^\w]/g, '');
+                    storeUrl = `https://www.${storeSlug}.com/products/${productSlug}`;
+                }
+                
+                // Better image generation with actual product-like appearance
+                const productImage = generateProductImage(competitor);
                 
                 results.push({
                     chain: store,
                     logo: store.substring(0, 2).toUpperCase(),
-                    image: `https://via.placeholder.com/80x80/${getRandomColor()}/ffffff?text=${competitor.substring(0,3).toUpperCase()}`,
+                    image: productImage,
                     description: competitor,
                     size: getRandomSize(product),
                     regularPrice: `${currency}${basePrice.toFixed(2)}`,
                     salePrice: hasDiscount ? `${currency}${(basePrice * (0.75 + Math.random() * 0.15)).toFixed(2)}` : null,
-                    productUrl: productUrl
+                    productUrl: storeUrl
                 });
             });
             
             return results;
+        }
+
+        function generateProductImage(productName) {
+            // Create a simple colored rectangle with product initials as a more reliable image
+            const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'F7DC6F', 'BB8FCE', 'F8C471', '82E0AA', 'AED6F1'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const initials = productName.split(' ').map(word => word[0]).join('').substring(0, 3).toUpperCase();
+            
+            // Using a different placeholder service that's more reliable
+            return `https://dummyimage.com/80x80/${color}/ffffff&text=${initials}`;
         }
 
         function getCurrency(country) {
