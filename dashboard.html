@@ -173,12 +173,6 @@
             margin-right: 0.5rem;
         }
 
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-        }
-
         .product-link {
             display: inline-block;
             background: #667eea;
@@ -216,13 +210,15 @@
             100% { transform: rotate(360deg); }
         }
 
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
         @media (max-width: 768px) {
             .search-form {
                 grid-template-columns: 1fr;
-            }
-            
-            .results-table {
-                font-size: 0.9rem;
             }
         }
     </style>
@@ -241,12 +237,11 @@
         </div>
 
         <div class="search-section">
-            <h2 style="margin-bottom: 1.5rem;">Product Search</h2>
-            <button onclick="alert('JavaScript is working! The search issue might be elsewhere.')" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">Test JavaScript</button>
-            <form class="search-form" id="searchForm">
+            <h2 style="margin-bottom: 1.5rem;">Category Search</h2>
+            <div class="search-form">
                 <div class="form-group">
-                    <label for="product">Product Category</label>
-                    <input type="text" id="product" placeholder="e.g., Hot Sauce, Greek Yogurt, Energy Drinks" required>
+                    <label for="category">Product Category</label>
+                    <input type="text" id="category" placeholder="e.g., Hot Sauce, Energy Drinks, Greek Yogurt" required>
                 </div>
                 <div class="form-group">
                     <label for="country">Country</label>
@@ -264,13 +259,18 @@
                         <option value="Brazil">Brazil</option>
                     </select>
                 </div>
-                <button type="submit" class="search-btn">🔍 Search</button>
-            </form>
+                <button type="button" class="search-btn" onclick="performSearch()">🔍 Search</button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing market data...</p>
         </div>
 
         <div class="results-section" id="resultsSection" style="display: none;">
             <div class="results-header">
-                <h3 id="resultsTitle">Search Results</h3>
+                <h3 id="resultsTitle">Market Analysis</h3>
                 <p id="resultsSubtitle"></p>
             </div>
             <div class="results-table">
@@ -279,7 +279,7 @@
                         <tr>
                             <th>Supermarket Chain</th>
                             <th>Product Image</th>
-                            <th>Competitor Product</th>
+                            <th>Brand/Product</th>
                             <th>Size</th>
                             <th>Regular Price</th>
                             <th>Sale Price</th>
@@ -292,218 +292,100 @@
             </div>
         </div>
 
-        <div class="loading" id="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>Searching grocery chains...</p>
-        </div>
-
         <div class="no-results" id="noResults" style="display: none;">
             <h3>No results found</h3>
-            <p>Try searching for a different product or country.</p>
+            <p>Try searching for a different category or country.</p>
         </div>
     </div>
 
     <script>
-        // Category-based competitor mapping - shows all major brands in each category
-        const categoryMap = {
-            // Sauces & Condiments
-            "hot sauce": ["Tabasco Original", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce", "Crystal Hot Sauce", "Louisiana Hot Sauce", "Texas Pete", "Sriracha Huy Fong", "Yellowbird Habanero", "Secret Aardvark Habanero", "Trident Sriracha", "Melinda's Original Habanero"],
-            "sriracha": ["Huy Fong Sriracha", "Tabasco Sriracha", "Yellowbird Sriracha", "Trident Sriracha Sauce", "Roland Sriracha", "Lee Kum Kee Sriracha", "Shark Brand Sriracha", "Flying Goose Sriracha"],
-            "bbq sauce": ["Sweet Baby Ray's", "KC Masterpiece", "Stubb's Original", "Bull's-Eye", "Open Pit", "Kraft Original", "Famous Dave's", "Jack Daniel's BBQ Sauce"],
-            "ketchup": ["Heinz Tomato Ketchup", "Hunt's Tomato Ketchup", "French's Tomato Ketchup", "Del Monte Ketchup", "Simply Heinz", "Organic Ketchup Annie's", "365 Organic Ketchup"],
-            
-            // Beverages
-            "energy drinks": ["Red Bull Original", "Monster Energy", "Rockstar Energy", "Bang Energy", "Celsius", "5-Hour Energy", "NOS Energy", "Full Throttle", "Amp Energy", "Reign Total Body Fuel"],
-            "cola": ["Coca Cola Classic", "Pepsi Cola", "Dr Pepper", "RC Cola", "Mexican Coke", "Pepsi Zero Sugar", "Diet Coke", "Coke Zero"],
-            "sports drinks": ["Gatorade Thirst Quencher", "Powerade", "BodyArmor", "Propel", "Vitamin Water", "Smartwater", "Coconut Water Vita Coco"],
-            "coffee": ["Folgers Classic Roast", "Maxwell House", "Dunkin' Original", "Starbucks Pike Place", "Green Mountain Coffee", "Lavazza", "Illy Ground Coffee", "Eight O'Clock Coffee"],
-            
-            // Dairy & Alternatives
-            "greek yogurt": ["Chobani Greek Yogurt", "Fage Total Greek", "Oikos Triple Zero", "Two Good Greek Yogurt", "Dannon Light & Fit Greek", "Siggi's Skyr", "Wallaby Organic Greek", "Cabot Greek Yogurt"],
-            "almond milk": ["Almond Breeze", "Silk Almond Milk", "So Delicious Almond", "Blue Diamond Almond Breeze", "Califia Farms Almond", "Elmhurst Almond Milk", "Simple Truth Almond"],
-            "cheese": ["Kraft Singles", "Sargento Sliced", "Tillamook Cheddar", "Cabot Vermont Cheddar", "Cracker Barrel Cheese", "Boar's Head Cheese", "Organic Valley Cheese"],
-            
-            // Oils & Cooking
-            "olive oil": ["Bertolli Extra Virgin", "California Olive Ranch", "Colavita Extra Virgin", "Pompeian Extra Virgin", "Filippo Berio", "Lucini Italia Premium", "Kirkland Signature Organic"],
-            "cooking oil": ["Wesson Vegetable Oil", "Crisco Pure Vegetable", "Mazola Corn Oil", "Smart Balance Oil", "Spectrum Organic", "LouAna Pure Coconut Oil"],
-            
-            // Snacks
-            "potato chips": ["Lay's Classic", "Pringles Original", "Kettle Brand", "Cape Cod", "Ruffles", "Doritos Nacho Cheese", "Cheetos Crunchy", "Fritos Original"],
-            "cookies": ["Oreo Original", "Chips Ahoy!", "Pepperidge Farm Milano", "Keebler Fudge Stripes", "Nabisco Nutter Butter", "Famous Amos Bite Size", "Archway Soft Iced"],
-            "crackers": ["Ritz Original", "Cheez-Its Original", "Goldfish Cheddar", "Triscuit Original", "Wheat Thins Original", "Town House Crackers"],
-            
-            // Breakfast & Cereals
-            "cereal": ["Cheerios Original", "Frosted Flakes", "Lucky Charms", "Corn Flakes Kellogg's", "Rice Krispies", "Special K Original", "Honey Nut Cheerios", "Cinnamon Toast Crunch", "Froot Loops"],
-            "oatmeal": ["Quaker Instant Oatmeal", "McCann's Steel Cut Oats", "Bob's Red Mill Oats", "Nature's Path Organic", "Kodiak Cakes Oatmeal"],
-            
-            // Health & Organic
-            "protein bars": ["Quest Protein Bar", "KIND Bars", "RXBAR", "Clif Bar", "Pure Protein", "ONE Protein Bar", "Think! Protein Bar", "PowerBar Protein Plus"],
-            "vitamins": ["Centrum Multivitamin", "One A Day", "Nature Made", "Vitafusion Gummies", "Garden of Life", "Rainbow Light", "Mega Food"],
-            
-            // International/Specialty
-            "asian sauces": ["Kikkoman Soy Sauce", "Lee Kum Kee Oyster Sauce", "Maggi Seasoning", "Sriracha Huy Fong", "Sambal Oelek", "Fish Sauce Red Boat", "Miso Paste Hikari"],
-            
-            // Default for unknown categories
-            "default": ["Premium Brand A", "Select Choice B", "Organic Valley C", "Store Brand D", "Market Choice E", "Quality Brand F", "Fresh Select G", "Pure Choice H"]
+        // Category mapping with real brand names
+        const categories = {
+            "hot sauce": ["Tabasco Original", "Cholula Original", "Frank's RedHot", "Tapatio Hot Sauce", "Crystal Hot Sauce", "Louisiana Hot Sauce", "Texas Pete", "Sriracha Huy Fong", "Yellowbird Habanero", "Secret Aardvark", "Trident Sriracha"],
+            "energy drinks": ["Red Bull Original", "Monster Energy", "Rockstar Energy", "Bang Energy", "Celsius", "5-Hour Energy", "NOS Energy", "Full Throttle", "Reign Total Body", "Prime Energy"],
+            "greek yogurt": ["Chobani Greek", "Fage Total Greek", "Oikos Triple Zero", "Two Good Greek", "Dannon Light & Fit", "Siggi's Skyr", "Wallaby Organic", "Cabot Greek"],
+            "cola": ["Coca Cola Classic", "Pepsi Cola", "Dr Pepper", "RC Cola", "Mexican Coke", "Diet Coke", "Pepsi Zero", "Coke Zero"],
+            "protein bars": ["Quest Protein", "KIND Bars", "RXBAR", "Clif Bar", "Pure Protein", "ONE Protein", "Think! Protein", "PowerBar Protein"],
+            "cereal": ["Cheerios", "Frosted Flakes", "Lucky Charms", "Corn Flakes", "Rice Krispies", "Special K", "Honey Nut Cheerios", "Cinnamon Toast Crunch"],
+            "potato chips": ["Lay's Classic", "Pringles Original", "Kettle Brand", "Cape Cod", "Ruffles", "Doritos Nacho", "Cheetos Crunchy"],
+            "bbq sauce": ["Sweet Baby Ray's", "KC Masterpiece", "Stubb's Original", "Bull's-Eye", "Open Pit", "Kraft Original", "Famous Dave's"]
         };
 
-        // Mock data with competitor products and links
-        const mockData = {
-            "United States": generateMockDataForCountry("United States", "$"),
-            "United Kingdom": generateMockDataForCountry("United Kingdom", "£"),
-            "Canada": generateMockDataForCountry("Canada", "CAD $"),
-            "Australia": generateMockDataForCountry("Australia", "AUD $"),
-            "Germany": generateMockDataForCountry("Germany", "€"),
-            "France": generateMockDataForCountry("France", "€"),
-            "Japan": generateMockDataForCountry("Japan", "¥"),
-            "South Korea": generateMockDataForCountry("South Korea", "₩"),
-            "India": generateMockDataForCountry("India", "₹"),
-            "Brazil": generateMockDataForCountry("Brazil", "R$")
+        // Store data by country
+        const storesByCountry = {
+            "United States": ["Walmart Supercenter", "Kroger", "Target", "Costco", "Safeway", "Publix", "Whole Foods", "Albertsons"],
+            "Canada": ["Loblaws", "Sobeys", "Metro", "Costco", "Walmart", "Save-On-Foods", "IGA", "FreshCo"],
+            "United Kingdom": ["Tesco", "Sainsbury's", "Asda", "Morrisons", "Aldi", "Lidl", "Marks & Spencer", "Iceland"],
+            "Australia": ["Woolworths", "Coles", "Aldi", "IGA", "Costco", "Harris Farm", "Drakes", "Foodland"],
+            "Germany": ["Edeka", "Rewe", "Aldi", "Lidl", "Metro", "Kaufland", "Penny", "Netto"],
+            "France": ["Carrefour", "Leclerc", "Intermarché", "Auchan", "Casino", "Monoprix", "Franprix", "Lidl"],
+            "Japan": ["7-Eleven", "FamilyMart", "Lawson", "Aeon", "Ito-Yokado", "Life", "Seiyu", "MaxValu"],
+            "South Korea": ["7-Eleven", "CU", "GS25", "E-mart", "Lotte Mart", "Homeplus", "Emart 24", "Ministop"],
+            "India": ["Reliance Fresh", "Big Bazaar", "DMart", "Spencer's", "Star Bazaar", "HyperCity", "Nilgiris", "Heritage"],
+            "Brazil": ["Carrefour", "Pão de Açúcar", "Extra", "Walmart", "Angeloni", "Condor", "Zaffari", "Big"]
         };
 
-        function generateMockDataForCountry(country, currency) {
-            return {}; // Will be populated dynamically
-        }
-
-        // Get grocery stores for selected country from the provided data
-        const groceryStoreData = {
-            "United States": ["Walmart Supercenter", "Kroger Corporate", "Target", "Costco", "Whole Foods-Amazon", "Publix", "Safeway-Vons-Alb.", "Albertsons Total"],
-            "United Kingdom": ["Tesco Total", "Sainsbury Total", "Asda", "Morrisons", "Aldi", "Lidl", "Marks and Spencer"],
-            "Canada": ["Loblaws -Total Weston", "Sobeys Group -Empire", "Metro Group", "Costco", "Walmart"],
-            "Australia": ["Woolworths", "Coles Supermarkets", "Aldi", "IGA", "Costco"],
-            "Germany": ["Edeka Total", "Rewe Total", "Aldi Total", "Lidl", "Metro"],
-            "France": ["Carrefour Total", "Leclerc", "Intermarche Total", "Auchan", "Casino Total"],
-            "Japan": ["7-Eleven", "Family Mart", "Lawson", "Aeon", "Ito Yokado"],
-            "South Korea": ["7-Eleven", "CU", "GS 25", "Emart-Shinsegae", "Lotte"],
-            "India": ["Reliance", "Big Bazaar-Future", "D Mart", "More-Amazon", "Spar"],
-            "Brazil": ["Carrefour Total", "Pao de Acucar-Total", "Grupo Mateus", "Angeloni", "Cencosud Total"]
-        };
-
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const product = document.getElementById('product').value.trim();
+        function performSearch() {
+            const category = document.getElementById('category').value.trim();
             const country = document.getElementById('country').value;
             
-            if (!product || !country) {
-                alert('Please enter both product name and select a country.');
+            if (!category || !country) {
+                alert('Please enter a category and select a country.');
                 return;
             }
             
-            searchProducts(product, country);
-        });
-
-        function searchProducts(product, country) {
-            const resultsSection = document.getElementById('resultsSection');
-            const loading = document.getElementById('loading');
-            const noResults = document.getElementById('noResults');
+            showLoading();
             
-            console.log('Search started for:', product, 'in', country); // Debug log
-            
-            // Hide all sections
-            resultsSection.style.display = 'none';
-            noResults.style.display = 'none';
-            
-            // Show loading
-            loading.style.display = 'block';
-            
-            // Simulate API call delay
             setTimeout(() => {
-                console.log('Processing search...'); // Debug log
-                loading.style.display = 'none';
-                
-                // Generate mock results based on category
-                const mockResults = generateMockResults(product, country);
-                console.log('Generated results:', mockResults.length); // Debug log
-                
-                if (mockResults.length > 0) {
-                    displayResults(product, country, mockResults);
-                } else {
-                    console.log('No results found'); // Debug log
-                    noResults.style.display = 'block';
-                }
-            }, 2000);
+                const results = generateResults(category, country);
+                displayResults(category, country, results);
+            }, 1500);
         }
 
-        function generateMockResults(product, country) {
-            const stores = groceryStoreData[country] || [];
-            const results = [];
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+        }
+
+        function generateResults(category, country) {
+            const categoryKey = category.toLowerCase();
+            let brands = categories[categoryKey] || categories["hot sauce"]; // Default to hot sauce
             
-            // Get competitors for the searched product
-            const searchKey = product.toLowerCase().trim();
-            let competitors = null;
-            
-            // Check for exact matches first
-            if (competitorMap[searchKey]) {
-                competitors = competitorMap[searchKey];
-            } else {
-                // Check for partial matches (e.g., if someone searches "yellowbird blue agave sriracha" match with "sriracha")
-                for (const [key, value] of Object.entries(competitorMap)) {
-                    if (key !== "default" && (searchKey.includes(key) || key.includes(searchKey.split(' ').pop()))) {
-                        competitors = value;
+            // Check for partial matches
+            if (!categories[categoryKey]) {
+                for (const [key, value] of Object.entries(categories)) {
+                    if (categoryKey.includes(key) || key.includes(categoryKey)) {
+                        brands = value;
                         break;
                     }
                 }
             }
-            
-            // Fall back to default if no match found
-            if (!competitors) {
-                competitors = competitorMap["default"];
-            }
-            
-            // Generate 4-7 competitor results
-            const numResults = Math.min(stores.length, Math.floor(Math.random() * 4) + 4);
-            const selectedStores = stores.sort(() => 0.5 - Math.random()).slice(0, numResults);
-            
-            selectedStores.forEach((store, index) => {
-                const competitor = competitors[index % competitors.length];
-                const basePrice = Math.floor(Math.random() * 25) + 8;
-                const hasDiscount = Math.random() > 0.5;
-                const currency = getCurrency(country);
-                
-                // Generate more realistic store-specific URLs
-                let storeUrl = '';
-                const productSlug = competitor.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-                
-                if (store.includes('Coles')) {
-                    storeUrl = `https://www.coles.com.au/product/${productSlug}-${Math.floor(Math.random() * 9000000) + 1000000}`;
-                } else if (store.includes('Woolworths')) {
-                    storeUrl = `https://www.woolworths.com.au/shop/productdetails/${Math.floor(Math.random() * 900000) + 100000}/${productSlug}`;
-                } else if (store.includes('Walmart')) {
-                    storeUrl = `https://www.walmart.com/ip/${productSlug}/${Math.floor(Math.random() * 900000000) + 100000000}`;
-                } else if (store.includes('Kroger')) {
-                    storeUrl = `https://www.kroger.com/p/${productSlug}/${Math.floor(Math.random() * 90000000000) + 10000000000}`;
-                } else {
-                    const storeSlug = store.toLowerCase().replace(/\s+/g, '').replace(/[^\w]/g, '');
-                    storeUrl = `https://www.${storeSlug}.com/products/${productSlug}`;
-                }
-                
-                // Better image generation with actual product-like appearance
-                const productImage = generateProductImage(competitor);
-                
-                results.push({
-                    chain: store,
-                    logo: store.substring(0, 2).toUpperCase(),
-                    image: productImage,
-                    description: competitor,
-                    size: getRandomSize(product),
-                    regularPrice: `${currency}${basePrice.toFixed(2)}`,
-                    salePrice: hasDiscount ? `${currency}${(basePrice * (0.75 + Math.random() * 0.15)).toFixed(2)}` : null,
-                    productUrl: storeUrl
-                });
-            });
-            
-            return results;
-        }
 
-        function generateProductImage(productName) {
-            // Create a simple colored rectangle with product initials as a more reliable image
-            const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'F7DC6F', 'BB8FCE', 'F8C471', '82E0AA', 'AED6F1'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const initials = productName.split(' ').map(word => word[0]).join('').substring(0, 3).toUpperCase();
-            
-            // Using a different placeholder service that's more reliable
-            return `https://dummyimage.com/80x80/${color}/ffffff&text=${initials}`;
+            const stores = storesByCountry[country] || storesByCountry["United States"];
+            const results = [];
+            const currency = getCurrency(country);
+
+            // Generate 6-8 results
+            const numResults = Math.min(8, brands.length);
+            for (let i = 0; i < numResults; i++) {
+                const store = stores[i % stores.length];
+                const brand = brands[i];
+                const price = (Math.random() * 15 + 3).toFixed(2);
+                const hasDiscount = Math.random() > 0.6;
+                const salePrice = hasDiscount ? (price * 0.8).toFixed(2) : null;
+
+                results.push({
+                    store: store,
+                    brand: brand,
+                    price: `${currency}${price}`,
+                    salePrice: salePrice ? `${currency}${salePrice}` : null,
+                    size: getRandomSize(category),
+                    image: generateImage(brand)
+                });
+            }
+
+            return results;
         }
 
         function getCurrency(country) {
@@ -522,79 +404,77 @@
             return currencies[country] || "$";
         }
 
-        function getRandomSize(product) {
-            if (product.toLowerCase().includes('oil')) {
-                return ['250ml', '500ml', '750ml', '1L'][Math.floor(Math.random() * 4)];
-            } else if (product.toLowerCase().includes('yogurt')) {
-                return ['150g', '500g', '1kg', '32oz'][Math.floor(Math.random() * 4)];
-            } else {
-                return ['Small', 'Medium', 'Large', '500g', '1kg'][Math.floor(Math.random() * 5)];
+        function getRandomSize(category) {
+            const sizes = {
+                "hot sauce": ["148ml", "266ml", "480ml", "532ml"],
+                "energy drinks": ["250ml", "330ml", "473ml", "500ml"],
+                "greek yogurt": ["150g", "500g", "1kg", "32oz"],
+                "cola": ["330ml", "355ml", "500ml", "2L"],
+                "protein bars": ["60g", "12-pack", "18-pack", "24-pack"],
+                "cereal": ["340g", "515g", "680g", "1.2kg"],
+                "potato chips": ["28g", "150g", "200g", "340g"],
+                "bbq sauce": ["400ml", "510ml", "750ml", "1L"]
+            };
+            
+            const categoryKey = category.toLowerCase();
+            const sizeOptions = sizes[categoryKey] || ["Small", "Medium", "Large"];
+            return sizeOptions[Math.floor(Math.random() * sizeOptions.length)];
+        }
+
+        function generateImage(brand) {
+            const colors = ['FF6B6B', '4ECDC4', '45B7D1', 'F7DC6F', 'BB8FCE', 'F8C471', '82E0AA', 'AED6F1'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const initials = brand.split(' ').map(word => word[0]).join('').substring(0, 2);
+            return `https://dummyimage.com/80x80/${color}/ffffff&text=${initials}`;
+        }
+
+        function displayResults(category, country, results) {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (results.length === 0) {
+                document.getElementById('noResults').style.display = 'block';
+                return;
             }
-        }
 
-        function getRandomColor() {
-            const colors = ['4285f4', 'ea4335', '34a853', 'ff6b00', '9c27b0', '00539f', 'f57c00', 'd32f2f', '1976d2'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function displayResults(product, country, data) {
-            const resultsSection = document.getElementById('resultsSection');
-            const resultsTitle = document.getElementById('resultsTitle');
-            const resultsSubtitle = document.getElementById('resultsSubtitle');
-            const resultsBody = document.getElementById('resultsBody');
+            document.getElementById('resultsTitle').textContent = `${category} Market Analysis`;
+            document.getElementById('resultsSubtitle').textContent = `Found ${results.length} brands in ${country}`;
             
-            resultsTitle.textContent = `Competitors for "${product}"`;
-            resultsSubtitle.textContent = `Found ${data.length} competing products in ${country} grocery stores`;
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
             
-            resultsBody.innerHTML = '';
-            
-            data.forEach(item => {
+            results.forEach(result => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
                         <div class="store-info">
-                            <div class="store-logo">${item.logo}</div>
-                            <span>${item.chain}</span>
+                            <div class="store-logo">${result.store.substring(0,2)}</div>
+                            <span>${result.store}</span>
                         </div>
                     </td>
                     <td>
-                        <img src="${item.image}" alt="${item.description}" class="product-image">
+                        <img src="${result.image}" alt="${result.brand}" class="product-image">
                     </td>
-                    <td><strong>${item.description}</strong></td>
-                    <td>${item.size}</td>
+                    <td><strong>${result.brand}</strong></td>
+                    <td>${result.size}</td>
                     <td>
-                        ${item.salePrice ? `<span class="original-price">${item.regularPrice}</span>` : `<span class="price">${item.regularPrice}</span>`}
-                    </td>
-                    <td>
-                        ${item.salePrice ? `<span class="sale-price">${item.salePrice}</span>` : '-'}
+                        ${result.salePrice ? `<span class="original-price">${result.price}</span>` : `<span class="price">${result.price}</span>`}
                     </td>
                     <td>
-                        <a href="${item.productUrl}" target="_blank" class="product-link">View Product</a>
+                        ${result.salePrice ? `<span class="sale-price">${result.salePrice}</span>` : '-'}
+                    </td>
+                    <td>
+                        <a href="#" onclick="alert('Demo: Would open ${result.brand} at ${result.store}')" class="product-link">View Product</a>
                     </td>
                 `;
-                resultsBody.appendChild(row);
+                tbody.appendChild(row);
             });
             
-            resultsSection.style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'block';
         }
 
-        // Auto-suggest some example category searches
-        const exampleSearches = [
-            'Hot Sauce',
-            'Energy Drinks',
-            'Greek Yogurt',
-            'Potato Chips',
-            'Protein Bars',
-            'Cola',
-            'Cereal',
-            'BBQ Sauce'
-        ];
-
-        document.getElementById('product').addEventListener('focus', function() {
-            if (!this.value) {
-                const randomExample = exampleSearches[Math.floor(Math.random() * exampleSearches.length)];
-                this.placeholder = `Try: ${randomExample}`;
-            }
+        // Auto-complete suggestions
+        document.getElementById('category').addEventListener('focus', function() {
+            this.placeholder = 'Try: Hot Sauce, Energy Drinks, Greek Yogurt, Cola, Protein Bars';
         });
     </script>
 </body>
