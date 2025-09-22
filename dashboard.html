@@ -179,6 +179,23 @@
             color: #6b7280;
         }
 
+        .product-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .product-link:hover {
+            background: #5a67d8;
+            text-decoration: none;
+            color: white;
+        }
+
         .loading {
             text-align: center;
             padding: 2rem;
@@ -261,10 +278,11 @@
                         <tr>
                             <th>Supermarket Chain</th>
                             <th>Product Image</th>
-                            <th>Product Description</th>
+                            <th>Competitor Product</th>
                             <th>Size</th>
                             <th>Regular Price</th>
                             <th>Sale Price</th>
+                            <th>View Product</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
@@ -285,104 +303,57 @@
     </div>
 
     <script>
-        // Mock data for demonstration
-        const mockData = {
-            "United States": {
-                "Organic Olive Oil": [
-                    {
-                        chain: "Walmart Supercenter",
-                        logo: "W",
-                        image: "https://via.placeholder.com/80x80/4285f4/ffffff?text=Oil",
-                        description: "Great Value Extra Virgin Organic Olive Oil",
-                        size: "500ml",
-                        regularPrice: "$8.97",
-                        salePrice: null
-                    },
-                    {
-                        chain: "Kroger Corporate",
-                        logo: "K",
-                        image: "https://via.placeholder.com/80x80/ea4335/ffffff?text=Oil",
-                        description: "Simple Truth Organic Extra Virgin Olive Oil",
-                        size: "500ml",
-                        regularPrice: "$12.99",
-                        salePrice: "$9.99"
-                    },
-                    {
-                        chain: "Whole Foods-Amazon",
-                        logo: "WF",
-                        image: "https://via.placeholder.com/80x80/34a853/ffffff?text=Oil",
-                        description: "365 Everyday Value Organic Extra Virgin Olive Oil",
-                        size: "500ml",
-                        regularPrice: "$10.99",
-                        salePrice: null
-                    }
-                ],
-                "Greek Yogurt": [
-                    {
-                        chain: "Target",
-                        logo: "T",
-                        image: "https://via.placeholder.com/80x80/ff6b00/ffffff?text=YGT",
-                        description: "Good & Gather Greek Vanilla Yogurt",
-                        size: "32oz",
-                        regularPrice: "$4.79",
-                        salePrice: "$3.99"
-                    },
-                    {
-                        chain: "Safeway-Vons-Alb.",
-                        logo: "S",
-                        image: "https://via.placeholder.com/80x80/9c27b0/ffffff?text=YGT",
-                        description: "Lucerne Greek Plain Yogurt",
-                        size: "32oz",
-                        regularPrice: "$5.49",
-                        salePrice: null
-                    }
-                ]
-            },
-            "United Kingdom": {
-                "Organic Olive Oil": [
-                    {
-                        chain: "Tesco Total",
-                        logo: "T",
-                        image: "https://via.placeholder.com/80x80/00539f/ffffff?text=Oil",
-                        description: "Tesco Finest Organic Extra Virgin Olive Oil",
-                        size: "500ml",
-                        regularPrice: "£4.50",
-                        salePrice: "£3.75"
-                    },
-                    {
-                        chain: "Sainsbury Total",
-                        logo: "S",
-                        image: "https://via.placeholder.com/80x80/f57c00/ffffff?text=Oil",
-                        description: "Sainsbury's Taste the Difference Organic Olive Oil",
-                        size: "500ml",
-                        regularPrice: "£5.00",
-                        salePrice: null
-                    }
-                ]
-            },
-            "Canada": {
-                "Organic Olive Oil": [
-                    {
-                        chain: "Loblaws -Total Weston",
-                        logo: "L",
-                        image: "https://via.placeholder.com/80x80/d32f2f/ffffff?text=Oil",
-                        description: "President's Choice Organic Extra Virgin Olive Oil",
-                        size: "500ml",
-                        regularPrice: "CAD $12.99",
-                        salePrice: "CAD $9.99"
-                    },
-                    {
-                        chain: "Sobeys Group -Empire",
-                        logo: "S",
-                        image: "https://via.placeholder.com/80x80/1976d2/ffffff?text=Oil",
-                        description: "Compliments Organic Extra Virgin Olive Oil",
-                        size: "500ml",
-                        regularPrice: "CAD $11.49",
-                        salePrice: null
-                    }
-                ]
-            }
+        // Competitor mapping - shows actual competing brands/products
+        const competitorMap = {
+            // Beverages
+            "coca cola": ["Pepsi", "Dr Pepper", "Sprite", "Mountain Dew", "7UP"],
+            "pepsi": ["Coca Cola", "Dr Pepper", "Mountain Dew", "Sprite", "RC Cola"],
+            "sprite": ["7UP", "Sierra Mist", "Coca Cola", "Pepsi", "Ginger Ale"],
+            
+            // Oils & Cooking
+            "olive oil": ["Bertolli Extra Virgin Olive Oil", "California Olive Ranch", "Colavita", "Pompeian", "Filippo Berio"],
+            "organic olive oil": ["California Olive Ranch Organic", "Spectrum Organic", "Colavita Organic", "Cobram Estate", "Lucini Italia"],
+            "canola oil": ["Wesson Canola Oil", "Crisco Pure Canola Oil", "Mazola Canola Oil", "Great Value Canola Oil", "Smart Balance"],
+            
+            // Dairy
+            "greek yogurt": ["Chobani Greek Yogurt", "Fage Total Greek Yogurt", "Oikos Triple Zero", "Two Good Greek Yogurt", "Dannon Light & Fit"],
+            "almond milk": ["Almond Breeze", "Silk Almond Milk", "So Delicious", "Blue Diamond", "Califia Farms"],
+            "milk": ["Horizon Organic Milk", "Fairlife Ultra-Filtered", "Organic Valley", "Great Value Milk", "Lactaid"],
+            
+            // Snacks
+            "potato chips": ["Lay's Classic", "Pringles Original", "Kettle Brand", "Cape Cod", "Ruffles"],
+            "cookies": ["Oreo Cookies", "Chips Ahoy!", "Pepperidge Farm", "Keebler Fudge Stripes", "Nabisco Nutter Butter"],
+            
+            // Cereals
+            "cheerios": ["Honey Nut Cheerios", "Lucky Charms", "Frosted Flakes", "Corn Flakes", "Rice Krispies"],
+            "corn flakes": ["Kellogg's Corn Flakes", "Post Toasties", "Great Value Corn Flakes", "Nature's Path Organic", "Barbara's Corn Flakes"],
+            
+            // Health/Organic
+            "protein bars": ["Quest Protein Bars", "KIND Bars", "RXBAR", "Clif Bar", "Pure Protein"],
+            "green tea": ["Lipton Green Tea", "Bigelow Green Tea", "Twinings Green Tea", "Arizona Green Tea", "Celestial Seasonings"],
+            "quinoa": ["Ancient Harvest Quinoa", "Bob's Red Mill Quinoa", "Lundberg Organic Quinoa", "TruRoots Quinoa", "Seeds of Change"],
+            
+            // Default competitors for unknown products
+            "default": ["Brand A Premium", "Brand B Select", "Brand C Organic", "Store Brand Classic", "Premium Choice"]
         };
+
+        // Mock data with competitor products and links
+        const mockData = {
+            "United States": generateMockDataForCountry("United States", "$"),
+            "United Kingdom": generateMockDataForCountry("United Kingdom", "£"),
+            "Canada": generateMockDataForCountry("Canada", "CAD $"),
+            "Australia": generateMockDataForCountry("Australia", "AUD $"),
+            "Germany": generateMockDataForCountry("Germany", "€"),
+            "France": generateMockDataForCountry("France", "€"),
+            "Japan": generateMockDataForCountry("Japan", "¥"),
+            "South Korea": generateMockDataForCountry("South Korea", "₩"),
+            "India": generateMockDataForCountry("India", "₹"),
+            "Brazil": generateMockDataForCountry("Brazil", "R$")
+        };
+
+        function generateMockDataForCountry(country, currency) {
+            return {}; // Will be populated dynamically
+        }
 
         // Get grocery stores for selected country from the provided data
         const groceryStoreData = {
@@ -450,23 +421,44 @@
             const stores = groceryStoreData[country] || [];
             const results = [];
             
-            // Generate 3-5 random results
-            const numResults = Math.min(stores.length, Math.floor(Math.random() * 3) + 3);
+            // Get competitors for the searched product
+            const searchKey = product.toLowerCase();
+            let competitors = competitorMap[searchKey] || competitorMap["default"];
+            
+            // Check for partial matches (e.g., if someone searches "olive oil" but we have "organic olive oil")
+            if (competitors === competitorMap["default"]) {
+                for (const [key, value] of Object.entries(competitorMap)) {
+                    if (key !== "default" && (searchKey.includes(key) || key.includes(searchKey))) {
+                        competitors = value;
+                        break;
+                    }
+                }
+            }
+            
+            // Generate 4-7 competitor results
+            const numResults = Math.min(stores.length, Math.floor(Math.random() * 4) + 4);
             const selectedStores = stores.sort(() => 0.5 - Math.random()).slice(0, numResults);
             
             selectedStores.forEach((store, index) => {
-                const basePrice = Math.floor(Math.random() * 20) + 5;
-                const hasDiscount = Math.random() > 0.6;
+                const competitor = competitors[index % competitors.length];
+                const basePrice = Math.floor(Math.random() * 25) + 8;
+                const hasDiscount = Math.random() > 0.5;
                 const currency = getCurrency(country);
+                
+                // Generate realistic product URLs
+                const storeSlug = store.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                const productSlug = competitor.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                const productUrl = `https://www.${storeSlug}.com/products/${productSlug}-${Math.floor(Math.random() * 10000)}`;
                 
                 results.push({
                     chain: store,
                     logo: store.substring(0, 2).toUpperCase(),
-                    image: `https://via.placeholder.com/80x80/${getRandomColor()}/ffffff?text=${product.substring(0,3).toUpperCase()}`,
-                    description: `${store.split('-')[0]} Brand ${product}`,
+                    image: `https://via.placeholder.com/80x80/${getRandomColor()}/ffffff?text=${competitor.substring(0,3).toUpperCase()}`,
+                    description: competitor,
                     size: getRandomSize(product),
                     regularPrice: `${currency}${basePrice.toFixed(2)}`,
-                    salePrice: hasDiscount ? `${currency}${(basePrice * 0.8).toFixed(2)}` : null
+                    salePrice: hasDiscount ? `${currency}${(basePrice * (0.75 + Math.random() * 0.15)).toFixed(2)}` : null,
+                    productUrl: productUrl
                 });
             });
             
@@ -510,8 +502,8 @@
             const resultsSubtitle = document.getElementById('resultsSubtitle');
             const resultsBody = document.getElementById('resultsBody');
             
-            resultsTitle.textContent = `"${product}" Results`;
-            resultsSubtitle.textContent = `Found ${data.length} products in ${country} grocery stores`;
+            resultsTitle.textContent = `Competitors for "${product}"`;
+            resultsSubtitle.textContent = `Found ${data.length} competing products in ${country} grocery stores`;
             
             resultsBody.innerHTML = '';
             
@@ -527,13 +519,16 @@
                     <td>
                         <img src="${item.image}" alt="${item.description}" class="product-image">
                     </td>
-                    <td>${item.description}</td>
+                    <td><strong>${item.description}</strong></td>
                     <td>${item.size}</td>
                     <td>
                         ${item.salePrice ? `<span class="original-price">${item.regularPrice}</span>` : `<span class="price">${item.regularPrice}</span>`}
                     </td>
                     <td>
                         ${item.salePrice ? `<span class="sale-price">${item.salePrice}</span>` : '-'}
+                    </td>
+                    <td>
+                        <a href="${item.productUrl}" target="_blank" class="product-link">View Product</a>
                     </td>
                 `;
                 resultsBody.appendChild(row);
