@@ -242,6 +242,7 @@
 
         <div class="search-section">
             <h2 style="margin-bottom: 1.5rem;">Product Search</h2>
+            <button onclick="alert('JavaScript is working! The search issue might be elsewhere.')" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">Test JavaScript</button>
             <form class="search-form" id="searchForm">
                 <div class="form-group">
                     <label for="product">Product Category</label>
@@ -397,6 +398,8 @@
             const loading = document.getElementById('loading');
             const noResults = document.getElementById('noResults');
             
+            console.log('Search started for:', product, 'in', country); // Debug log
+            
             // Hide all sections
             resultsSection.style.display = 'none';
             noResults.style.display = 'none';
@@ -406,22 +409,18 @@
             
             // Simulate API call delay
             setTimeout(() => {
+                console.log('Processing search...'); // Debug log
                 loading.style.display = 'none';
                 
-                // Check if we have mock data for this search
-                const countryData = mockData[country];
-                const productData = countryData ? countryData[product] : null;
+                // Generate mock results based on category
+                const mockResults = generateMockResults(product, country);
+                console.log('Generated results:', mockResults.length); // Debug log
                 
-                if (productData && productData.length > 0) {
-                    displayResults(product, country, productData);
+                if (mockResults.length > 0) {
+                    displayResults(product, country, mockResults);
                 } else {
-                    // Generate mock results based on available grocery stores
-                    const mockResults = generateMockResults(product, country);
-                    if (mockResults.length > 0) {
-                        displayResults(product, country, mockResults);
-                    } else {
-                        noResults.style.display = 'block';
-                    }
+                    console.log('No results found'); // Debug log
+                    noResults.style.display = 'block';
                 }
             }, 2000);
         }
@@ -579,16 +578,16 @@
             resultsSection.style.display = 'block';
         }
 
-        // Auto-suggest some example searches
+        // Auto-suggest some example category searches
         const exampleSearches = [
-            'Organic Olive Oil',
+            'Hot Sauce',
+            'Energy Drinks',
             'Greek Yogurt',
-            'Almond Milk',
-            'Dark Chocolate',
-            'Quinoa',
-            'Coconut Oil',
+            'Potato Chips',
             'Protein Bars',
-            'Green Tea'
+            'Cola',
+            'Cereal',
+            'BBQ Sauce'
         ];
 
         document.getElementById('product').addEventListener('focus', function() {
