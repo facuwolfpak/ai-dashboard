@@ -87,6 +87,127 @@
             margin-top: 1rem;
         }
 
+        .voice-section {
+            max-width: 1400px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .voice-control {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .voice-button {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .voice-button.recording {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            animation: pulse-recording 1.5s infinite;
+        }
+
+        @keyframes pulse-recording {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .voice-status {
+            flex: 1;
+        }
+
+        .voice-status span {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fbbf24;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-status p {
+            color: #94a3b8;
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .voice-status.listening span {
+            color: #22c55e;
+        }
+
+        .voice-status.processing span {
+            color: #3b82f6;
+        }
+
+        .voice-transcript {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transcript-content {
+            color: #e2e8f0;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .transcript-interim {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .transcript-final {
+            color: #22c55e;
+            font-weight: 500;
+        }
+
+        .update-notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .update-notification.show {
+            transform: translateX(0);
+        }
+
         .spinner {
             width: 20px;
             height: 20px;
@@ -395,7 +516,37 @@
         <div class="subtitle">Business Dashboard - Connecting Suppliers, Distributors & Retailers</div>
     </div>
 
+    <!-- Voice Control Section -->
+    <div class="voice-section">
+        <div class="voice-control">
+            <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()">
+                <i class="fas fa-microphone" id="voiceIcon"></i>
+            </button>
+            <div class="voice-status" id="voiceStatus">
+                <span>Click to start voice updates</span>
+                <p>Say things like: "Update Casbah status to negotiating" or "Add pending item TDS to Yellow Bird"</p>
+            </div>
+        </div>
+        <div class="voice-transcript" id="voiceTranscript" style="display: none;">
+            <div class="transcript-content" id="transcriptContent"></div>
+        </div>
+    </div>
+
     <!-- Excel Import Section -->
+    <div class="import-section">
+        <div class="import-box" onclick="document.getElementById('excelInput').click();">
+            <i class="fas fa-check-circle"></i>
+            <div class="import-text">
+                <strong>Your DASHBOARD 2025.xlsx Data Loaded</strong>
+                <p>15 suppliers, 15 distributors, 7 retailers, and 19 active relationships imported. Click to reimport or update.</p>
+            </div>
+            <input type="file" id="excelInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
+        </div>
+        <div class="import-status" id="importStatus" style="display: none;">
+            <div class="spinner"></div>
+            <span>Processing Excel file...</span>
+        </div>
+    </div>
     <div class="import-section">
         <div class="import-box" onclick="document.getElementById('excelInput').click();">
             <i class="fas fa-check-circle"></i>
@@ -1553,6 +1704,432 @@
 
         // Initialize the dashboard with real data
         renderAll();
+
+        // Voice Recognition System
+        let isRecording = false;
+        let recognition = null;
+        let finalTranscript = '';
+
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                recognition.maxAlternatives = 1;
+                
+                recognition.onstart = function() {
+                    isRecording = true;
+                    updateVoiceStatus('listening', 'Listening... Speak your updates');
+                    document.getElementById('voiceTranscript').style.display = 'block';
+                };
+                
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalText = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        
+                        if (event.results[i].isFinal) {
+                            finalText += transcript;
+                            finalTranscript += transcript + ' ';
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    updateTranscript(finalText, interimTranscript);
+                    
+                    if (finalText) {
+                        processVoiceCommand(finalText);
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    updateVoiceStatus('error', 'Error: ' + event.error);
+                };
+                
+                recognition.onend = function() {
+                    if (isRecording) {
+                        // Restart recognition if we're still supposed to be recording
+                        recognition.start();
+                    }
+                };
+                
+                return true;
+            }
+            return false;
+        }
+
+        function toggleVoiceRecording() {
+            const button = document.getElementById('voiceButton');
+            const icon = document.getElementById('voiceIcon');
+            
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    showNotification('Speech recognition not supported in this browser');
+                    return;
+                }
+            }
+            
+            if (!isRecording) {
+                startVoiceRecording();
+                button.classList.add('recording');
+                icon.className = 'fas fa-stop';
+            } else {
+                stopVoiceRecording();
+                button.classList.remove('recording');
+                icon.className = 'fas fa-microphone';
+            }
+        }
+
+        function startVoiceRecording() {
+            finalTranscript = '';
+            recognition.start();
+        }
+
+        function stopVoiceRecording() {
+            isRecording = false;
+            recognition.stop();
+            updateVoiceStatus('idle', 'Click to start voice updates');
+            document.getElementById('voiceTranscript').style.display = 'none';
+        }
+
+        function updateVoiceStatus(state, message) {
+            const status = document.getElementById('voiceStatus');
+            status.className = `voice-status ${state}`;
+            status.querySelector('span').textContent = message;
+        }
+
+        function updateTranscript(finalText, interimText) {
+            const transcriptContent = document.getElementById('transcriptContent');
+            
+            let html = '';
+            if (finalTranscript) {
+                html += `<div class="transcript-final">${finalTranscript}</div>`;
+            }
+            if (finalText) {
+                html += `<div class="transcript-final">${finalText}</div>`;
+            }
+            if (interimText) {
+                html += `<div class="transcript-interim">${interimText}</div>`;
+            }
+            
+            transcriptContent.innerHTML = html;
+            transcriptContent.scrollTop = transcriptContent.scrollHeight;
+        }
+
+        // Process voice commands and update dashboard
+        function processVoiceCommand(text) {
+            const command = text.toLowerCase().trim();
+            updateVoiceStatus('processing', 'Processing command...');
+            
+            console.log('Processing voice command:', command);
+            
+            // Parse different types of commands
+            if (processStatusUpdate(command) ||
+                processPendingItemUpdate(command) ||
+                processNewEntityCommand(command) ||
+                processRelationshipUpdate(command)) {
+                // Command was processed successfully
+                setTimeout(() => {
+                    updateVoiceStatus('listening', 'Listening... Speak your updates');
+                }, 1500);
+            } else {
+                updateVoiceStatus('error', 'Command not understood. Try: "Update [brand] status to [status]"');
+                setTimeout(() => {
+                    updateVoiceStatus('listening', 'Listening... Speak your updates');
+                }, 3000);
+            }
+        }
+
+        // Process status updates: "Update Casbah status to negotiating"
+        function processStatusUpdate(command) {
+            const statusPattern = /update\s+(.+?)\s+status\s+to\s+(\w+)/i;
+            const match = command.match(statusPattern);
+            
+            if (match) {
+                const entityName = match[1].trim();
+                const newStatus = normalizeStatus(match[2].trim());
+                
+                // Try to find in suppliers first
+                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (supplier) {
+                    const oldStatus = supplier.status;
+                    supplier.status = newStatus;
+                    renderSuppliers();
+                    showNotification(`✅ Updated ${supplier.name} status from ${oldStatus} to ${newStatus}`);
+                    return true;
+                }
+                
+                // Try distributors
+                let distributor = distributors.find(d => d.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (distributor) {
+                    const oldStatus = distributor.status;
+                    distributor.status = newStatus;
+                    renderDistributors();
+                    showNotification(`✅ Updated ${distributor.name} status from ${oldStatus} to ${newStatus}`);
+                    return true;
+                }
+                
+                // Try retailers
+                let retailer = retailers.find(r => r.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (retailer) {
+                    const oldStatus = retailer.status;
+                    retailer.status = newStatus;
+                    renderRetailers();
+                    showNotification(`✅ Updated ${retailer.name} status from ${oldStatus} to ${newStatus}`);
+                    return true;
+                }
+                
+                showNotification(`❌ Could not find entity: ${entityName}`);
+            }
+            
+            return false;
+        }
+
+        // Process pending item updates: "Add pending item TDS to Yellow Bird" or "Remove TDS from Vermints"
+        function processPendingItemUpdate(command) {
+            const addPattern = /add\s+pending\s+item\s+(.+?)\s+to\s+(.+)/i;
+            const removePattern = /remove\s+(.+?)\s+from\s+(.+)/i;
+            const completePattern = /complete\s+(.+?)\s+for\s+(.+)/i;
+            
+            let match = command.match(addPattern);
+            if (match) {
+                const item = match[1].trim();
+                const entityName = match[2].trim();
+                
+                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (supplier) {
+                    if (!supplier.pendingItems.includes(item)) {
+                        supplier.pendingItems.push(item);
+                        renderSuppliers();
+                        showNotification(`✅ Added pending item "${item}" to ${supplier.name}`);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            match = command.match(removePattern);
+            if (match) {
+                const item = match[1].trim();
+                const entityName = match[2].trim();
+                
+                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (supplier) {
+                    const index = supplier.pendingItems.findIndex(p => p.toLowerCase().includes(item.toLowerCase()));
+                    if (index !== -1) {
+                        const removedItem = supplier.pendingItems.splice(index, 1)[0];
+                        renderSuppliers();
+                        showNotification(`✅ Removed "${removedItem}" from ${supplier.name}`);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            match = command.match(completePattern);
+            if (match) {
+                const item = match[1].trim();
+                const entityName = match[2].trim();
+                
+                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
+                if (supplier) {
+                    const index = supplier.pendingItems.findIndex(p => p.toLowerCase().includes(item.toLowerCase()));
+                    if (index !== -1) {
+                        const completedItem = supplier.pendingItems.splice(index, 1)[0];
+                        renderSuppliers();
+                        showNotification(`✅ Marked "${completedItem}" as complete for ${supplier.name}`);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            return false;
+        }
+
+        // Process new entity commands: "Add new supplier called TechCorp from Germany"
+        function processNewEntityCommand(command) {
+            const supplierPattern = /add\s+new\s+supplier\s+called\s+(.+?)\s+from\s+(.+)/i;
+            const distributorPattern = /add\s+new\s+distributor\s+called\s+(.+?)\s+from\s+(.+)/i;
+            const retailerPattern = /add\s+new\s+retailer\s+called\s+(.+?)\s+from\s+(.+)/i;
+            
+            let match = command.match(supplierPattern);
+            if (match) {
+                const name = match[1].trim();
+                const country = match[2].trim();
+                
+                const newSupplier = {
+                    id: Date.now(),
+                    name: name,
+                    country: country,
+                    contact: 'Not specified',
+                    email: '',
+                    status: 'pending',
+                    notes: 'Added via voice command',
+                    pendingItems: ['Initial documentation', 'Sample review']
+                };
+                
+                suppliers.push(newSupplier);
+                renderSuppliers();
+                showNotification(`✅ Added new supplier: ${name} from ${country}`);
+                return true;
+            }
+            
+            match = command.match(distributorPattern);
+            if (match) {
+                const name = match[1].trim();
+                const country = match[2].trim();
+                
+                const newDistributor = {
+                    id: Date.now(),
+                    name: name,
+                    country: country,
+                    contact: 'Not specified',
+                    email: '',
+                    status: 'pending',
+                    notes: 'Added via voice command'
+                };
+                
+                distributors.push(newDistributor);
+                renderDistributors();
+                showNotification(`✅ Added new distributor: ${name} from ${country}`);
+                return true;
+            }
+            
+            match = command.match(retailerPattern);
+            if (match) {
+                const name = match[1].trim();
+                const country = match[2].trim();
+                
+                const newRetailer = {
+                    id: Date.now(),
+                    name: name,
+                    country: country,
+                    contact: 'Not specified',
+                    email: '',
+                    status: 'pending',
+                    notes: 'Added via voice command'
+                };
+                
+                retailers.push(newRetailer);
+                renderRetailers();
+                showNotification(`✅ Added new retailer: ${name} from ${country}`);
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Process relationship updates: "Yellow Bird is now working with Pacific Distributors"
+        function processRelationshipUpdate(command) {
+            const relationPattern = /(.+?)\s+is\s+now\s+working\s+with\s+(.+)/i;
+            const dealPattern = /(.+?)\s+deal\s+with\s+(.+?)\s+is\s+(.+)/i;
+            
+            let match = command.match(relationPattern);
+            if (match) {
+                const supplierName = match[1].trim();
+                const distributorName = match[2].trim();
+                
+                const supplier = suppliers.find(s => s.name.toLowerCase().includes(supplierName.toLowerCase()));
+                const distributor = distributors.find(d => d.name.toLowerCase().includes(distributorName.toLowerCase()));
+                
+                if (supplier && distributor) {
+                    // Check if relationship already exists
+                    const existingRel = relationships.find(r => r.supplierId === supplier.id && r.distributorId === distributor.id);
+                    if (!existingRel) {
+                        relationships.push({
+                            supplierId: supplier.id,
+                            distributorId: distributor.id,
+                            retailerId: null,
+                            status: 'pending',
+                            progress: 'New partnership via voice update',
+                            pendingItems: ['Initial presentation', 'Contract review']
+                        });
+                        
+                        renderAll();
+                        showNotification(`✅ Created new relationship: ${supplier.name} ↔ ${distributor.name}`);
+                        return true;
+                    }
+                }
+            }
+            
+            match = command.match(dealPattern);
+            if (match) {
+                const supplierName = match[1].trim();
+                const distributorName = match[2].trim();
+                const newStatus = normalizeStatus(match[3].trim());
+                
+                const supplier = suppliers.find(s => s.name.toLowerCase().includes(supplierName.toLowerCase()));
+                const distributor = distributors.find(d => d.name.toLowerCase().includes(distributorName.toLowerCase()));
+                
+                if (supplier && distributor) {
+                    const relationship = relationships.find(r => r.supplierId === supplier.id && r.distributorId === distributor.id);
+                    if (relationship) {
+                        const oldStatus = relationship.status;
+                        relationship.status = newStatus;
+                        relationship.progress = `Updated via voice: ${newStatus} status`;
+                        
+                        renderAll();
+                        showNotification(`✅ Updated ${supplier.name} - ${distributor.name} deal from ${oldStatus} to ${newStatus}`);
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        // Helper functions
+        function normalizeStatus(status) {
+            const statusLower = status.toLowerCase();
+            
+            if (statusLower.includes('active') || statusLower.includes('confirmed')) return 'active';
+            if (statusLower.includes('pending') || statusLower.includes('waiting')) return 'pending';
+            if (statusLower.includes('negotiat') || statusLower.includes('discuss')) return 'negotiating';
+            if (statusLower.includes('hold') || statusLower.includes('pause') || statusLower.includes('delay')) return 'on-hold';
+            
+            return status; // Return as-is if no match
+        }
+
+        function showNotification(message) {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.update-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'update-notification';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-microphone"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Initialize speech recognition on page load
+        initSpeechRecognition();
     </script>
 </body>
 </html>
