@@ -6,108 +6,167 @@
     <title>Energy Drink Category Analyzer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #4c1d95 50%, #1e293b 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #22d3ee, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .header p { color: #cbd5e1; font-size: 1.1rem; }
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .upload-area {
+            text-align: center;
+            padding: 40px;
+            border: 2px dashed rgba(168, 85, 247, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover { border-color: #a855f7; background: rgba(168, 85, 247, 0.1); }
+        .upload-icon { font-size: 3rem; margin-bottom: 15px; }
+        .btn {
+            background: linear-gradient(90deg, #9333ea, #ec4899);
+            color: white;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5); }
+        .hidden { display: none !important; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        input[type="text"]:focus { outline: none; border-color: #a855f7; }
+        .quick-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .quick-btn {
+            padding: 8px 16px;
+            background: rgba(51, 65, 85, 0.7);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .quick-btn:hover { background: rgba(71, 85, 105, 0.9); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(100, 116, 139, 0.3); }
+        th { color: #a855f7; font-weight: 600; }
+        tr:hover { background: rgba(71, 85, 105, 0.3); }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 3px solid rgba(168, 85, 247, 0.3);
+            border-top: 3px solid #a855f7;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status { margin-top: 15px; padding: 10px; border-radius: 6px; }
+        .status.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .positive { color: #4ade80; }
+        .negative { color: #f87171; }
+        canvas { max-height: 400px; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Energy Drink Category Analyzer
-            </h1>
-            <p class="text-gray-300 text-lg">AI-Powered Market Intelligence Tool</p>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Energy Drink Analyzer</h1>
+            <p>AI-Powered Market Intelligence Tool</p>
         </div>
 
-        <!-- File Upload Section -->
-        <div id="uploadSection" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 shadow-2xl border border-purple-500/20 mb-8">
-            <div class="text-center">
-                <div class="mb-4">
-                    <svg class="mx-auto h-16 w-16 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                </div>
-                <label for="fileInput" class="cursor-pointer inline-block">
-                    <span class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-purple-500/50 inline-block">
-                        Upload Excel File
-                    </span>
-                    <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
-                </label>
-                <p class="mt-4 text-gray-400 text-sm">Upload your Energy Drink Category data file</p>
-                <div id="fileStatus" class="mt-4 text-sm"></div>
+        <div id="uploadSection" class="card">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📊</div>
+                <h2>Upload Your Excel File</h2>
+                <p style="color: #94a3b8; margin-top: 10px;">Click here or drag your Energy Drink Category file</p>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
             </div>
+            <div id="fileStatus"></div>
         </div>
 
-        <!-- Query Interface -->
-        <div id="querySection" class="hidden bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-purple-500/20 mb-8">
-            <div class="mb-6">
-                <label class="block text-sm font-medium mb-3 text-purple-300">Ask a question about the data:</label>
-                <div class="flex gap-3">
-                    <input type="text" id="queryInput" 
-                           placeholder="e.g., What are the top 10 brands by dollar sales?"
-                           class="flex-1 px-4 py-3 bg-slate-700/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <button onclick="processQuery()" 
-                            class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-purple-500/50">
-                        Analyze
-                    </button>
-                </div>
-            </div>
-
-            <!-- Quick Questions -->
-            <div class="mb-4">
-                <p class="text-sm text-gray-400 mb-2">Quick questions:</p>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="setQuery('top brands')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Top Brands
-                    </button>
-                    <button onclick="setQuery('best performing')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Best Performing
-                    </button>
-                    <button onclick="setQuery('worst performing')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Worst Performing
-                    </button>
-                    <button onclick="setQuery('market share')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Market Share
-                    </button>
-                    <button onclick="setQuery('growth leaders')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Growth Leaders
-                    </button>
-                    <button onclick="setQuery('price analysis')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
-                        Price Analysis
-                    </button>
+        <div id="querySection" class="card hidden">
+            <h3 style="margin-bottom: 15px; color: #a855f7;">Ask a Question</h3>
+            <input type="text" id="queryInput" placeholder="e.g., What are the top 10 brands by dollar sales?">
+            <button class="btn" onclick="processQuery()">Analyze</button>
+            
+            <div style="margin-top: 20px;">
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 10px;">Quick Questions:</p>
+                <div class="quick-btns">
+                    <button class="quick-btn" onclick="setQuery('top brands')">Top Brands</button>
+                    <button class="quick-btn" onclick="setQuery('best performing')">Best Performing</button>
+                    <button class="quick-btn" onclick="setQuery('worst performing')">Worst Performing</button>
+                    <button class="quick-btn" onclick="setQuery('market share')">Market Share</button>
+                    <button class="quick-btn" onclick="setQuery('price analysis')">Price Analysis</button>
                 </div>
             </div>
         </div>
 
-        <!-- Results Section -->
+        <div id="loadingIndicator" class="card hidden">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Analyzing data...</p>
+            </div>
+        </div>
+
         <div id="resultsSection" class="hidden">
-            <!-- Answer Card -->
-            <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-cyan-500/20 mb-6">
-                <h2 class="text-2xl font-bold mb-4 text-cyan-400">Analysis Results</h2>
-                <div id="answerText" class="text-gray-200 leading-relaxed"></div>
+            <div class="card">
+                <h2 style="color: #22d3ee; margin-bottom: 20px;">📊 Analysis Results</h2>
+                <div id="answerText"></div>
             </div>
 
-            <!-- Data Table -->
-            <div id="tableContainer" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-purple-500/20 mb-6 hidden">
-                <h3 class="text-xl font-bold mb-4 text-purple-400">Detailed Data</h3>
-                <div class="overflow-x-auto">
-                    <table id="dataTable" class="w-full text-sm">
+            <div id="tableContainer" class="card hidden">
+                <h3 style="color: #a855f7; margin-bottom: 15px;">Detailed Data</h3>
+                <div style="overflow-x: auto;">
+                    <table id="dataTable">
                         <thead id="tableHead"></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Chart -->
-            <div id="chartContainer" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-pink-500/20 hidden">
-                <h3 class="text-xl font-bold mb-4 text-pink-400">Visual Analysis</h3>
-                <canvas id="dataChart" class="max-h-96"></canvas>
+            <div id="chartContainer" class="card hidden">
+                <h3 style="color: #ec4899; margin-bottom: 15px;">Visual Analysis</h3>
+                <canvas id="dataChart"></canvas>
             </div>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="text-center py-8 hidden">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-            <p class="mt-4 text-gray-400">Analyzing data...</p>
         </div>
     </div>
 
@@ -115,20 +174,21 @@
         let energyDrinkData = {};
         let currentChart = null;
 
-        // File upload handler
+        console.log('Page loaded successfully');
+
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatus').innerHTML = '<span class="text-yellow-400">Loading file...</span>';
+            console.log('File selected:', file.name);
+            document.getElementById('fileStatus').innerHTML = '<div class="status">Loading file...</div>';
 
             try {
                 const data = await file.arrayBuffer();
-                const workbook = XLSX.read(data, {
-                    cellStyles: true,
-                    cellFormulas: true,
-                    cellDates: true
-                });
+                console.log('File read, size:', data.byteLength);
+                
+                const workbook = XLSX.read(data, { type: 'array' });
+                console.log('Workbook loaded, sheets:', workbook.SheetNames);
 
                 const sheetNames = workbook.SheetNames.filter(name => name !== 'Index');
                 
@@ -159,19 +219,22 @@
                         }).filter(row => row.Product);
                         
                         energyDrinkData[sheetName] = parsedData;
+                        console.log(`Sheet ${sheetName}: ${parsedData.length} products loaded`);
                     }
                 });
 
-                document.getElementById('fileStatus').innerHTML = `<span class="text-green-400">✓ File loaded successfully! ${Object.keys(energyDrinkData).length} sheets, ${energyDrinkData['1']?.length || 0} products</span>`;
+                const totalProducts = Object.values(energyDrinkData).reduce((sum, arr) => sum + arr.length, 0);
+                document.getElementById('fileStatus').innerHTML = 
+                    `<div class="status success">✓ File loaded! ${Object.keys(energyDrinkData).length} sheets, ${totalProducts} total products</div>`;
+                
                 document.getElementById('uploadSection').classList.add('hidden');
                 document.getElementById('querySection').classList.remove('hidden');
                 
-                // Auto-show top brands
-                setTimeout(() => {
-                    setQuery('top brands');
-                }, 500);
+                setTimeout(() => setQuery('top brands'), 800);
             } catch (error) {
-                document.getElementById('fileStatus').innerHTML = `<span class="text-red-400">Error loading file: ${error.message}</span>`;
+                console.error('Error:', error);
+                document.getElementById('fileStatus').innerHTML = 
+                    `<div class="status error">Error: ${error.message}</div>`;
             }
         });
 
@@ -184,23 +247,30 @@
             const query = document.getElementById('queryInput').value.toLowerCase();
             if (!query) return;
 
+            console.log('Processing query:', query);
             document.getElementById('loadingIndicator').classList.remove('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
 
             setTimeout(() => {
-                analyzeQuery(query);
-                document.getElementById('loadingIndicator').classList.add('hidden');
-                document.getElementById('resultsSection').classList.remove('hidden');
-                window.scrollTo({ top: document.getElementById('resultsSection').offsetTop - 100, behavior: 'smooth' });
+                try {
+                    analyzeQuery(query);
+                    document.getElementById('loadingIndicator').classList.add('hidden');
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    alert('Error analyzing data: ' + error.message);
+                    document.getElementById('loadingIndicator').classList.add('hidden');
+                }
             }, 500);
         }
 
         function analyzeQuery(query) {
             const data = energyDrinkData['1'] || [];
+            console.log('Analyzing with', data.length, 'products');
             
             if (query.includes('top') && query.includes('brand')) {
                 showTopBrands(data);
-            } else if (query.includes('best') || query.includes('growth leader')) {
+            } else if (query.includes('best') || query.includes('growth')) {
                 showBestPerforming(data);
             } else if (query.includes('worst') || query.includes('declining')) {
                 showWorstPerforming(data);
@@ -228,24 +298,19 @@
             const top10Share = ((top10Sales / totalSales) * 100).toFixed(1);
 
             document.getElementById('answerText').innerHTML = `
-                <p class="text-lg mb-4">The top 10 brands represent <strong class="text-cyan-400">${top10Share}%</strong> of total category sales.</p>
-                <p class="mb-2">Here are the leading brands:</p>
-                <ol class="list-decimal list-inside space-y-1 ml-4">
-                    ${top10.map((b, i) => `
-                        <li><strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} 
-                        (${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}% vs YA)</li>
-                    `).join('')}
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">The top 10 brands represent <strong style="color: #22d3ee;">${top10Share}%</strong> of total category sales.</p>
+                <ol style="line-height: 1.8;">
+                    ${top10.map((b, i) => {
+                        const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
+                        const changeClass = change >= 0 ? 'positive' : 'negative';
+                        return `<li><strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} 
+                        (<span class="${changeClass}">${change}% vs YA</span>)</li>`;
+                    }).join('')}
                 </ol>
             `;
 
             displayTable(top10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Unit Sales', 'Price per Unit']);
-
-            createChart(
-                top10.map(b => b.Product.trim()),
-                top10.map(b => b['Dollar Sales']),
-                'Top 10 Brands by Dollar Sales',
-                'bar'
-            );
+            createChart(top10.map(b => b.Product.trim()), top10.map(b => b['Dollar Sales']), 'Top 10 Brands by Dollar Sales', 'bar');
         }
 
         function showBestPerforming(data) {
@@ -259,25 +324,18 @@
             const top10 = brands.slice(0, 10);
 
             document.getElementById('answerText').innerHTML = `
-                <p class="text-lg mb-4">The fastest-growing brands in the energy drink category:</p>
-                <ol class="list-decimal list-inside space-y-1 ml-4">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">The fastest-growing brands in the energy drink category:</p>
+                <ol style="line-height: 1.8;">
                     ${top10.map(b => `
                         <li><strong>${b.Product.trim()}</strong>: 
-                        <span class="text-green-400">+${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span> growth
+                        <span class="positive">+${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span> growth
                         ($${formatNumber(b['Dollar Sales'])} sales)</li>
                     `).join('')}
                 </ol>
             `;
 
             displayTable(top10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Unit Sales % Change vs YA']);
-
-            createChart(
-                top10.map(b => b.Product.trim()),
-                top10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
-                'Top 10 Growth Leaders (% Change vs YA)',
-                'bar',
-                true
-            );
+            createChart(top10.map(b => b.Product.trim()), top10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100), 'Growth Leaders', 'bar', true);
         }
 
         function showWorstPerforming(data) {
@@ -291,25 +349,18 @@
             const bottom10 = brands.slice(0, 10);
 
             document.getElementById('answerText').innerHTML = `
-                <p class="text-lg mb-4">Brands facing the biggest declines:</p>
-                <ol class="list-decimal list-inside space-y-1 ml-4">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Brands facing the biggest declines:</p>
+                <ol style="line-height: 1.8;">
                     ${bottom10.map(b => `
                         <li><strong>${b.Product.trim()}</strong>: 
-                        <span class="text-red-400">${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span> change
+                        <span class="negative">${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span>
                         ($${formatNumber(b['Dollar Sales'])} current sales)</li>
                     `).join('')}
                 </ol>
             `;
 
             displayTable(bottom10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'ACV Weighted Distribution']);
-
-            createChart(
-                bottom10.map(b => b.Product.trim()),
-                bottom10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
-                'Brands with Largest Declines (% Change vs YA)',
-                'bar',
-                true
-            );
+            createChart(bottom10.map(b => b.Product.trim()), bottom10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100), 'Declining Brands', 'bar', true);
         }
 
         function showMarketShare(data) {
@@ -320,29 +371,23 @@
             });
 
             const totalSales = brands.reduce((sum, b) => sum + (b['Dollar Sales'] || 0), 0);
-            brands.forEach(b => {
-                b.marketShare = ((b['Dollar Sales'] || 0) / totalSales) * 100;
-            });
-
+            brands.forEach(b => b.marketShare = ((b['Dollar Sales'] || 0) / totalSales) * 100);
             brands.sort((a, b) => b.marketShare - a.marketShare);
             const top10 = brands.slice(0, 10);
 
             document.getElementById('answerText').innerHTML = `
-                <p class="text-lg mb-4">Market share distribution across top brands:</p>
-                <div class="space-y-2">
-                    ${top10.map(b => `
-                        <div class="flex items-center gap-3">
-                            <div class="w-48 truncate font-medium">${b.Product.trim()}</div>
-                            <div class="flex-1 bg-slate-700 rounded-full h-6 relative overflow-hidden">
-                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all" 
-                                     style="width: ${b.marketShare}%"></div>
-                                <span class="absolute inset-0 flex items-center justify-center text-xs font-bold">
-                                    ${b.marketShare.toFixed(1)}%
-                                </span>
-                            </div>
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Market share distribution:</p>
+                ${top10.map(b => `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span><strong>${b.Product.trim()}</strong></span>
+                            <span style="color: #22d3ee;">${b.marketShare.toFixed(1)}%</span>
                         </div>
-                    `).join('')}
-                </div>
+                        <div style="background: rgba(51, 65, 85, 0.5); border-radius: 10px; height: 20px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #a855f7, #ec4899); height: 100%; width: ${b.marketShare}%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+                `).join('')}
             `;
 
             displayTable(top10.map(b => ({
@@ -352,12 +397,7 @@
                 'YA Change %': ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)
             })), ['Product', 'Dollar Sales', 'Market Share %', 'YA Change %']);
 
-            createChart(
-                top10.map(b => b.Product.trim()),
-                top10.map(b => b.marketShare),
-                'Market Share - Top 10 Brands',
-                'pie'
-            );
+            createChart(top10.map(b => b.Product.trim()), top10.map(b => b.marketShare), 'Market Share', 'pie');
         }
 
         function showPriceAnalysis(data) {
@@ -369,29 +409,21 @@
 
             brands.sort((a, b) => (b['Price per Unit'] || 0) - (a['Price per Unit'] || 0));
             const top10 = brands.slice(0, 10);
-
             const avgPrice = brands.reduce((sum, b) => sum + (b['Price per Unit'] || 0), 0) / brands.length;
 
             document.getElementById('answerText').innerHTML = `
-                <p class="text-lg mb-4">Price positioning analysis:</p>
-                <p class="mb-4">Average category price per unit: <strong class="text-cyan-400">$${avgPrice.toFixed(2)}</strong></p>
-                <p class="mb-2">Highest-priced brands:</p>
-                <ol class="list-decimal list-inside space-y-1 ml-4">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Price positioning analysis:</p>
+                <p style="margin-bottom: 15px;">Average category price: <strong style="color: #22d3ee;">$${avgPrice.toFixed(2)}/unit</strong></p>
+                <p style="margin-bottom: 10px;">Highest-priced brands:</p>
+                <ol style="line-height: 1.8;">
                     ${top10.map(b => `
-                        <li><strong>${b.Product.trim()}</strong>: $${(b['Price per Unit'] || 0).toFixed(2)}/unit
-                        (${((b['Price per Unit Change vs YA'] || 0) * 100).toFixed(1)}% change vs YA)</li>
+                        <li><strong>${b.Product.trim()}</strong>: $${(b['Price per Unit'] || 0).toFixed(2)}/unit</li>
                     `).join('')}
                 </ol>
             `;
 
             displayTable(top10, ['Product', 'Price per Unit', 'Price per Unit Change vs YA', 'Dollar Sales']);
-
-            createChart(
-                top10.map(b => b.Product.trim()),
-                top10.map(b => b['Price per Unit']),
-                'Price per Unit Comparison',
-                'bar'
-            );
+            createChart(top10.map(b => b.Product.trim()), top10.map(b => b['Price per Unit']), 'Price per Unit', 'bar');
         }
 
         function displayTable(data, columns) {
@@ -400,30 +432,25 @@
                 return;
             }
 
-            const thead = document.getElementById('tableHead');
-            const tbody = document.getElementById('tableBody');
-
-            thead.innerHTML = `
-                <tr class="border-b border-purple-500/30">
-                    ${columns.map(col => `<th class="px-4 py-3 text-left text-purple-300 font-semibold">${col}</th>`).join('')}
-                </tr>
+            document.getElementById('tableHead').innerHTML = `
+                <tr>${columns.map(col => `<th>${col}</th>`).join('')}</tr>
             `;
 
-            tbody.innerHTML = data.map((row, i) => `
-                <tr class="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
+            document.getElementById('tableBody').innerHTML = data.map(row => `
+                <tr>
                     ${columns.map(col => {
                         let value = row[col];
                         if (typeof value === 'number') {
                             if (col.includes('%')) {
                                 const pct = (value * 100).toFixed(1);
-                                const color = value > 0 ? 'text-green-400' : value < 0 ? 'text-red-400' : '';
-                                return `<td class="px-4 py-3 ${color}">${pct}%</td>`;
+                                const color = value > 0 ? 'positive' : value < 0 ? 'negative' : '';
+                                return `<td class="${color}">${pct}%</td>`;
                             } else if (col.includes('Sales') || col.includes('Dollar')) {
-                                return `<td class="px-4 py-3">$${formatNumber(value)}</td>`;
+                                return `<td>$${formatNumber(value)}</td>`;
                             }
-                            return `<td class="px-4 py-3">${value.toFixed(2)}</td>`;
+                            return `<td>${value.toFixed(2)}</td>`;
                         }
-                        return `<td class="px-4 py-3 ${i === 0 ? 'font-medium' : ''}">${value || 'N/A'}</td>`;
+                        return `<td>${value || 'N/A'}</td>`;
                     }).join('')}
                 </tr>
             `).join('');
@@ -432,16 +459,12 @@
         }
 
         function createChart(labels, data, title, type = 'bar', isPercentage = false) {
-            if (currentChart) {
-                currentChart.destroy();
-            }
+            if (currentChart) currentChart.destroy();
 
-            const canvas = document.getElementById('dataChart');
-            const ctx = canvas.getContext('2d');
-
+            const ctx = document.getElementById('dataChart').getContext('2d');
             const colors = type === 'pie' 
                 ? labels.map((_, i) => `hsl(${(i * 360 / labels.length)}, 70%, 60%)`)
-                : data.map(val => val >= 0 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(236, 72, 153, 0.8)');
+                : data.map(val => val >= 0 ? 'rgba(168, 85, 247, 0.8)' : 'rgba(236, 72, 153, 0.8)');
 
             currentChart = new Chart(ctx, {
                 type: type,
@@ -459,34 +482,17 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            display: type === 'pie',
-                            labels: { color: '#e2e8f0' }
-                        },
-                        title: {
-                            display: true,
-                            text: title,
-                            color: '#e2e8f0',
-                            font: { size: 16 }
-                        }
+                        legend: { display: type === 'pie', labels: { color: '#e2e8f0' } },
+                        title: { display: true, text: title, color: '#e2e8f0', font: { size: 16 } }
                     },
                     scales: type !== 'pie' ? {
                         y: {
                             beginAtZero: true,
-                            ticks: { 
-                                color: '#cbd5e1',
-                                callback: function(value) {
-                                    return isPercentage ? value + '%' : value;
-                                }
-                            },
+                            ticks: { color: '#cbd5e1', callback: v => isPercentage ? v + '%' : v },
                             grid: { color: 'rgba(148, 163, 184, 0.1)' }
                         },
                         x: {
-                            ticks: { 
-                                color: '#cbd5e1',
-                                maxRotation: 45,
-                                minRotation: 45
-                            },
+                            ticks: { color: '#cbd5e1', maxRotation: 45, minRotation: 45 },
                             grid: { color: 'rgba(148, 163, 184, 0.1)' }
                         }
                     } : {}
@@ -497,19 +503,16 @@
         }
 
         function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(2) + 'M';
-            } else if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
             return num.toFixed(0);
         }
 
-        document.getElementById('queryInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                processQuery();
-            }
+        document.getElementById('queryInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processQuery();
         });
+
+        console.log('All scripts loaded successfully');
     </script>
 </body>
 </html>
