@@ -3,2133 +3,513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolfpak Brands - Business Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Energy Drink Category Analyzer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #fbbf24;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            font-size: 1.1rem;
-        }
-
-        .import-section {
-            max-width: 1400px;
-            margin: 0 auto 2rem auto;
-        }
-
-        .import-box {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border-radius: 16px;
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .import-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
-        }
-
-        .import-box i {
-            font-size: 2.5rem;
-        }
-
-        .import-text strong {
-            font-size: 1.2rem;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .import-text p {
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .import-status {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid #22c55e;
-            border-radius: 12px;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: #22c55e;
-            margin-top: 1rem;
-        }
-
-        .voice-section {
-            max-width: 1400px;
-            margin: 0 auto 2rem auto;
-        }
-
-        .voice-control {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .voice-button {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            border: none;
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
-        }
-
-        .voice-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-        }
-
-        .voice-button.recording {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            animation: pulse-recording 1.5s infinite;
-        }
-
-        @keyframes pulse-recording {
-            0%, 100% { 
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-            }
-            50% { 
-                transform: scale(1.05);
-                box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
-            }
-        }
-
-        .voice-status {
-            flex: 1;
-        }
-
-        .voice-status span {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #fbbf24;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .voice-status p {
-            color: #94a3b8;
-            margin: 0;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .voice-status.listening span {
-            color: #22c55e;
-        }
-
-        .voice-status.processing span {
-            color: #3b82f6;
-        }
-
-        .voice-transcript {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            min-height: 100px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .transcript-content {
-            color: #e2e8f0;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        .transcript-interim {
-            color: #94a3b8;
-            font-style: italic;
-        }
-
-        .transcript-final {
-            color: #22c55e;
-            font-weight: 500;
-        }
-
-        .update-notification {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
-            z-index: 2000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-
-        .update-notification.show {
-            transform: translateX(0);
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(34, 197, 94, 0.3);
-            border-top: 2px solid #22c55e;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-box {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 1.5rem;
-            min-height: 600px;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fbbf24;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .add-button {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            font-weight: 500;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .add-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
-        }
-
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .item-card {
-            background: rgba(51, 65, 85, 0.5);
-            border-radius: 12px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid #fbbf24;
-        }
-
-        .item-card:hover {
-            background: rgba(51, 65, 85, 0.8);
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.2);
-        }
-
-        .item-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: #e2e8f0;
-        }
-
-        .item-details {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            line-height: 1.4;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-top: 0.5rem;
-            margin-right: 0.5rem;
-        }
-
-        .status-active { background: rgba(34, 197, 94, 0.2); color: #86efac; }
-        .status-pending { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-        .status-negotiating { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
-        .status-on-hold { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid #475569;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fbbf24;
-        }
-
-        .close-button {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .close-button:hover {
-            color: #e2e8f0;
-        }
-
-        .brand-status-item {
-            background: rgba(51, 65, 85, 0.3);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid #fbbf24;
-        }
-
-        .brand-status-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .brand-status-name {
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .progress-info {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
-        }
-
-        .pending-list {
-            list-style: none;
-            margin-top: 0.5rem;
-        }
-
-        .pending-item {
-            padding: 0.25rem 0;
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-
-        .pending-item::before {
-            content: "• ";
-            color: #f59e0b;
-            font-weight: bold;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #e2e8f0;
-            font-weight: 500;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(51, 65, 85, 0.5);
-            border: 1px solid #64748b;
-            border-radius: 8px;
-            color: #e2e8f0;
-            font-size: 1rem;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #fbbf24;
-            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border: none;
-            border-radius: 8px;
-            color: #0f172a;
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .btn-secondary {
-            background: rgba(71, 85, 105, 0.5);
-            border: 1px solid #64748b;
-            border-radius: 8px;
-            color: #e2e8f0;
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: #64748b;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            body {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .modal-content {
-                padding: 1rem;
-                width: 95%;
-            }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="header">
-        <div class="logo">
-            <i class="fas fa-wolf-pack-battalion"></i>
-            Wolfpak Brands
-        </div>
-        <div class="subtitle">Business Dashboard - Connecting Suppliers, Distributors & Retailers</div>
-    </div>
-
-    <!-- Voice Control Section -->
-    <div class="voice-section">
-        <div class="voice-control">
-            <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()">
-                <i class="fas fa-microphone" id="voiceIcon"></i>
-            </button>
-            <div class="voice-status" id="voiceStatus">
-                <span>Click to start voice updates</span>
-                <p>Say things like: "Update Casbah status to negotiating" or "Add pending item TDS to Yellow Bird"</p>
-            </div>
-        </div>
-        <div class="voice-transcript" id="voiceTranscript" style="display: none;">
-            <div class="transcript-content" id="transcriptContent"></div>
-        </div>
-    </div>
-
-    <!-- Excel Import Section -->
-    <div class="import-section">
-        <div class="import-box" onclick="document.getElementById('excelInput').click();">
-            <i class="fas fa-check-circle"></i>
-            <div class="import-text">
-                <strong>Your DASHBOARD 2025.xlsx Data Loaded</strong>
-                <p>15 suppliers, 15 distributors, 7 retailers, and 19 active relationships imported. Click to reimport or update.</p>
-            </div>
-            <input type="file" id="excelInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
-        </div>
-        <div class="import-status" id="importStatus" style="display: none;">
-            <div class="spinner"></div>
-            <span>Processing Excel file...</span>
-        </div>
-    </div>
-    <div class="import-section">
-        <div class="import-box" onclick="document.getElementById('excelInput').click();">
-            <i class="fas fa-check-circle"></i>
-            <div class="import-text">
-                <strong>Your DASHBOARD 2025.xlsx Data Loaded</strong>
-                <p>15 suppliers, 15 distributors, 7 retailers, and 19 active relationships imported. Click to reimport or update.</p>
-            </div>
-            <input type="file" id="excelInput" style="display: none;" accept=".xlsx,.xls" onchange="handleExcelImport(event)">
-        </div>
-        <div class="import-status" id="importStatus" style="display: none;">
-            <div class="spinner"></div>
-            <span>Processing Excel file...</span>
-        </div>
-    </div>
-
-    <div class="main-grid">
-        <!-- Brands/Suppliers Section -->
-        <div class="section-box">
-            <h2 class="section-title">
-                <i class="fas fa-industry"></i>
-                Brands / Suppliers
-            </h2>
-            <button class="add-button" onclick="openAddModal('supplier')">
-                <i class="fas fa-plus"></i> Add New Supplier
-            </button>
-            <div class="item-list" id="supplierList">
-                <!-- Suppliers will be populated here -->
-            </div>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Energy Drink Category Analyzer
+            </h1>
+            <p class="text-gray-300 text-lg">AI-Powered Market Intelligence Tool</p>
         </div>
 
-        <!-- Distributors Section -->
-        <div class="section-box">
-            <h2 class="section-title">
-                <i class="fas fa-truck"></i>
-                Distributors
-            </h2>
-            <button class="add-button" onclick="openAddModal('distributor')">
-                <i class="fas fa-plus"></i> Add New Distributor
-            </button>
-            <div class="item-list" id="distributorList">
-                <!-- Distributors will be populated here -->
-            </div>
-        </div>
-
-        <!-- Retailers Section -->
-        <div class="section-box">
-            <h2 class="section-title">
-                <i class="fas fa-store"></i>
-                Retailers
-            </h2>
-            <button class="add-button" onclick="openAddModal('retailer')">
-                <i class="fas fa-plus"></i> Add New Retailer
-            </button>
-            <div class="item-list" id="retailerList">
-                <!-- Retailers will be populated here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Item Modal -->
-    <div class="modal" id="addModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Add New Item</h3>
-                <button class="close-button" onclick="closeModal()">&times;</button>
-            </div>
-            <form id="addForm">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" class="form-input" id="itemName" required>
+        <!-- File Upload Section -->
+        <div id="uploadSection" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 shadow-2xl border border-purple-500/20 mb-8">
+            <div class="text-center">
+                <div class="mb-4">
+                    <svg class="mx-auto h-16 w-16 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Country/Region</label>
-                    <input type="text" class="form-input" id="itemCountry" placeholder="e.g., Germany, USA, Global">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Contact Person</label>
-                    <input type="text" class="form-input" id="itemContact">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="itemEmail">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="itemStatus">
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="negotiating">Negotiating</option>
-                        <option value="on-hold">On Hold</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Notes</label>
-                    <textarea class="form-textarea" id="itemNotes" placeholder="Additional information..."></textarea>
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="btn-primary">Add Item</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Distributor Details Modal -->
-    <div class="modal" id="distributorModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="distributorModalTitle">Distributor Details</h3>
-                <button class="close-button" onclick="closeDistributorModal()">&times;</button>
-            </div>
-            <div id="distributorDetails">
-                <!-- Distributor brand details will be populated here -->
+                <label for="fileInput" class="cursor-pointer inline-block">
+                    <span class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-purple-500/50 inline-block">
+                        Upload Excel File
+                    </span>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
+                </label>
+                <p class="mt-4 text-gray-400 text-sm">Upload your Energy Drink Category data file</p>
+                <div id="fileStatus" class="mt-4 text-sm"></div>
             </div>
         </div>
-    </div>
 
-    <!-- Supplier Details Modal -->
-    <div class="modal" id="supplierModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="supplierModalTitle">Supplier Details</h3>
-                <button class="close-button" onclick="closeSupplierModal()">&times;</button>
+        <!-- Query Interface -->
+        <div id="querySection" class="hidden bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-purple-500/20 mb-8">
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-3 text-purple-300">Ask a question about the data:</label>
+                <div class="flex gap-3">
+                    <input type="text" id="queryInput" 
+                           placeholder="e.g., What are the top 10 brands by dollar sales?"
+                           class="flex-1 px-4 py-3 bg-slate-700/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <button onclick="processQuery()" 
+                            class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-purple-500/50">
+                        Analyze
+                    </button>
+                </div>
             </div>
-            <div id="supplierDetails">
-                <!-- Supplier details will be populated here -->
+
+            <!-- Quick Questions -->
+            <div class="mb-4">
+                <p class="text-sm text-gray-400 mb-2">Quick questions:</p>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setQuery('top brands')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Top Brands
+                    </button>
+                    <button onclick="setQuery('best performing')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Best Performing
+                    </button>
+                    <button onclick="setQuery('worst performing')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Worst Performing
+                    </button>
+                    <button onclick="setQuery('market share')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Market Share
+                    </button>
+                    <button onclick="setQuery('growth leaders')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Growth Leaders
+                    </button>
+                    <button onclick="setQuery('price analysis')" class="px-3 py-1.5 bg-slate-700/70 hover:bg-slate-600 rounded-full text-sm transition-colors">
+                        Price Analysis
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Answer Card -->
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-cyan-500/20 mb-6">
+                <h2 class="text-2xl font-bold mb-4 text-cyan-400">Analysis Results</h2>
+                <div id="answerText" class="text-gray-200 leading-relaxed"></div>
+            </div>
+
+            <!-- Data Table -->
+            <div id="tableContainer" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-purple-500/20 mb-6 hidden">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">Detailed Data</h3>
+                <div class="overflow-x-auto">
+                    <table id="dataTable" class="w-full text-sm">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div id="chartContainer" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 shadow-2xl border border-pink-500/20 hidden">
+                <h3 class="text-xl font-bold mb-4 text-pink-400">Visual Analysis</h3>
+                <canvas id="dataChart" class="max-h-96"></canvas>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center py-8 hidden">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+            <p class="mt-4 text-gray-400">Analyzing data...</p>
         </div>
     </div>
 
     <script>
-        // Real data extracted from DASHBOARD 2025.xlsx
-        let suppliers = [
-            {
-                id: 1,
-                name: "Casbah",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 2,
-                name: "Dannon",
-                country: "USA", 
-                contact: "Danny",
-                email: "",
-                status: "active",
-                notes: "Owner: Danny",
-                pendingItems: []
-            },
-            {
-                id: 3,
-                name: "Fruzel",
-                country: "Taiwan",
-                contact: "Chris",
-                email: "",
-                status: "active",
-                notes: "Owner: Chris",
-                pendingItems: []
-            },
-            {
-                id: 4,
-                name: "Happy Family",
-                country: "USA",
-                contact: "Danny",
-                email: "",
-                status: "active",
-                notes: "Owner: Danny",
-                pendingItems: []
-            },
-            {
-                id: 5,
-                name: "Horizon Organic",
-                country: "USA",
-                contact: "Danny",
-                email: "",
-                status: "active",
-                notes: "Owner: Danny",
-                pendingItems: []
-            },
-            {
-                id: 6,
-                name: "International Delight",
-                country: "USA",
-                contact: "Danny",
-                email: "",
-                status: "active",
-                notes: "Owner: Danny",
-                pendingItems: []
-            },
-            {
-                id: 7,
-                name: "Mill & Folks",
-                country: "Hungary",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 8,
-                name: "Root Foods",
-                country: "Vietnam",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 9,
-                name: "Vermints",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "pending",
-                notes: "Owner: Facu",
-                pendingItems: ["Spec Sheets", "Price List"]
-            },
-            {
-                id: 10,
-                name: "Yellow Bird",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 11,
-                name: "Wavers",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 12,
-                name: "Organic Valley",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 13,
-                name: "Nature's Bakery",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 14,
-                name: "Tate's",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            },
-            {
-                id: 15,
-                name: "Sol-ti",
-                country: "USA",
-                contact: "Facu",
-                email: "",
-                status: "active",
-                notes: "Owner: Facu",
-                pendingItems: []
-            }
-        ];
+        let energyDrinkData = {};
+        let currentChart = null;
 
-        let distributors = [
-            {
-                id: 1001,
-                name: "Linkage Foods",
-                country: "Philippines",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Philippines - 3 brands in pipeline"
-            },
-            {
-                id: 1002,
-                name: "Eatics",
-                country: "Mexico",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Mexico - High probability deals"
-            },
-            {
-                id: 1003,
-                name: "Butter Field Vallis",
-                country: "Bermuda",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Bermuda - 3 brands in pipeline"
-            },
-            {
-                id: 1004,
-                name: "Felipe Motta",
-                country: "Panama",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Panama"
-            },
-            {
-                id: 1005,
-                name: "Power Nature",
-                country: "Peru",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Peru - 3 brands in pipeline"
-            },
-            {
-                id: 1006,
-                name: "AMG",
-                country: "Caribbean",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Caribbean"
-            },
-            {
-                id: 1007,
-                name: "Plaza Provision",
-                country: "Puerto Rico",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Puerto Rico"
-            },
-            {
-                id: 1008,
-                name: "Loud n Clear",
-                country: "Israel",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Israel"
-            },
-            {
-                id: 1009,
-                name: "Winning",
-                country: "South Korea",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in South Korea - 2 brands in pipeline"
-            },
-            {
-                id: 1010,
-                name: "Protteina",
-                country: "Chile",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Chile"
-            },
-            {
-                id: 1011,
-                name: "Stellar Distributor",
-                country: "Australia",
-                contact: "Not specified",
-                email: "",
-                status: "active",
-                notes: "Active in Australia - High probability deals"
-            },
-            {
-                id: 1012,
-                name: "Alvarez y Sanchez",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential partner"
-            },
-            {
-                id: 1013,
-                name: "Colomer & Suarez",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential partner"
-            },
-            {
-                id: 1014,
-                name: "CP Group",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential partner"
-            },
-            {
-                id: 1015,
-                name: "GMT",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential partner"
-            }
-        ];
-
-        let retailers = [
-            {
-                id: 2001,
-                name: "Costco HQ",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2002,
-                name: "Costco",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2003,
-                name: "Dollar General",
-                country: "USA",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2004,
-                name: "Healthy Options",
-                country: "Multiple",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2005,
-                name: "Publix",
-                country: "USA",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2006,
-                name: "Wholefoods",
-                country: "USA",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            },
-            {
-                id: 2007,
-                name: "Tops",
-                country: "USA",
-                contact: "Not specified",
-                email: "",
-                status: "pending",
-                notes: "From lookup list - potential target"
-            }
-        ];
-
-        let relationships = [
-            {
-                supplierId: 5, // Horizon Organic
-                distributorId: 1001, // Linkage Foods
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Philippines market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 2, // Dannon
-                distributorId: 1001, // Linkage Foods
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Philippines market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 1, // Casbah
-                distributorId: 1001, // Linkage Foods
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Philippines market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 5, // Horizon Organic
-                distributorId: 1002, // Eatics
-                retailerId: null,
-                status: "negotiating",
-                progress: "Hi probability - Mexico market",
-                pendingItems: []
-            },
-            {
-                supplierId: 10, // Yellow Bird
-                distributorId: 1003, // Butter Field Vallis
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Bermuda market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 11, // Wavers
-                distributorId: 1003, // Butter Field Vallis
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Bermuda market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 3, // Fruzel
-                distributorId: 1003, // Butter Field Vallis
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Bermuda market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 5, // Horizon Organic
-                distributorId: 1004, // Felipe Motta
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Panama market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 1, // Casbah
-                distributorId: 1004, // Felipe Motta
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Panama market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 10, // Yellow Bird
-                distributorId: 1005, // Power Nature
-                retailerId: null,
-                status: "negotiating",
-                progress: "Hi probability - Peru market",
-                pendingItems: []
-            },
-            {
-                supplierId: 4, // Happy Family
-                distributorId: 1005, // Power Nature
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Peru market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 7, // Mill & Folks
-                distributorId: 1005, // Power Nature
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Peru market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 12, // Organic Valley
-                distributorId: 1006, // AMG
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Caribbean market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 10, // Yellow Bird
-                distributorId: 1008, // Loud n Clear
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Israel market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 6, // International Delight
-                distributorId: 1009, // Winning
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - South Korea market",
-                pendingItems: ["SOP Agreement"]
-            },
-            {
-                supplierId: 4, // Happy Family
-                distributorId: 1009, // Winning
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - South Korea market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 15, // Sol-ti
-                distributorId: 1010, // Protteina
-                retailerId: null,
-                status: "on-hold",
-                progress: "Lo probability - Chile market",
-                pendingItems: ["Presentation"]
-            },
-            {
-                supplierId: 10, // Yellow Bird
-                distributorId: 1011, // Stellar Distributor
-                retailerId: null,
-                status: "negotiating",
-                progress: "Hi probability - Australia market",
-                pendingItems: []
-            },
-            {
-                supplierId: 6, // International Delight
-                distributorId: 1011, // Stellar Distributor
-                retailerId: null,
-                status: "pending",
-                progress: "Med probability - Australia market",
-                pendingItems: ["SOP Agreement"]
-            }
-        ];
-
-        // Render functions
-        function renderSuppliers() {
-            const container = document.getElementById('supplierList');
-            
-            if (suppliers.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-industry"></i>
-                        <p>No suppliers added yet</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = suppliers.map(supplier => {
-                const supplierRelationships = relationships.filter(r => r.supplierId === supplier.id);
-                const activeDeals = supplierRelationships.length;
-                
-                return `
-                    <div class="item-card" onclick="showSupplierDetails(${supplier.id})">
-                        <div class="item-name">${supplier.name}</div>
-                        <div class="item-details">
-                            📍 ${supplier.country} | 👤 ${supplier.contact}<br>
-                            🤝 ${activeDeals} active deal${activeDeals !== 1 ? 's' : ''} | 📋 ${supplier.pendingItems.length} pending items
-                        </div>
-                        <span class="status-badge status-${supplier.status}">${supplier.status.toUpperCase()}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderDistributors() {
-            const container = document.getElementById('distributorList');
-            
-            if (distributors.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-truck"></i>
-                        <p>No distributors added yet</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = distributors.map(distributor => {
-                const distributorRelationships = relationships.filter(r => r.distributorId === distributor.id);
-                const brandsCount = distributorRelationships.length;
-                
-                return `
-                    <div class="item-card" onclick="showDistributorDetails(${distributor.id})">
-                        <div class="item-name">${distributor.name}</div>
-                        <div class="item-details">
-                            📍 ${distributor.country} | 👤 ${distributor.contact}<br>
-                            🏷️ ${brandsCount} brand${brandsCount !== 1 ? 's' : ''} in pipeline
-                        </div>
-                        <span class="status-badge status-${distributor.status}">${distributor.status.toUpperCase()}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderRetailers() {
-            const container = document.getElementById('retailerList');
-            
-            if (retailers.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-store"></i>
-                        <p>No retailers added yet</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = retailers.map(retailer => {
-                const retailerRelationships = relationships.filter(r => r.retailerId === retailer.id);
-                const brandsCount = retailerRelationships.length;
-                
-                return `
-                    <div class="item-card">
-                        <div class="item-name">${retailer.name}</div>
-                        <div class="item-details">
-                            📍 ${retailer.country} | 👤 ${retailer.contact}<br>
-                            🏷️ ${brandsCount} brand${brandsCount !== 1 ? 's' : ''} being sold
-                        </div>
-                        <span class="status-badge status-${retailer.status}">${retailer.status.toUpperCase()}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderAll() {
-            renderSuppliers();
-            renderDistributors();
-            renderRetailers();
-        }
-
-        // Modal functions
-        function openAddModal(type) {
-            const modal = document.getElementById('addModal');
-            const title = document.getElementById('modalTitle');
-            
-            title.textContent = `Add New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-            modal.dataset.type = type;
-            modal.classList.add('show');
-            
-            // Clear form
-            document.getElementById('addForm').reset();
-        }
-
-        function closeModal() {
-            document.getElementById('addModal').classList.remove('show');
-        }
-
-        function showDistributorDetails(distributorId) {
-            const distributor = distributors.find(d => d.id === distributorId);
-            const distributorRelationships = relationships.filter(r => r.distributorId === distributorId);
-            
-            const modal = document.getElementById('distributorModal');
-            const title = document.getElementById('distributorModalTitle');
-            const details = document.getElementById('distributorDetails');
-            
-            title.textContent = `${distributor.name} - Brand Pipeline`;
-            
-            if (distributorRelationships.length === 0) {
-                details.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-handshake"></i>
-                        <p>No brands currently in pipeline with this distributor</p>
-                    </div>
-                `;
-            } else {
-                details.innerHTML = distributorRelationships.map(relationship => {
-                    const supplier = suppliers.find(s => s.id === relationship.supplierId);
-                    const retailer = relationship.retailerId ? retailers.find(r => r.id === relationship.retailerId) : null;
-                    
-                    return `
-                        <div class="brand-status-item">
-                            <div class="brand-status-header">
-                                <span class="brand-status-name">${supplier.name}</span>
-                                <span class="status-badge status-${relationship.status}">${relationship.status.toUpperCase()}</span>
-                            </div>
-                            <div class="progress-info">
-                                📈 Progress: ${relationship.progress}
-                                ${retailer ? `<br>🏪 End Retailer: ${retailer.name}` : ''}
-                            </div>
-                            ${relationship.pendingItems.length > 0 ? `
-                                <div>
-                                    <strong>Pending Items:</strong>
-                                    <ul class="pending-list">
-                                        ${relationship.pendingItems.map(item => `<li class="pending-item">${item}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
-            }
-            
-            modal.classList.add('show');
-        }
-
-        function closeDistributorModal() {
-            document.getElementById('distributorModal').classList.remove('show');
-        }
-
-        function showSupplierDetails(supplierId) {
-            const supplier = suppliers.find(s => s.id === supplierId);
-            const supplierRelationships = relationships.filter(r => r.supplierId === supplierId);
-            
-            const modal = document.getElementById('supplierModal');
-            const title = document.getElementById('supplierModalTitle');
-            const details = document.getElementById('supplierDetails');
-            
-            title.textContent = `${supplier.name} - Overview`;
-            
-            details.innerHTML = `
-                <div class="brand-status-item">
-                    <div class="brand-status-header">
-                        <span class="brand-status-name">Pending from Supplier</span>
-                    </div>
-                    ${supplier.pendingItems.length > 0 ? `
-                        <ul class="pending-list">
-                            ${supplier.pendingItems.map(item => `<li class="pending-item">${item}</li>`).join('')}
-                        </ul>
-                    ` : '<p class="progress-info">✅ No pending items</p>'}
-                </div>
-                
-                <div class="brand-status-item">
-                    <div class="brand-status-header">
-                        <span class="brand-status-name">Distribution Network</span>
-                    </div>
-                    ${supplierRelationships.length > 0 ? 
-                        supplierRelationships.map(relationship => {
-                            const distributor = distributors.find(d => d.id === relationship.distributorId);
-                            const retailer = relationship.retailerId ? retailers.find(r => r.id === relationship.retailerId) : null;
-                            
-                            return `
-                                <div class="progress-info">
-                                    🚛 <strong>${distributor.name}</strong> (${distributor.country})
-                                    ${retailer ? `<br>   └─ 🏪 ${retailer.name}` : ''}
-                                    <br>   📊 Status: <span class="status-badge status-${relationship.status}">${relationship.status.toUpperCase()}</span>
-                                </div>
-                            `;
-                        }).join('')
-                        : '<p class="progress-info">No active distribution partnerships</p>'
-                    }
-                </div>
-            `;
-            
-            modal.classList.add('show');
-        }
-
-        function closeSupplierModal() {
-            document.getElementById('supplierModal').classList.remove('show');
-        }
-
-        // Form submission
-        document.getElementById('addForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const type = document.getElementById('addModal').dataset.type;
-            const formData = {
-                id: Date.now(), // Simple ID generation
-                name: document.getElementById('itemName').value,
-                country: document.getElementById('itemCountry').value,
-                contact: document.getElementById('itemContact').value,
-                email: document.getElementById('itemEmail').value,
-                status: document.getElementById('itemStatus').value,
-                notes: document.getElementById('itemNotes').value
-            };
-            
-            if (type === 'supplier') {
-                formData.pendingItems = []; // Initialize empty pending items
-                suppliers.push(formData);
-            } else if (type === 'distributor') {
-                distributors.push(formData);
-            } else if (type === 'retailer') {
-                retailers.push(formData);
-            }
-            
-            renderAll();
-            closeModal();
-        });
-
-        // Excel Import Functionality - Customized for Wolfpak DASHBOARD 2025.xlsx
-        async function handleExcelImport(event) {
-            const file = event.target.files[0];
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
 
-            const statusElement = document.getElementById('importStatus');
-            statusElement.style.display = 'flex';
-            statusElement.innerHTML = '<div class="spinner"></div><span>Reading your DASHBOARD 2025.xlsx file...</span>';
+            document.getElementById('fileStatus').innerHTML = '<span class="text-yellow-400">Loading file...</span>';
 
             try {
                 const data = await file.arrayBuffer();
-                const workbook = XLSX.read(data, {type: 'array'});
-                
-                statusElement.innerHTML = '<div class="spinner"></div><span>Processing: ' + workbook.SheetNames.join(', ') + '</span>';
-
-                // Clear existing data
-                suppliers = [];
-                distributors = [];
-                retailers = [];
-                relationships = [];
-
-                // Process each sheet according to Wolfpak structure
-                if (workbook.Sheets["Supplier"]) {
-                    suppliers = parseWolfpakSuppliers(workbook.Sheets["Supplier"]);
-                    statusElement.innerHTML = '<div class="spinner"></div><span>Imported ' + suppliers.length + ' suppliers...</span>';
-                }
-
-                if (workbook.Sheets["DashBoard"]) {
-                    const dashboardData = parseWolfpakDashboard(workbook.Sheets["DashBoard"]);
-                    distributors = distributors.concat(dashboardData.distributors);
-                    retailers = retailers.concat(dashboardData.retailers);
-                    relationships = relationships.concat(dashboardData.relationships);
-                    statusElement.innerHTML = '<div class="spinner"></div><span>Imported ' + relationships.length + ' active deals...</span>';
-                }
-
-                if (workbook.Sheets["Look Up List"]) {
-                    const lookupData = parseWolfpakLookup(workbook.Sheets["Look Up List"]);
-                    // Add additional distributors and retailers from lookup
-                    distributors = distributors.concat(lookupData.distributors);
-                    retailers = retailers.concat(lookupData.retailers);
-                    statusElement.innerHTML = '<div class="spinner"></div><span>Added lookup data...</span>';
-                }
-
-                // Remove duplicates
-                suppliers = removeDuplicates(suppliers, 'name');
-                distributors = removeDuplicates(distributors, 'name');
-                retailers = removeDuplicates(retailers, 'name');
-
-                // Update the dashboard
-                renderAll();
-                
-                statusElement.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <span>Import complete! ${suppliers.length} suppliers, ${distributors.length} distributors, ${retailers.length} retailers, ${relationships.length} active deals</span>
-                `;
-                
-                setTimeout(() => {
-                    statusElement.style.display = 'none';
-                }, 5000);
-
-            } catch (error) {
-                console.error('Error importing Excel:', error);
-                statusElement.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                    <span style="color: #ef4444;">Error importing file: ${error.message}</span>
-                `;
-            }
-        }
-
-        // Parse Supplier sheet - specific to Wolfpak format
-        function parseWolfpakSuppliers(sheet) {
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-            const suppliers = [];
-            
-            // Headers are in row 2 (index 1): Brand, Country, Owner, Discovery, Spec Sheets, Price List, etc.
-            for (let row = 2; row <= range.e.r; row++) {
-                const brandCell = sheet[XLSX.utils.encode_cell({r: row, c: 0})]; // Brand
-                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 1})]; // Country  
-                const ownerCell = sheet[XLSX.utils.encode_cell({r: row, c: 2})]; // Owner
-                const discoveryCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Discovery
-                const specSheetsCell = sheet[XLSX.utils.encode_cell({r: row, c: 4})]; // Spec Sheets
-                const priceListCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Price List
-                const externalDeckCell = sheet[XLSX.utils.encode_cell({r: row, c: 6})]; // External Deck
-                const internalDeckCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // Internal Deck
-                const ndaCell = sheet[XLSX.utils.encode_cell({r: row, c: 8})]; // NDA
-                const brokerContractCell = sheet[XLSX.utils.encode_cell({r: row, c: 9})]; // Broker Contract
-                const tdsCell = sheet[XLSX.utils.encode_cell({r: row, c: 10})]; // TDS
-                
-                if (!brandCell || !brandCell.v) continue;
-                
-                // Build pending items list
-                const pendingItems = [];
-                if (!discoveryCell || discoveryCell.v !== "Done") pendingItems.push("Discovery");
-                if (!specSheetsCell || specSheetsCell.v !== "Done") pendingItems.push("Spec Sheets");
-                if (!priceListCell || priceListCell.v !== "Done") pendingItems.push("Price List");
-                if (!externalDeckCell || externalDeckCell.v !== "Done") pendingItems.push("External Deck");
-                if (!internalDeckCell || internalDeckCell.v !== "Done") pendingItems.push("Internal Deck");
-                if (!ndaCell || ndaCell.v !== "Done") pendingItems.push("NDA");
-                if (!brokerContractCell || brokerContractCell.v !== "Done") pendingItems.push("Broker Contract");
-                if (!tdsCell || tdsCell.v !== "Done") pendingItems.push("TDS");
-                
-                suppliers.push({
-                    id: Date.now() + row,
-                    name: brandCell.v,
-                    country: countryCell ? countryCell.v : 'Not specified',
-                    contact: ownerCell ? ownerCell.v : 'Not specified',
-                    email: '',
-                    status: pendingItems.length === 0 ? 'active' : 'pending',
-                    notes: `Owner: ${ownerCell ? ownerCell.v : 'TBD'}`,
-                    pendingItems: pendingItems
+                const workbook = XLSX.read(data, {
+                    cellStyles: true,
+                    cellFormulas: true,
+                    cellDates: true
                 });
-            }
-            
-            return suppliers;
-        }
 
-        // Parse Dashboard sheet - specific to Wolfpak format  
-        function parseWolfpakDashboard(sheet) {
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-            const distributors = [];
-            const retailers = [];
-            const relationships = [];
-            const distributorMap = new Map();
-            const retailerMap = new Map();
-            
-            // Headers in row 2: Probability, Brand, Country, Distributor, Retailer, Owner, SOP, SOC, etc.
-            for (let row = 2; row <= range.e.r; row++) {
-                const probCell = sheet[XLSX.utils.encode_cell({r: row, c: 0})]; // Probability
-                const brandCell = sheet[XLSX.utils.encode_cell({r: row, c: 1})]; // Brand
-                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 2})]; // Country
-                const distributorCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Distributor
-                const retailerCell = sheet[XLSX.utils.encode_cell({r: row, c: 4})]; // Retailer
-                const ownerCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Owner
-                const sopCell = sheet[XLSX.utils.encode_cell({r: row, c: 6})]; // SOP
-                const socCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // SOC
-                const presentedCell = sheet[XLSX.utils.encode_cell({r: row, c: 8})]; // Presented
+                const sheetNames = workbook.SheetNames.filter(name => name !== 'Index');
                 
-                if (!brandCell || !brandCell.v || !distributorCell || !distributorCell.v) continue;
-                
-                const distributor = distributorCell.v;
-                const retailer = retailerCell ? retailerCell.v : '';
-                const country = countryCell ? countryCell.v : '';
-                const probability = probCell ? probCell.v : 'Med';
-                
-                // Track unique distributors
-                if (!distributorMap.has(distributor)) {
-                    distributorMap.set(distributor, {
-                        id: Date.now() + distributors.length,
-                        name: distributor,
-                        country: country,
-                        contact: 'Not specified',
-                        email: '',
-                        status: 'active',
-                        notes: `Active in ${country}`
-                    });
-                }
-                
-                // Track unique retailers
-                if (retailer && !retailerMap.has(retailer)) {
-                    retailerMap.set(retailer, {
-                        id: Date.now() + retailers.length + 1000,
-                        name: retailer,
-                        country: country,
-                        contact: 'Not specified', 
-                        email: '',
-                        status: 'active',
-                        notes: `Active in ${country}`
-                    });
-                }
-                
-                // Create relationship
-                const pendingItems = [];
-                if (!presentedCell || presentedCell.v !== "Done") pendingItems.push("Presentation");
-                if (!sopCell || !sopCell.v) pendingItems.push("SOP Agreement");
-                if (!socCell || !socCell.v) pendingItems.push("SOC Documentation");
-                
-                relationships.push({
-                    supplierId: findSupplierIdByName(brandCell.v),
-                    distributorId: distributorMap.get(distributor).id,
-                    retailerId: retailer ? retailerMap.get(retailer).id : null,
-                    status: mapProbabilityToStatus(probability),
-                    progress: `${probability} probability - ${country} market`,
-                    pendingItems: pendingItems
-                });
-            }
-            
-            return {
-                distributors: Array.from(distributorMap.values()),
-                retailers: Array.from(retailerMap.values()),
-                relationships: relationships
-            };
-        }
-
-        // Parse Look Up List sheet - specific to Wolfpak format
-        function parseWolfpakLookup(sheet) {
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-            const distributors = [];
-            const retailers = [];
-            const distributorSet = new Set();
-            const retailerSet = new Set();
-            
-            // Headers in row 2: [blank], Supplier, [blank], Country, [blank], Distributor, [blank], Retailer, [blank], Owner
-            for (let row = 2; row <= range.e.r; row++) {
-                const distributorCell = sheet[XLSX.utils.encode_cell({r: row, c: 5})]; // Distributor
-                const retailerCell = sheet[XLSX.utils.encode_cell({r: row, c: 7})]; // Retailer
-                const countryCell = sheet[XLSX.utils.encode_cell({r: row, c: 3})]; // Country
-                
-                // Add distributors
-                if (distributorCell && distributorCell.v && !distributorSet.has(distributorCell.v)) {
-                    distributorSet.add(distributorCell.v);
-                    distributors.push({
-                        id: Date.now() + distributors.length + 2000,
-                        name: distributorCell.v,
-                        country: countryCell ? countryCell.v : 'Multiple',
-                        contact: 'Not specified',
-                        email: '',
-                        status: 'pending',
-                        notes: 'From lookup list - not yet in active pipeline'
-                    });
-                }
-                
-                // Add retailers
-                if (retailerCell && retailerCell.v && !retailerSet.has(retailerCell.v)) {
-                    retailerSet.add(retailerCell.v);
-                    retailers.push({
-                        id: Date.now() + retailers.length + 3000,
-                        name: retailerCell.v,
-                        country: countryCell ? countryCell.v : 'Multiple',
-                        contact: 'Not specified',
-                        email: '',
-                        status: 'pending',
-                        notes: 'From lookup list - potential target'
-                    });
-                }
-            }
-            
-            return { distributors, retailers };
-        }
-
-        // Helper functions
-        function findSupplierIdByName(name) {
-            const supplier = suppliers.find(s => s.name.toLowerCase() === name.toLowerCase());
-            return supplier ? supplier.id : Date.now();
-        }
-
-        function mapProbabilityToStatus(probability) {
-            if (!probability) return 'pending';
-            const prob = probability.toString().toLowerCase();
-            if (prob.includes('hi')) return 'negotiating';
-            if (prob.includes('med')) return 'pending';
-            if (prob.includes('lo')) return 'on-hold';
-            return 'pending';
-        }
-
-        function removeDuplicates(array, key) {
-            const seen = new Set();
-            return array.filter(item => {
-                const keyValue = item[key].toLowerCase();
-                if (seen.has(keyValue)) {
-                    return false;
-                }
-                seen.add(keyValue);
-                return true;
-            });
-        }
-
-        // Initialize the dashboard with real data
-        renderAll();
-
-        // Voice Recognition System
-        let isRecording = false;
-        let recognition = null;
-        let finalTranscript = '';
-
-        // Initialize speech recognition
-        function initSpeechRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'en-US';
-                recognition.maxAlternatives = 1;
-                
-                recognition.onstart = function() {
-                    isRecording = true;
-                    updateVoiceStatus('listening', 'Listening... Speak your updates');
-                    document.getElementById('voiceTranscript').style.display = 'block';
-                };
-                
-                recognition.onresult = function(event) {
-                    let interimTranscript = '';
-                    let finalText = '';
+                sheetNames.forEach(sheetName => {
+                    const sheet = workbook.Sheets[sheetName];
+                    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
                     
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        
-                        if (event.results[i].isFinal) {
-                            finalText += transcript;
-                            finalTranscript += transcript + ' ';
-                        } else {
-                            interimTranscript += transcript;
+                    let headerRowIndex = -1;
+                    for (let i = 0; i < Math.min(10, rawData.length); i++) {
+                        if (rawData[i] && rawData[i][0] === 'Product') {
+                            headerRowIndex = i;
+                            break;
                         }
                     }
                     
-                    updateTranscript(finalText, interimTranscript);
-                    
-                    if (finalText) {
-                        processVoiceCommand(finalText);
-                    }
-                };
-                
-                recognition.onerror = function(event) {
-                    console.error('Speech recognition error:', event.error);
-                    updateVoiceStatus('error', 'Error: ' + event.error);
-                };
-                
-                recognition.onend = function() {
-                    if (isRecording) {
-                        // Restart recognition if we're still supposed to be recording
-                        recognition.start();
-                    }
-                };
-                
-                return true;
-            }
-            return false;
-        }
-
-        function toggleVoiceRecording() {
-            const button = document.getElementById('voiceButton');
-            const icon = document.getElementById('voiceIcon');
-            
-            if (!recognition) {
-                if (!initSpeechRecognition()) {
-                    showNotification('Speech recognition not supported in this browser');
-                    return;
-                }
-            }
-            
-            if (!isRecording) {
-                startVoiceRecording();
-                button.classList.add('recording');
-                icon.className = 'fas fa-stop';
-            } else {
-                stopVoiceRecording();
-                button.classList.remove('recording');
-                icon.className = 'fas fa-microphone';
-            }
-        }
-
-        function startVoiceRecording() {
-            finalTranscript = '';
-            recognition.start();
-        }
-
-        function stopVoiceRecording() {
-            isRecording = false;
-            recognition.stop();
-            updateVoiceStatus('idle', 'Click to start voice updates');
-            document.getElementById('voiceTranscript').style.display = 'none';
-        }
-
-        function updateVoiceStatus(state, message) {
-            const status = document.getElementById('voiceStatus');
-            status.className = `voice-status ${state}`;
-            status.querySelector('span').textContent = message;
-        }
-
-        function updateTranscript(finalText, interimText) {
-            const transcriptContent = document.getElementById('transcriptContent');
-            
-            let html = '';
-            if (finalTranscript) {
-                html += `<div class="transcript-final">${finalTranscript}</div>`;
-            }
-            if (finalText) {
-                html += `<div class="transcript-final">${finalText}</div>`;
-            }
-            if (interimText) {
-                html += `<div class="transcript-interim">${interimText}</div>`;
-            }
-            
-            transcriptContent.innerHTML = html;
-            transcriptContent.scrollTop = transcriptContent.scrollHeight;
-        }
-
-        // Process voice commands and update dashboard
-        function processVoiceCommand(text) {
-            const command = text.toLowerCase().trim();
-            updateVoiceStatus('processing', 'Processing command...');
-            
-            console.log('Processing voice command:', command);
-            
-            // Parse different types of commands
-            if (processStatusUpdate(command) ||
-                processPendingItemUpdate(command) ||
-                processNewEntityCommand(command) ||
-                processRelationshipUpdate(command)) {
-                // Command was processed successfully
-                setTimeout(() => {
-                    updateVoiceStatus('listening', 'Listening... Speak your updates');
-                }, 1500);
-            } else {
-                updateVoiceStatus('error', 'Command not understood. Try: "Update [brand] status to [status]"');
-                setTimeout(() => {
-                    updateVoiceStatus('listening', 'Listening... Speak your updates');
-                }, 3000);
-            }
-        }
-
-        // Process status updates: "Update Casbah status to negotiating"
-        function processStatusUpdate(command) {
-            const statusPattern = /update\s+(.+?)\s+status\s+to\s+(\w+)/i;
-            const match = command.match(statusPattern);
-            
-            if (match) {
-                const entityName = match[1].trim();
-                const newStatus = normalizeStatus(match[2].trim());
-                
-                // Try to find in suppliers first
-                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (supplier) {
-                    const oldStatus = supplier.status;
-                    supplier.status = newStatus;
-                    renderSuppliers();
-                    showNotification(`✅ Updated ${supplier.name} status from ${oldStatus} to ${newStatus}`);
-                    return true;
-                }
-                
-                // Try distributors
-                let distributor = distributors.find(d => d.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (distributor) {
-                    const oldStatus = distributor.status;
-                    distributor.status = newStatus;
-                    renderDistributors();
-                    showNotification(`✅ Updated ${distributor.name} status from ${oldStatus} to ${newStatus}`);
-                    return true;
-                }
-                
-                // Try retailers
-                let retailer = retailers.find(r => r.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (retailer) {
-                    const oldStatus = retailer.status;
-                    retailer.status = newStatus;
-                    renderRetailers();
-                    showNotification(`✅ Updated ${retailer.name} status from ${oldStatus} to ${newStatus}`);
-                    return true;
-                }
-                
-                showNotification(`❌ Could not find entity: ${entityName}`);
-            }
-            
-            return false;
-        }
-
-        // Process pending item updates: "Add pending item TDS to Yellow Bird" or "Remove TDS from Vermints"
-        function processPendingItemUpdate(command) {
-            const addPattern = /add\s+pending\s+item\s+(.+?)\s+to\s+(.+)/i;
-            const removePattern = /remove\s+(.+?)\s+from\s+(.+)/i;
-            const completePattern = /complete\s+(.+?)\s+for\s+(.+)/i;
-            
-            let match = command.match(addPattern);
-            if (match) {
-                const item = match[1].trim();
-                const entityName = match[2].trim();
-                
-                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (supplier) {
-                    if (!supplier.pendingItems.includes(item)) {
-                        supplier.pendingItems.push(item);
-                        renderSuppliers();
-                        showNotification(`✅ Added pending item "${item}" to ${supplier.name}`);
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            match = command.match(removePattern);
-            if (match) {
-                const item = match[1].trim();
-                const entityName = match[2].trim();
-                
-                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (supplier) {
-                    const index = supplier.pendingItems.findIndex(p => p.toLowerCase().includes(item.toLowerCase()));
-                    if (index !== -1) {
-                        const removedItem = supplier.pendingItems.splice(index, 1)[0];
-                        renderSuppliers();
-                        showNotification(`✅ Removed "${removedItem}" from ${supplier.name}`);
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            match = command.match(completePattern);
-            if (match) {
-                const item = match[1].trim();
-                const entityName = match[2].trim();
-                
-                let supplier = suppliers.find(s => s.name.toLowerCase().includes(entityName.toLowerCase()));
-                if (supplier) {
-                    const index = supplier.pendingItems.findIndex(p => p.toLowerCase().includes(item.toLowerCase()));
-                    if (index !== -1) {
-                        const completedItem = supplier.pendingItems.splice(index, 1)[0];
-                        renderSuppliers();
-                        showNotification(`✅ Marked "${completedItem}" as complete for ${supplier.name}`);
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            return false;
-        }
-
-        // Process new entity commands: "Add new supplier called TechCorp from Germany"
-        function processNewEntityCommand(command) {
-            const supplierPattern = /add\s+new\s+supplier\s+called\s+(.+?)\s+from\s+(.+)/i;
-            const distributorPattern = /add\s+new\s+distributor\s+called\s+(.+?)\s+from\s+(.+)/i;
-            const retailerPattern = /add\s+new\s+retailer\s+called\s+(.+?)\s+from\s+(.+)/i;
-            
-            let match = command.match(supplierPattern);
-            if (match) {
-                const name = match[1].trim();
-                const country = match[2].trim();
-                
-                const newSupplier = {
-                    id: Date.now(),
-                    name: name,
-                    country: country,
-                    contact: 'Not specified',
-                    email: '',
-                    status: 'pending',
-                    notes: 'Added via voice command',
-                    pendingItems: ['Initial documentation', 'Sample review']
-                };
-                
-                suppliers.push(newSupplier);
-                renderSuppliers();
-                showNotification(`✅ Added new supplier: ${name} from ${country}`);
-                return true;
-            }
-            
-            match = command.match(distributorPattern);
-            if (match) {
-                const name = match[1].trim();
-                const country = match[2].trim();
-                
-                const newDistributor = {
-                    id: Date.now(),
-                    name: name,
-                    country: country,
-                    contact: 'Not specified',
-                    email: '',
-                    status: 'pending',
-                    notes: 'Added via voice command'
-                };
-                
-                distributors.push(newDistributor);
-                renderDistributors();
-                showNotification(`✅ Added new distributor: ${name} from ${country}`);
-                return true;
-            }
-            
-            match = command.match(retailerPattern);
-            if (match) {
-                const name = match[1].trim();
-                const country = match[2].trim();
-                
-                const newRetailer = {
-                    id: Date.now(),
-                    name: name,
-                    country: country,
-                    contact: 'Not specified',
-                    email: '',
-                    status: 'pending',
-                    notes: 'Added via voice command'
-                };
-                
-                retailers.push(newRetailer);
-                renderRetailers();
-                showNotification(`✅ Added new retailer: ${name} from ${country}`);
-                return true;
-            }
-            
-            return false;
-        }
-
-        // Process relationship updates: "Yellow Bird is now working with Pacific Distributors"
-        function processRelationshipUpdate(command) {
-            const relationPattern = /(.+?)\s+is\s+now\s+working\s+with\s+(.+)/i;
-            const dealPattern = /(.+?)\s+deal\s+with\s+(.+?)\s+is\s+(.+)/i;
-            
-            let match = command.match(relationPattern);
-            if (match) {
-                const supplierName = match[1].trim();
-                const distributorName = match[2].trim();
-                
-                const supplier = suppliers.find(s => s.name.toLowerCase().includes(supplierName.toLowerCase()));
-                const distributor = distributors.find(d => d.name.toLowerCase().includes(distributorName.toLowerCase()));
-                
-                if (supplier && distributor) {
-                    // Check if relationship already exists
-                    const existingRel = relationships.find(r => r.supplierId === supplier.id && r.distributorId === distributor.id);
-                    if (!existingRel) {
-                        relationships.push({
-                            supplierId: supplier.id,
-                            distributorId: distributor.id,
-                            retailerId: null,
-                            status: 'pending',
-                            progress: 'New partnership via voice update',
-                            pendingItems: ['Initial presentation', 'Contract review']
-                        });
+                    if (headerRowIndex !== -1) {
+                        const headers = rawData[headerRowIndex];
+                        const dataRows = rawData.slice(headerRowIndex + 1);
                         
-                        renderAll();
-                        showNotification(`✅ Created new relationship: ${supplier.name} ↔ ${distributor.name}`);
-                        return true;
-                    }
-                }
-            }
-            
-            match = command.match(dealPattern);
-            if (match) {
-                const supplierName = match[1].trim();
-                const distributorName = match[2].trim();
-                const newStatus = normalizeStatus(match[3].trim());
-                
-                const supplier = suppliers.find(s => s.name.toLowerCase().includes(supplierName.toLowerCase()));
-                const distributor = distributors.find(d => d.name.toLowerCase().includes(distributorName.toLowerCase()));
-                
-                if (supplier && distributor) {
-                    const relationship = relationships.find(r => r.supplierId === supplier.id && r.distributorId === distributor.id);
-                    if (relationship) {
-                        const oldStatus = relationship.status;
-                        relationship.status = newStatus;
-                        relationship.progress = `Updated via voice: ${newStatus} status`;
+                        const parsedData = dataRows.map(row => {
+                            const obj = {};
+                            headers.forEach((header, idx) => {
+                                if (header) {
+                                    obj[header.trim()] = row[idx];
+                                }
+                            });
+                            return obj;
+                        }).filter(row => row.Product);
                         
-                        renderAll();
-                        showNotification(`✅ Updated ${supplier.name} - ${distributor.name} deal from ${oldStatus} to ${newStatus}`);
-                        return true;
+                        energyDrinkData[sheetName] = parsedData;
                     }
-                }
+                });
+
+                document.getElementById('fileStatus').innerHTML = `<span class="text-green-400">✓ File loaded successfully! ${Object.keys(energyDrinkData).length} sheets, ${energyDrinkData['1']?.length || 0} products</span>`;
+                document.getElementById('uploadSection').classList.add('hidden');
+                document.getElementById('querySection').classList.remove('hidden');
+                
+                // Auto-show top brands
+                setTimeout(() => {
+                    setQuery('top brands');
+                }, 500);
+            } catch (error) {
+                document.getElementById('fileStatus').innerHTML = `<span class="text-red-400">Error loading file: ${error.message}</span>`;
             }
-            
-            return false;
+        });
+
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+            processQuery();
         }
 
-        // Helper functions
-        function normalizeStatus(status) {
-            const statusLower = status.toLowerCase();
-            
-            if (statusLower.includes('active') || statusLower.includes('confirmed')) return 'active';
-            if (statusLower.includes('pending') || statusLower.includes('waiting')) return 'pending';
-            if (statusLower.includes('negotiat') || statusLower.includes('discuss')) return 'negotiating';
-            if (statusLower.includes('hold') || statusLower.includes('pause') || statusLower.includes('delay')) return 'on-hold';
-            
-            return status; // Return as-is if no match
+        function processQuery() {
+            const query = document.getElementById('queryInput').value.toLowerCase();
+            if (!query) return;
+
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+
+            setTimeout(() => {
+                analyzeQuery(query);
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('resultsSection').classList.remove('hidden');
+                window.scrollTo({ top: document.getElementById('resultsSection').offsetTop - 100, behavior: 'smooth' });
+            }, 500);
         }
 
-        function showNotification(message) {
-            // Remove existing notification
-            const existingNotification = document.querySelector('.update-notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
+        function analyzeQuery(query) {
+            const data = energyDrinkData['1'] || [];
             
-            // Create new notification
-            const notification = document.createElement('div');
-            notification.className = 'update-notification';
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-microphone"></i>
-                    <span>${message}</span>
+            if (query.includes('top') && query.includes('brand')) {
+                showTopBrands(data);
+            } else if (query.includes('best') || query.includes('growth leader')) {
+                showBestPerforming(data);
+            } else if (query.includes('worst') || query.includes('declining')) {
+                showWorstPerforming(data);
+            } else if (query.includes('market share')) {
+                showMarketShare(data);
+            } else if (query.includes('price')) {
+                showPriceAnalysis(data);
+            } else {
+                showTopBrands(data);
+            }
+        }
+
+        function showTopBrands(data) {
+            const brands = data.filter(row => {
+                const product = row.Product || '';
+                const spaces = product.match(/^\s*/)[0].length;
+                return spaces === 6 && row['Dollar Sales'] > 0;
+            });
+
+            brands.sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
+            const top10 = brands.slice(0, 10);
+
+            const totalSales = brands.reduce((sum, b) => sum + (b['Dollar Sales'] || 0), 0);
+            const top10Sales = top10.reduce((sum, b) => sum + (b['Dollar Sales'] || 0), 0);
+            const top10Share = ((top10Sales / totalSales) * 100).toFixed(1);
+
+            document.getElementById('answerText').innerHTML = `
+                <p class="text-lg mb-4">The top 10 brands represent <strong class="text-cyan-400">${top10Share}%</strong> of total category sales.</p>
+                <p class="mb-2">Here are the leading brands:</p>
+                <ol class="list-decimal list-inside space-y-1 ml-4">
+                    ${top10.map((b, i) => `
+                        <li><strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} 
+                        (${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}% vs YA)</li>
+                    `).join('')}
+                </ol>
+            `;
+
+            displayTable(top10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Unit Sales', 'Price per Unit']);
+
+            createChart(
+                top10.map(b => b.Product.trim()),
+                top10.map(b => b['Dollar Sales']),
+                'Top 10 Brands by Dollar Sales',
+                'bar'
+            );
+        }
+
+        function showBestPerforming(data) {
+            const brands = data.filter(row => {
+                const product = row.Product || '';
+                const spaces = product.match(/^\s*/)[0].length;
+                return spaces === 6 && row['Dollar Sales'] > 10000 && row['Dollar Sales % Change vs YA'] !== null;
+            });
+
+            brands.sort((a, b) => (b['Dollar Sales % Change vs YA'] || -999) - (a['Dollar Sales % Change vs YA'] || -999));
+            const top10 = brands.slice(0, 10);
+
+            document.getElementById('answerText').innerHTML = `
+                <p class="text-lg mb-4">The fastest-growing brands in the energy drink category:</p>
+                <ol class="list-decimal list-inside space-y-1 ml-4">
+                    ${top10.map(b => `
+                        <li><strong>${b.Product.trim()}</strong>: 
+                        <span class="text-green-400">+${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span> growth
+                        ($${formatNumber(b['Dollar Sales'])} sales)</li>
+                    `).join('')}
+                </ol>
+            `;
+
+            displayTable(top10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Unit Sales % Change vs YA']);
+
+            createChart(
+                top10.map(b => b.Product.trim()),
+                top10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
+                'Top 10 Growth Leaders (% Change vs YA)',
+                'bar',
+                true
+            );
+        }
+
+        function showWorstPerforming(data) {
+            const brands = data.filter(row => {
+                const product = row.Product || '';
+                const spaces = product.match(/^\s*/)[0].length;
+                return spaces === 6 && row['Dollar Sales'] > 10000 && row['Dollar Sales % Change vs YA'] !== null;
+            });
+
+            brands.sort((a, b) => (a['Dollar Sales % Change vs YA'] || 999) - (b['Dollar Sales % Change vs YA'] || 999));
+            const bottom10 = brands.slice(0, 10);
+
+            document.getElementById('answerText').innerHTML = `
+                <p class="text-lg mb-4">Brands facing the biggest declines:</p>
+                <ol class="list-decimal list-inside space-y-1 ml-4">
+                    ${bottom10.map(b => `
+                        <li><strong>${b.Product.trim()}</strong>: 
+                        <span class="text-red-400">${((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)}%</span> change
+                        ($${formatNumber(b['Dollar Sales'])} current sales)</li>
+                    `).join('')}
+                </ol>
+            `;
+
+            displayTable(bottom10, ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'ACV Weighted Distribution']);
+
+            createChart(
+                bottom10.map(b => b.Product.trim()),
+                bottom10.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
+                'Brands with Largest Declines (% Change vs YA)',
+                'bar',
+                true
+            );
+        }
+
+        function showMarketShare(data) {
+            const brands = data.filter(row => {
+                const product = row.Product || '';
+                const spaces = product.match(/^\s*/)[0].length;
+                return spaces === 6 && row['Dollar Sales'] > 0;
+            });
+
+            const totalSales = brands.reduce((sum, b) => sum + (b['Dollar Sales'] || 0), 0);
+            brands.forEach(b => {
+                b.marketShare = ((b['Dollar Sales'] || 0) / totalSales) * 100;
+            });
+
+            brands.sort((a, b) => b.marketShare - a.marketShare);
+            const top10 = brands.slice(0, 10);
+
+            document.getElementById('answerText').innerHTML = `
+                <p class="text-lg mb-4">Market share distribution across top brands:</p>
+                <div class="space-y-2">
+                    ${top10.map(b => `
+                        <div class="flex items-center gap-3">
+                            <div class="w-48 truncate font-medium">${b.Product.trim()}</div>
+                            <div class="flex-1 bg-slate-700 rounded-full h-6 relative overflow-hidden">
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all" 
+                                     style="width: ${b.marketShare}%"></div>
+                                <span class="absolute inset-0 flex items-center justify-center text-xs font-bold">
+                                    ${b.marketShare.toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-            
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            // Hide notification after 4 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 4000);
+
+            displayTable(top10.map(b => ({
+                Product: b.Product,
+                'Dollar Sales': b['Dollar Sales'],
+                'Market Share %': b.marketShare.toFixed(2),
+                'YA Change %': ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1)
+            })), ['Product', 'Dollar Sales', 'Market Share %', 'YA Change %']);
+
+            createChart(
+                top10.map(b => b.Product.trim()),
+                top10.map(b => b.marketShare),
+                'Market Share - Top 10 Brands',
+                'pie'
+            );
         }
 
-        // Initialize speech recognition on page load
-        initSpeechRecognition();
+        function showPriceAnalysis(data) {
+            const brands = data.filter(row => {
+                const product = row.Product || '';
+                const spaces = product.match(/^\s*/)[0].length;
+                return spaces === 6 && row['Dollar Sales'] > 50000 && row['Price per Unit'] > 0;
+            });
+
+            brands.sort((a, b) => (b['Price per Unit'] || 0) - (a['Price per Unit'] || 0));
+            const top10 = brands.slice(0, 10);
+
+            const avgPrice = brands.reduce((sum, b) => sum + (b['Price per Unit'] || 0), 0) / brands.length;
+
+            document.getElementById('answerText').innerHTML = `
+                <p class="text-lg mb-4">Price positioning analysis:</p>
+                <p class="mb-4">Average category price per unit: <strong class="text-cyan-400">$${avgPrice.toFixed(2)}</strong></p>
+                <p class="mb-2">Highest-priced brands:</p>
+                <ol class="list-decimal list-inside space-y-1 ml-4">
+                    ${top10.map(b => `
+                        <li><strong>${b.Product.trim()}</strong>: $${(b['Price per Unit'] || 0).toFixed(2)}/unit
+                        (${((b['Price per Unit Change vs YA'] || 0) * 100).toFixed(1)}% change vs YA)</li>
+                    `).join('')}
+                </ol>
+            `;
+
+            displayTable(top10, ['Product', 'Price per Unit', 'Price per Unit Change vs YA', 'Dollar Sales']);
+
+            createChart(
+                top10.map(b => b.Product.trim()),
+                top10.map(b => b['Price per Unit']),
+                'Price per Unit Comparison',
+                'bar'
+            );
+        }
+
+        function displayTable(data, columns) {
+            if (!data || data.length === 0) {
+                document.getElementById('tableContainer').classList.add('hidden');
+                return;
+            }
+
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+
+            thead.innerHTML = `
+                <tr class="border-b border-purple-500/30">
+                    ${columns.map(col => `<th class="px-4 py-3 text-left text-purple-300 font-semibold">${col}</th>`).join('')}
+                </tr>
+            `;
+
+            tbody.innerHTML = data.map((row, i) => `
+                <tr class="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
+                    ${columns.map(col => {
+                        let value = row[col];
+                        if (typeof value === 'number') {
+                            if (col.includes('%')) {
+                                const pct = (value * 100).toFixed(1);
+                                const color = value > 0 ? 'text-green-400' : value < 0 ? 'text-red-400' : '';
+                                return `<td class="px-4 py-3 ${color}">${pct}%</td>`;
+                            } else if (col.includes('Sales') || col.includes('Dollar')) {
+                                return `<td class="px-4 py-3">$${formatNumber(value)}</td>`;
+                            }
+                            return `<td class="px-4 py-3">${value.toFixed(2)}</td>`;
+                        }
+                        return `<td class="px-4 py-3 ${i === 0 ? 'font-medium' : ''}">${value || 'N/A'}</td>`;
+                    }).join('')}
+                </tr>
+            `).join('');
+
+            document.getElementById('tableContainer').classList.remove('hidden');
+        }
+
+        function createChart(labels, data, title, type = 'bar', isPercentage = false) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const canvas = document.getElementById('dataChart');
+            const ctx = canvas.getContext('2d');
+
+            const colors = type === 'pie' 
+                ? labels.map((_, i) => `hsl(${(i * 360 / labels.length)}, 70%, 60%)`)
+                : data.map(val => val >= 0 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(236, 72, 153, 0.8)');
+
+            currentChart = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: type === 'pie',
+                            labels: { color: '#e2e8f0' }
+                        },
+                        title: {
+                            display: true,
+                            text: title,
+                            color: '#e2e8f0',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: type !== 'pie' ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#cbd5e1',
+                                callback: function(value) {
+                                    return isPercentage ? value + '%' : value;
+                                }
+                            },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#cbd5e1',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    } : {}
+                }
+            });
+
+            document.getElementById('chartContainer').classList.remove('hidden');
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toFixed(0);
+        }
+
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                processQuery();
+            }
+        });
     </script>
 </body>
 </html>
