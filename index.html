@@ -3,43 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Powered Energy Drink Analyzer</title>
+    <title>AI Presentation Builder</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
             min-height: 100vh;
             color: white;
             padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 40px; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
         .header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             background: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        .header p { color: #cbd5e1; font-size: 1.1rem; }
         .badge {
             display: inline-block;
             background: linear-gradient(90deg, #8b5cf6, #ec4899);
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 12px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .card {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(139, 92, 246, 0.3);
             border-radius: 12px;
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
         }
@@ -52,11 +50,10 @@
             transition: all 0.3s;
         }
         .upload-area:hover { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
-        .upload-icon { font-size: 3rem; margin-bottom: 15px; }
         .btn {
             background: linear-gradient(90deg, #8b5cf6, #ec4899);
             color: white;
-            padding: 14px 32px;
+            padding: 12px 28px;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
@@ -65,54 +62,68 @@
             transition: all 0.3s;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .hidden { display: none !important; }
         .chat-input {
             width: 100%;
-            padding: 16px;
-            background: rgba(51, 65, 85, 0.5);
-            border: 2px solid rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
             color: white;
             font-size: 1rem;
-            margin-bottom: 15px;
-            transition: all 0.3s;
+            margin-bottom: 12px;
+            resize: vertical;
         }
-        .chat-input:focus { 
-            outline: none; 
-            border-color: #8b5cf6; 
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
+        .chat-input:focus { outline: none; border-color: #8b5cf6; }
         .examples {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
         }
         .example-btn {
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: rgba(51, 65, 85, 0.6);
             border: 1px solid rgba(139, 92, 246, 0.3);
             border-radius: 8px;
             color: #cbd5e1;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-align: left;
             transition: all 0.3s;
         }
-        .example-btn:hover { 
-            background: rgba(71, 85, 105, 0.8); 
-            border-color: #8b5cf6;
-            transform: translateY(-2px);
+        .example-btn:hover { background: rgba(71, 85, 105, 0.8); border-color: #8b5cf6; }
+        .output-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(100, 116, 139, 0.3); }
-        th { color: #8b5cf6; font-weight: 600; }
-        tr:hover { background: rgba(71, 85, 105, 0.3); }
-        .loading {
-            text-align: center;
-            padding: 40px;
+        @media (max-width: 968px) {
+            .output-container { grid-template-columns: 1fr; }
         }
+        .viz-box {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+        .copy-btn:hover { background: #7c3aed; }
         .spinner {
             border: 3px solid rgba(139, 92, 246, 0.3);
             border-top: 3px solid #8b5cf6;
@@ -120,119 +131,120 @@
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .status { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 0.95rem; }
-        .status.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .status.error { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .positive { color: #4ade80; font-weight: 600; }
-        .negative { color: #f87171; font-weight: 600; }
-        .neutral { color: #94a3b8; }
-        .answer-section {
-            background: rgba(15, 23, 42, 0.6);
-            border-left: 4px solid #06b6d4;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
-        .metric-card {
-            background: rgba(51, 65, 85, 0.4);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(139, 92, 246, 0.2);
-        }
-        .metric-label { color: #94a3b8; font-size: 0.85rem; margin-bottom: 5px; }
-        .metric-value { font-size: 1.5rem; font-weight: 700; color: #06b6d4; }
-        canvas { max-height: 400px; }
+        .status { padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .status.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .thinking {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            padding: 12px 16px;
-            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.15);
+            border-left: 3px solid #8b5cf6;
+            padding: 12px 15px;
+            border-radius: 6px;
             margin-bottom: 15px;
             font-size: 0.9rem;
             color: #c4b5fd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            color: #1e293b;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+        }
+        tr:hover { background: #f8fafc; }
+        .positive { color: #22c55e; font-weight: 600; }
+        .negative { color: #ef4444; font-weight: 600; }
+        canvas { max-height: 400px !important; }
+        .answer-text {
+            background: rgba(15, 23, 42, 0.7);
+            border-left: 4px solid #06b6d4;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        .insight-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 AI Energy Drink Analyzer</h1>
-            <p>Ask anything about your data in natural language</p>
+            <h1>🤖 AI Presentation Builder</h1>
+            <p style="color: #cbd5e1;">Ask questions, get presentation-ready visuals</p>
             <span class="badge">Powered by Advanced NLP</span>
         </div>
 
         <div id="uploadSection" class="card">
             <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                <div class="upload-icon">📊</div>
-                <h2>Upload Your Excel File</h2>
-                <p style="color: #94a3b8; margin-top: 10px;">Click to upload Energy Drink Category data</p>
+                <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
+                <h2>Upload Excel Data</h2>
+                <p style="color: #94a3b8; margin-top: 10px;">Click to upload your Energy Drink Category file</p>
                 <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
             </div>
             <div id="fileStatus"></div>
         </div>
 
         <div id="querySection" class="card hidden">
-            <h3 style="margin-bottom: 15px; color: #8b5cf6;">💬 Ask Me Anything</h3>
-            <textarea class="chat-input" id="queryInput" rows="3" 
-                placeholder="Ask any question about the data...&#10;Example: Which brand has the highest growth rate? Or: Show me brands with sales over $500K that are declining"></textarea>
-            <button class="btn" id="analyzeBtn" onclick="processQuery()">Analyze with AI</button>
+            <h3 style="margin-bottom: 12px; color: #8b5cf6;">💬 Ask Anything</h3>
+            <textarea class="chat-input" id="queryInput" rows="2" 
+                placeholder="Ask any question in natural language..."></textarea>
+            <button class="btn" id="analyzeBtn" onclick="processQuery()">🚀 Generate Answer</button>
             
-            <div style="margin-top: 25px;">
-                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px;">📝 Example Questions:</p>
+            <div style="margin-top: 20px;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">💡 Example Questions:</p>
                 <div class="examples">
-                    <button class="example-btn" onclick="setQuery('Which brand has the highest dollar sales?')">
-                        Which brand has the highest dollar sales?
+                    <button class="example-btn" onclick="setQuery('Show me top 5 and bottom 5 brands by sales')">
+                        Show me top 5 and bottom 5 brands by sales
                     </button>
-                    <button class="example-btn" onclick="setQuery('Show me brands that are growing faster than 50%')">
-                        Show me brands growing faster than 50%
+                    <button class="example-btn" onclick="setQuery('Create a pie chart of the top 3 brands by market share')">
+                        Create a pie chart of top 3 brands by market share
                     </button>
-                    <button class="example-btn" onclick="setQuery('What is the average price per unit in the category?')">
-                        What is the average price per unit?
+                    <button class="example-btn" onclick="setQuery('Which brands over $500K are declining?')">
+                        Which brands over $500K are declining?
                     </button>
-                    <button class="example-btn" onclick="setQuery('Which brands have sales over $1 million but are declining?')">
-                        Which brands have $1M+ sales but declining?
+                    <button class="example-btn" onclick="setQuery('Compare growth rates of top 5 vs bottom 5 brands')">
+                        Compare growth rates of top 5 vs bottom 5
                     </button>
-                    <button class="example-btn" onclick="setQuery('Compare the top 3 brands by market share')">
-                        Compare top 3 brands by market share
+                    <button class="example-btn" onclick="setQuery('Show brands with highest and lowest prices')">
+                        Show brands with highest and lowest prices
                     </button>
-                    <button class="example-btn" onclick="setQuery('What percentage of brands are experiencing negative growth?')">
-                        What % of brands have negative growth?
+                    <button class="example-btn" onclick="setQuery('What percentage of brands are growing vs declining?')">
+                        What % of brands are growing vs declining?
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="loadingIndicator" class="card hidden">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>AI is analyzing your question...</p>
-            </div>
+        <div id="loadingIndicator" class="card hidden" style="text-align: center; padding: 40px;">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; color: #94a3b8;">AI is analyzing your question...</p>
         </div>
 
         <div id="resultsSection" class="hidden">
             <div class="card">
                 <div id="thinkingProcess" class="thinking hidden"></div>
-                <h2 style="color: #06b6d4; margin-bottom: 20px;">🎯 Answer</h2>
-                <div id="answerText" class="answer-section"></div>
+                <div class="answer-text" id="answerText"></div>
             </div>
 
-            <div id="tableContainer" class="card hidden">
-                <h3 style="color: #8b5cf6; margin-bottom: 15px;">📊 Data</h3>
-                <div style="overflow-x: auto;">
-                    <table id="dataTable">
-                        <thead id="tableHead"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="chartContainer" class="card hidden">
-                <h3 style="color: #ec4899; margin-bottom: 15px;">📈 Visualization</h3>
-                <canvas id="dataChart"></canvas>
+            <div id="visualContainer" class="hidden">
+                <div class="output-container" id="outputGrid"></div>
             </div>
         </div>
     </div>
@@ -240,13 +252,13 @@
     <script>
         let energyDrinkData = {};
         let allBrands = [];
-        let currentChart = null;
+        let currentCharts = [];
 
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatus').innerHTML = '<div class="status">Loading file...</div>';
+            document.getElementById('fileStatus').innerHTML = '<div class="status">Loading...</div>';
 
             try {
                 const data = await file.arrayBuffer();
@@ -258,7 +270,7 @@
                     const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
                     
                     let headerRowIndex = -1;
-                    for (let i = 0; i < Math.min(10, rawData.length); i++) {
+                    for (let i = 0; i < 10; i++) {
                         if (rawData[i] && rawData[i][0] === 'Product') {
                             headerRowIndex = i;
                             break;
@@ -268,7 +280,6 @@
                     if (headerRowIndex !== -1) {
                         const headers = rawData[headerRowIndex];
                         const dataRows = rawData.slice(headerRowIndex + 1);
-                        
                         const parsedData = dataRows.map(row => {
                             const obj = {};
                             headers.forEach((header, idx) => {
@@ -276,12 +287,10 @@
                             });
                             return obj;
                         }).filter(row => row.Product);
-                        
                         energyDrinkData[sheetName] = parsedData;
                     }
                 });
 
-                // Extract brand-level data
                 allBrands = (energyDrinkData['1'] || []).filter(row => {
                     const product = row.Product || '';
                     const spaces = product.match(/^\s*/)[0].length;
@@ -289,7 +298,7 @@
                 });
 
                 document.getElementById('fileStatus').innerHTML = 
-                    `<div class="status success">✓ Loaded ${allBrands.length} brands from ${Object.keys(energyDrinkData).length} sheets</div>`;
+                    `<div class="status success">✓ Loaded ${allBrands.length} brands successfully</div>`;
                 
                 document.getElementById('uploadSection').classList.add('hidden');
                 document.getElementById('querySection').classList.remove('hidden');
@@ -311,11 +320,15 @@
             document.getElementById('analyzeBtn').disabled = true;
             document.getElementById('loadingIndicator').classList.remove('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
+            
+            // Clear previous charts
+            currentCharts.forEach(chart => chart.destroy());
+            currentCharts = [];
 
             setTimeout(() => {
                 try {
-                    const result = analyzeQueryWithAI(query, allBrands);
-                    displayResults(result);
+                    const result = analyzeWithAI(query, allBrands);
+                    displayResults(result, query);
                     document.getElementById('loadingIndicator').classList.add('hidden');
                     document.getElementById('resultsSection').classList.remove('hidden');
                 } catch (error) {
@@ -323,257 +336,375 @@
                     document.getElementById('loadingIndicator').classList.add('hidden');
                 }
                 document.getElementById('analyzeBtn').disabled = false;
-            }, 800);
+            }, 1000);
         }
 
-        function analyzeQueryWithAI(query, brands) {
+        function analyzeWithAI(query, brands) {
             const q = query.toLowerCase();
             
-            // Show thinking process
+            // Show thinking
             const thinking = document.getElementById('thinkingProcess');
             thinking.classList.remove('hidden');
-            thinking.textContent = `💭 Understanding: "${query}"`;
-            
-            // Extract metrics mentioned
-            const metrics = {
-                sales: q.includes('sales') || q.includes('revenue'),
-                growth: q.includes('growth') || q.includes('growing') || q.includes('increase'),
-                decline: q.includes('decline') || q.includes('declining') || q.includes('decrease') || q.includes('negative'),
-                price: q.includes('price') || q.includes('pricing'),
-                share: q.includes('share') || q.includes('market'),
-                units: q.includes('unit'),
-                distribution: q.includes('distribution') || q.includes('stores')
-            };
+            thinking.textContent = `🧠 Analyzing: "${query}"`;
 
-            // Extract numbers/thresholds
-            const numbers = q.match(/\d+/g);
-            const threshold = numbers ? parseFloat(numbers[0]) : null;
-            
-            // Extract intent
-            const isComparison = q.includes('compare') || q.includes('vs') || q.includes('versus');
-            const isAverage = q.includes('average') || q.includes('mean');
-            const isTop = q.includes('top') || q.includes('highest') || q.includes('best') || q.includes('leading');
-            const isBottom = q.includes('worst') || q.includes('lowest') || q.includes('bottom');
-            const isCount = q.includes('how many') || q.includes('percentage') || q.includes('% of');
-            const isSpecific = q.includes('which brand') || q.includes('what brand');
+            const outputs = [];
+            let answer = '';
 
-            // WHICH BRAND HAS THE HIGHEST...
-            if (isSpecific && (isTop || q.includes('highest'))) {
-                if (metrics.sales) {
-                    const top = brands.sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0))[0];
-                    return {
-                        answer: `The brand with the highest dollar sales is <strong>${top.Product.trim()}</strong> with <strong class="positive">$${formatNumber(top['Dollar Sales'])}</strong> in sales. This represents ${((top['Dollar Sales'] / brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0)) * 100).toFixed(1)}% of total category sales.`,
-                        data: brands.slice(0, 5),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Market Share'],
-                        chartData: {
-                            labels: brands.slice(0, 10).map(b => b.Product.trim()),
-                            values: brands.slice(0, 10).map(b => b['Dollar Sales']),
-                            title: 'Top 10 Brands by Dollar Sales'
-                        }
-                    };
-                }
-                if (metrics.growth) {
-                    const validBrands = brands.filter(b => b['Dollar Sales % Change vs YA'] !== null);
-                    const top = validBrands.sort((a, b) => (b['Dollar Sales % Change vs YA'] || -999) - (a['Dollar Sales % Change vs YA'] || -999))[0];
-                    const growthPct = ((top['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
-                    return {
-                        answer: `The brand with the highest growth rate is <strong>${top.Product.trim()}</strong> with <strong class="positive">+${growthPct}%</strong> growth vs last year. Current sales: $${formatNumber(top['Dollar Sales'])}.`,
-                        data: validBrands.slice(0, 10),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA'],
-                        chartData: {
-                            labels: validBrands.slice(0, 10).map(b => b.Product.trim()),
-                            values: validBrands.slice(0, 10).map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
-                            title: 'Top Growth Brands (%)',
-                            isPercentage: true
-                        }
-                    };
-                }
+            // Detect chart type preference
+            const wantsPie = q.includes('pie chart') || q.includes('pie');
+            const wantsBar = q.includes('bar chart') || q.includes('bar');
+            const wantsTable = q.includes('table') || q.includes('list');
+
+            // Extract top/bottom numbers
+            const topMatch = q.match(/top (\d+)/);
+            const bottomMatch = q.match(/bottom (\d+)/);
+            const topN = topMatch ? parseInt(topMatch[1]) : (q.includes('top') ? 10 : 0);
+            const bottomN = bottomMatch ? parseInt(bottomMatch[1]) : (q.includes('bottom') ? 5 : 0);
+
+            // TOP AND BOTTOM
+            if (topN > 0 && bottomN > 0) {
+                const sorted = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
+                const top = sorted.slice(0, topN);
+                const bottom = sorted.slice(-bottomN).reverse();
+
+                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top ${topN} & Bottom ${bottomN} Brands by Dollar Sales</h3>`;
+                answer += `<div class="insight-box">`;
+                answer += `<strong>Top ${topN}:</strong> Combined sales of $${formatNumber(top.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
+                answer += `<strong>Bottom ${bottomN}:</strong> Combined sales of $${formatNumber(bottom.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
+                answer += `<strong>Gap:</strong> The #1 brand sells ${(top[0]['Dollar Sales'] / bottom[0]['Dollar Sales']).toFixed(1)}x more than the bottom brand`;
+                answer += `</div>`;
+
+                outputs.push({
+                    type: 'table',
+                    title: `Top ${topN} Brands`,
+                    data: top,
+                    columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
+                });
+
+                outputs.push({
+                    type: 'table',
+                    title: `Bottom ${bottomN} Brands`,
+                    data: bottom,
+                    columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
+                });
+
+                outputs.push({
+                    type: 'chart',
+                    chartType: 'bar',
+                    title: 'Sales Comparison',
+                    labels: [...top.map(b => b.Product.trim()), ...bottom.map(b => b.Product.trim())],
+                    data: [...top.map(b => b['Dollar Sales']), ...bottom.map(b => b['Dollar Sales'])]
+                });
+
+                return { answer, outputs };
             }
 
-            // AVERAGE CALCULATIONS
-            if (isAverage) {
-                if (metrics.price) {
-                    const validBrands = brands.filter(b => b['Price per Unit'] > 0);
-                    const avg = validBrands.reduce((s, b) => s + (b['Price per Unit'] || 0), 0) / validBrands.length;
-                    const highest = validBrands.sort((a, b) => (b['Price per Unit'] || 0) - (a['Price per Unit'] || 0))[0];
-                    const lowest = validBrands.sort((a, b) => (a['Price per Unit'] || 0) - (b['Price per Unit'] || 0))[0];
-                    return {
-                        answer: `The average price per unit across all brands is <strong class="positive">$${avg.toFixed(2)}</strong>.<br><br>
-                                 Highest: <strong>${highest.Product.trim()}</strong> at $${highest['Price per Unit'].toFixed(2)}<br>
-                                 Lowest: <strong>${lowest.Product.trim()}</strong> at $${lowest['Price per Unit'].toFixed(2)}`,
-                        data: validBrands.slice(0, 15),
-                        columns: ['Product', 'Price per Unit', 'Dollar Sales'],
-                        chartData: {
-                            labels: validBrands.slice(0, 10).map(b => b.Product.trim()),
-                            values: validBrands.slice(0, 10).map(b => b['Price per Unit']),
-                            title: 'Price per Unit Comparison'
-                        }
-                    };
-                }
-                if (metrics.sales) {
-                    const avg = brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0) / brands.length;
-                    return {
-                        answer: `The average dollar sales per brand is <strong class="positive">$${formatNumber(avg)}</strong>. ${brands.filter(b => b['Dollar Sales'] > avg).length} brands are above average, and ${brands.filter(b => b['Dollar Sales'] <= avg).length} are below average.`,
-                        data: brands.slice(0, 10),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
-                    };
-                }
-            }
-
-            // FILTERING WITH THRESHOLDS
-            if (threshold && (metrics.sales || metrics.growth || metrics.decline)) {
-                let filtered = brands;
-                let filterDesc = '';
+            // PIE CHART REQUEST
+            if (wantsPie || (q.includes('market share') && (topN === 3 || q.includes('top 3')))) {
+                const n = topN || 3;
+                const top = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, n);
+                const totalSales = brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0);
                 
-                if (q.includes('over') || q.includes('above') || q.includes('more than') || q.includes('>')) {
-                    if (q.includes('million') || q.includes('m')) {
-                        filtered = brands.filter(b => (b['Dollar Sales'] || 0) > threshold * 1000000);
-                        filterDesc = `sales over $${threshold}M`;
-                    } else if (q.includes('thousand') || q.includes('k')) {
-                        filtered = brands.filter(b => (b['Dollar Sales'] || 0) > threshold * 1000);
-                        filterDesc = `sales over $${threshold}K`;
-                    } else if (q.includes('%')) {
-                        filtered = brands.filter(b => ((b['Dollar Sales % Change vs YA'] || 0) * 100) > threshold);
-                        filterDesc = `growth over ${threshold}%`;
-                    }
-                } else if (q.includes('under') || q.includes('below') || q.includes('less than') || q.includes('<')) {
-                    if (q.includes('million') || q.includes('m')) {
-                        filtered = brands.filter(b => (b['Dollar Sales'] || 0) < threshold * 1000000);
-                        filterDesc = `sales under $${threshold}M`;
-                    }
-                }
+                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top ${n} Brands Market Share</h3>`;
+                answer += top.map((b, i) => {
+                    const share = ((b['Dollar Sales'] / totalSales) * 100).toFixed(1);
+                    return `<div style="margin-bottom: 8px;"><strong>${i + 1}. ${b.Product.trim()}</strong><br>
+                            <span style="color: #06b6d4;">Market Share: ${share}%</span> | 
+                            Sales: $${formatNumber(b['Dollar Sales'])}</div>`;
+                }).join('');
 
-                if (metrics.decline || q.includes('but') && q.includes('declining')) {
-                    filtered = filtered.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
-                    filterDesc += filtered.length > 0 ? ' and declining' : '';
-                }
+                outputs.push({
+                    type: 'chart',
+                    chartType: 'pie',
+                    title: `Top ${n} Brands by Market Share`,
+                    labels: top.map(b => b.Product.trim()),
+                    data: top.map(b => (b['Dollar Sales'] / totalSales) * 100)
+                });
 
-                if (filtered.length > 0) {
-                    filtered.sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
-                    return {
-                        answer: `Found <strong class="positive">${filtered.length} brands</strong> with ${filterDesc}:<br><br>` +
-                                filtered.slice(0, 5).map((b, i) => {
-                                    const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
-                                    const changeClass = change >= 0 ? 'positive' : 'negative';
-                                    return `${i + 1}. <strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} (<span class="${changeClass}">${change}% YA</span>)`;
-                                }).join('<br>'),
-                        data: filtered.slice(0, 15),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Price per Unit'],
-                        chartData: {
-                            labels: filtered.slice(0, 10).map(b => b.Product.trim()),
-                            values: filtered.slice(0, 10).map(b => b['Dollar Sales']),
-                            title: `Brands with ${filterDesc}`
-                        }
-                    };
-                }
+                outputs.push({
+                    type: 'table',
+                    title: 'Market Share Data',
+                    data: top.map(b => ({
+                        Brand: b.Product.trim(),
+                        'Dollar Sales': b['Dollar Sales'],
+                        'Market Share': ((b['Dollar Sales'] / totalSales) * 100).toFixed(1) + '%',
+                        'YA Growth': ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1) + '%'
+                    })),
+                    columns: ['Brand', 'Dollar Sales', 'Market Share', 'YA Growth']
+                });
+
+                return { answer, outputs };
             }
 
-            // PERCENTAGE/COUNT QUESTIONS
-            if (isCount) {
-                if (metrics.decline || q.includes('negative')) {
-                    const declining = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
-                    const pct = ((declining.length / brands.length) * 100).toFixed(1);
-                    return {
-                        answer: `<strong class="negative">${pct}%</strong> of brands (${declining.length} out of ${brands.length}) are experiencing negative growth (declining sales vs last year).`,
-                        data: declining.slice(0, 15),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA'],
-                        chartData: {
-                            labels: declining.slice(0, 10).map(b => b.Product.trim()),
-                            values: declining.slice(0, 10).map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100),
-                            title: 'Declining Brands (%)',
-                            isPercentage: true
-                        }
-                    };
-                }
-                if (metrics.growth) {
-                    const growing = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) > 0);
-                    const pct = ((growing.length / brands.length) * 100).toFixed(1);
-                    return {
-                        answer: `<strong class="positive">${pct}%</strong> of brands (${growing.length} out of ${brands.length}) are experiencing positive growth.`,
-                        data: growing.slice(0, 15),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
-                    };
+            // FILTERING WITH CONDITIONS
+            if (q.includes('over') || q.includes('above')) {
+                const numbers = q.match(/\$?(\d+)k/i);
+                if (numbers) {
+                    const threshold = parseInt(numbers[1]) * 1000;
+                    let filtered = brands.filter(b => (b['Dollar Sales'] || 0) > threshold);
+                    
+                    if (q.includes('declining') || q.includes('negative')) {
+                        filtered = filtered.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
+                    }
+
+                    filtered.sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
+
+                    answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Found ${filtered.length} Brands</h3>`;
+                    answer += `<p>Brands with sales over $${numbers[1]}K${q.includes('declining') ? ' that are declining' : ''}:</p>`;
+                    answer += `<div class="insight-box">Total combined sales: $${formatNumber(filtered.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}</div>`;
+
+                    outputs.push({
+                        type: 'table',
+                        title: 'Filtered Brands',
+                        data: filtered.slice(0, 20),
+                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Price per Unit']
+                    });
+
+                    outputs.push({
+                        type: 'chart',
+                        chartType: 'bar',
+                        title: 'Sales Overview',
+                        labels: filtered.slice(0, 10).map(b => b.Product.trim()),
+                        data: filtered.slice(0, 10).map(b => b['Dollar Sales'])
+                    });
+
+                    return { answer, outputs };
                 }
             }
 
             // COMPARISON
-            if (isComparison) {
-                const top3 = brands.slice(0, 3);
-                const totalSales = brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0);
-                return {
-                    answer: `<strong>Top 3 Brand Comparison:</strong><br><br>` +
-                            top3.map((b, i) => {
-                                const share = ((b['Dollar Sales'] / totalSales) * 100).toFixed(1);
-                                const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
-                                return `${i + 1}. <strong>${b.Product.trim()}</strong><br>
-                                        &nbsp;&nbsp;&nbsp;Sales: $${formatNumber(b['Dollar Sales'])} (${share}% share)<br>
-                                        &nbsp;&nbsp;&nbsp;Growth: ${change}% vs YA<br>
-                                        &nbsp;&nbsp;&nbsp;Price: $${(b['Price per Unit'] || 0).toFixed(2)}/unit`;
-                            }).join('<br><br>'),
-                    data: top3,
-                    columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Price per Unit', 'ACV Weighted Distribution'],
-                    chartData: {
-                        labels: top3.map(b => b.Product.trim()),
-                        values: top3.map(b => (b['Dollar Sales'] / totalSales) * 100),
-                        title: 'Market Share Comparison (%)',
-                        type: 'pie'
-                    }
-                };
+            if (q.includes('compare')) {
+                const top5 = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, 5);
+                const bottom5 = [...brands].sort((a, b) => (a['Dollar Sales'] || 0) - (b['Dollar Sales'] || 0)).slice(0, 5);
+
+                const topGrowth = top5.reduce((s, b) => s + (b['Dollar Sales % Change vs YA'] || 0), 0) / 5 * 100;
+                const bottomGrowth = bottom5.reduce((s, b) => s + (b['Dollar Sales % Change vs YA'] || 0), 0) / 5 * 100;
+
+                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Growth Rate Comparison</h3>`;
+                answer += `<div class="insight-box">`;
+                answer += `<strong>Top 5 Brands:</strong> Average growth of ${topGrowth.toFixed(1)}%<br>`;
+                answer += `<strong>Bottom 5 Brands:</strong> Average growth of ${bottomGrowth.toFixed(1)}%<br>`;
+                answer += `<strong>Insight:</strong> ${topGrowth > bottomGrowth ? 'Top brands are outperforming' : 'Smaller brands are growing faster'}`;
+                answer += `</div>`;
+
+                outputs.push({
+                    type: 'chart',
+                    chartType: 'bar',
+                    title: 'Growth Rate Comparison (%)',
+                    labels: [...top5.map(b => 'Top: ' + b.Product.trim().substring(0, 20)), ...bottom5.map(b => 'Bottom: ' + b.Product.trim().substring(0, 20))],
+                    data: [...top5.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100), ...bottom5.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100)],
+                    isPercentage: true
+                });
+
+                return { answer, outputs };
+            }
+
+            // PRICE ANALYSIS
+            if (q.includes('price') && (q.includes('highest') || q.includes('lowest'))) {
+                const validBrands = brands.filter(b => b['Price per Unit'] > 0 && b['Dollar Sales'] > 50000);
+                validBrands.sort((a, b) => (b['Price per Unit'] || 0) - (a['Price per Unit'] || 0));
+                const highest = validBrands.slice(0, 5);
+                const lowest = validBrands.slice(-5).reverse();
+
+                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Price Analysis</h3>`;
+                answer += `<div class="insight-box">`;
+                answer += `Highest priced: $${highest[0]['Price per Unit'].toFixed(2)}/unit<br>`;
+                answer += `Lowest priced: $${lowest[0]['Price per Unit'].toFixed(2)}/unit<br>`;
+                answer += `Price range: ${(highest[0]['Price per Unit'] / lowest[0]['Price per Unit']).toFixed(1)}x difference`;
+                answer += `</div>`;
+
+                outputs.push({
+                    type: 'table',
+                    title: 'Highest Priced Brands',
+                    data: highest,
+                    columns: ['Product', 'Price per Unit', 'Dollar Sales']
+                });
+
+                outputs.push({
+                    type: 'table',
+                    title: 'Lowest Priced Brands',
+                    data: lowest,
+                    columns: ['Product', 'Price per Unit', 'Dollar Sales']
+                });
+
+                return { answer, outputs };
+            }
+
+            // PERCENTAGE ANALYSIS
+            if (q.includes('percentage') || q.includes('%')) {
+                const growing = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) > 0);
+                const declining = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
+                const growingPct = ((growing.length / brands.length) * 100).toFixed(1);
+                const decliningPct = ((declining.length / brands.length) * 100).toFixed(1);
+
+                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Growth vs Decline Analysis</h3>`;
+                answer += `<div class="insight-box">`;
+                answer += `<strong class="positive">${growingPct}%</strong> of brands (${growing.length}) are growing<br>`;
+                answer += `<strong class="negative">${decliningPct}%</strong> of brands (${declining.length}) are declining<br>`;
+                answer += `Category health: ${growingPct > decliningPct ? '✅ More brands growing' : '⚠️ More brands declining'}`;
+                answer += `</div>`;
+
+                outputs.push({
+                    type: 'chart',
+                    chartType: 'pie',
+                    title: 'Growing vs Declining Brands',
+                    labels: ['Growing', 'Declining'],
+                    data: [growing.length, declining.length]
+                });
+
+                return { answer, outputs };
             }
 
             // DEFAULT: TOP BRANDS
-            const top10 = brands.slice(0, 10);
-            const totalSales = brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0);
-            return {
-                answer: `Here are the <strong>top 10 brands</strong> by dollar sales (representing ${((top10.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0) / totalSales) * 100).toFixed(1)}% of category):<br><br>` +
-                        top10.map((b, i) => {
-                            const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
-                            const changeClass = change >= 0 ? 'positive' : 'negative';
-                            return `${i + 1}. <strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} (<span class="${changeClass}">${change}%</span>)`;
-                        }).join('<br>'),
+            const top10 = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, 10);
+            answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top 10 Brands by Sales</h3>`;
+            answer += top10.map((b, i) => {
+                const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
+                const changeClass = change >= 0 ? 'positive' : 'negative';
+                return `<div style="margin-bottom: 6px;">${i + 1}. <strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} 
+                        (<span class="${changeClass}">${change}%</span>)</div>`;
+            }).join('');
+
+            outputs.push({
+                type: 'table',
+                title: 'Top 10 Brands',
                 data: top10,
-                columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Unit Sales'],
-                chartData: {
-                    labels: top10.map(b => b.Product.trim()),
-                    values: top10.map(b => b['Dollar Sales']),
-                    title: 'Top 10 Brands by Dollar Sales'
-                }
-            };
+                columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
+            });
+
+            outputs.push({
+                type: 'chart',
+                chartType: 'bar',
+                title: 'Top 10 Brands Sales',
+                labels: top10.map(b => b.Product.trim()),
+                data: top10.map(b => b['Dollar Sales'])
+            });
+
+            return { answer, outputs };
         }
 
-        function displayResults(result) {
+        function displayResults(result, originalQuery) {
             document.getElementById('answerText').innerHTML = result.answer;
 
-            if (result.data && result.data.length > 0) {
-                displayTable(result.data, result.columns);
-            } else {
-                document.getElementById('tableContainer').classList.add('hidden');
-            }
+            const grid = document.getElementById('outputGrid');
+            grid.innerHTML = '';
 
-            if (result.chartData) {
-                createChart(result.chartData);
+            if (result.outputs && result.outputs.length > 0) {
+                document.getElementById('visualContainer').classList.remove('hidden');
+
+                result.outputs.forEach((output, idx) => {
+                    const box = document.createElement('div');
+                    box.className = 'viz-box';
+                    box.id = `output-${idx}`;
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-btn';
+                    copyBtn.textContent = '📋 Copy';
+                    copyBtn.onclick = () => copyToClipboard(`output-${idx}`);
+                    box.appendChild(copyBtn);
+
+                    if (output.type === 'chart') {
+                        const title = document.createElement('h4');
+                        title.textContent = output.title;
+                        title.style.color = '#1e293b';
+                        title.style.marginBottom = '15px';
+                        box.appendChild(title);
+
+                        const canvas = document.createElement('canvas');
+                        canvas.id = `chart-${idx}`;
+                        box.appendChild(canvas);
+
+                        grid.appendChild(box);
+
+                        setTimeout(() => {
+                            const chart = createChart(canvas, output);
+                            currentCharts.push(chart);
+                        }, 100);
+                    } else if (output.type === 'table') {
+                        const title = document.createElement('h4');
+                        title.textContent = output.title;
+                        title.style.color = '#1e293b';
+                        title.style.marginBottom = '15px';
+                        box.appendChild(title);
+
+                        const table = createTable(output.data, output.columns);
+                        box.appendChild(table);
+                        grid.appendChild(box);
+                    }
+                });
             } else {
-                document.getElementById('chartContainer').classList.add('hidden');
+                document.getElementById('visualContainer').classList.add('hidden');
             }
         }
 
-        function displayTable(data, columns) {
-            document.getElementById('tableHead').innerHTML = `
-                <tr>${columns.map(col => `<th>${col}</th>`).join('')}</tr>
-            `;
+        function createChart(canvas, config) {
+            const ctx = canvas.getContext('2d');
+            const type = config.chartType || 'bar';
+            
+            const colors = type === 'pie' 
+                ? config.labels.map((_, i) => `hsl(${(i * 360 / config.labels.length)}, 70%, 60%)`)
+                : config.data.map(val => val >= 0 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(236, 72, 153, 0.8)');
 
-            document.getElementById('tableBody').innerHTML = data.map(row => `
+            return new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: config.labels,
+                    datasets: [{
+                        label: config.title,
+                        data: config.data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            display: type === 'pie',
+                            labels: { color: '#1e293b' }
+                        },
+                        title: { 
+                            display: false
+                        }
+                    },
+                    scales: type !== 'pie' ? {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#64748b',
+                                callback: v => config.isPercentage ? v + '%' : v
+                            },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#64748b',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { display: false }
+                        }
+                    } : {}
+                }
+            });
+        }
+
+        function createTable(data, columns) {
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            thead.innerHTML = `<tr>${columns.map(col => `<th>${col}</th>`).join('')}</tr>`;
+
+            tbody.innerHTML = data.map(row => `
                 <tr>
                     ${columns.map(col => {
                         let value = row[col];
-                        if (col === 'Market Share') {
-                            const total = allBrands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0);
-                            value = ((row['Dollar Sales'] / total) * 100).toFixed(2) + '%';
-                            return `<td>${value}</td>`;
-                        }
                         if (typeof value === 'number') {
                             if (col.includes('%')) {
-                                const pct = (value * 100).toFixed(1);
+                                const pct = col === 'Market Share' ? value : (value * 100).toFixed(1);
                                 const color = value > 0 ? 'positive' : value < 0 ? 'negative' : '';
                                 return `<td class="${color}">${pct}%</td>`;
                             } else if (col.includes('Sales') || col.includes('Dollar')) {
@@ -586,55 +717,32 @@
                 </tr>
             `).join('');
 
-            document.getElementById('tableContainer').classList.remove('hidden');
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            return table;
         }
 
-        function createChart(chartData) {
-            if (currentChart) currentChart.destroy();
-
-            const ctx = document.getElementById('dataChart').getContext('2d');
-            const type = chartData.type || 'bar';
-            const colors = type === 'pie' 
-                ? chartData.labels.map((_, i) => `hsl(${(i * 360 / chartData.labels.length)}, 70%, 60%)`)
-                : chartData.values.map(val => val >= 0 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(236, 72, 153, 0.8)');
-
-            currentChart = new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: chartData.title,
-                        data: chartData.values,
-                        backgroundColor: colors,
-                        borderColor: colors.map(c => c.replace('0.8', '1')),
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: type === 'pie', labels: { color: '#e2e8f0' } },
-                        title: { display: true, text: chartData.title, color: '#e2e8f0', font: { size: 16 } }
-                    },
-                    scales: type !== 'pie' ? {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { 
-                                color: '#cbd5e1',
-                                callback: v => chartData.isPercentage ? v + '%' : v
-                            },
-                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                        },
-                        x: {
-                            ticks: { color: '#cbd5e1', maxRotation: 45, minRotation: 45 },
-                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                        }
-                    } : {}
-                }
-            });
-
-            document.getElementById('chartContainer').classList.remove('hidden');
+        async function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const canvas = element.querySelector('canvas');
+            
+            if (canvas) {
+                canvas.toBlob(blob => {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        alert('✅ Chart copied! You can paste it directly into PowerPoint or Google Slides.');
+                    });
+                });
+            } else {
+                // Copy table as HTML
+                const range = document.createRange();
+                range.selectNode(element);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                alert('✅ Table copied! You can paste it into your presentation.');
+            }
         }
 
         function formatNumber(num) {
