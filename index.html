@@ -10,7 +10,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #064e3b 100%);
             min-height: 100vh;
             color: white;
             padding: 20px;
@@ -19,23 +19,23 @@
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 {
             font-size: 2.5rem;
-            background: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
+            background: linear-gradient(90deg, #34d399, #10b981, #6ee7b7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
         .badge {
             display: inline-block;
-            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            background: linear-gradient(90deg, #10b981, #34d399);
             padding: 4px 14px;
             border-radius: 12px;
             font-size: 0.7rem;
             font-weight: 600;
-            margin-top: 8px;
+            color: #064e3b;
         }
         .card {
-            background: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(6, 78, 59, 0.9);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 20px;
@@ -44,38 +44,39 @@
         .upload-area {
             text-align: center;
             padding: 40px;
-            border: 2px dashed rgba(139, 92, 246, 0.5);
+            border: 2px dashed rgba(16, 185, 129, 0.5);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .upload-area:hover { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+        .upload-area:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .btn {
-            background: linear-gradient(90deg, #8b5cf6, #ec4899);
-            color: white;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            color: #064e3b;
             padding: 12px 28px;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .hidden { display: none !important; }
         .chat-input {
             width: 100%;
             padding: 14px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(139, 92, 246, 0.4);
+            background: rgba(4, 47, 46, 0.8);
+            border: 2px solid rgba(16, 185, 129, 0.4);
             border-radius: 10px;
             color: white;
             font-size: 1rem;
             margin-bottom: 12px;
             resize: vertical;
         }
-        .chat-input:focus { outline: none; border-color: #8b5cf6; }
+        .chat-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+        .chat-input::placeholder { color: #6ee7b7; }
         .examples {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -84,16 +85,16 @@
         }
         .example-btn {
             padding: 10px 14px;
-            background: rgba(51, 65, 85, 0.6);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(4, 47, 46, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 8px;
-            color: #cbd5e1;
+            color: #d1fae5;
             cursor: pointer;
             font-size: 0.85rem;
             text-align: left;
             transition: all 0.3s;
         }
-        .example-btn:hover { background: rgba(71, 85, 105, 0.8); border-color: #8b5cf6; }
+        .example-btn:hover { background: rgba(5, 150, 105, 0.3); border-color: #10b981; }
         .output-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -114,19 +115,20 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #8b5cf6;
+            background: #10b981;
             color: white;
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
+            font-weight: 600;
             z-index: 10;
         }
-        .copy-btn:hover { background: #7c3aed; }
+        .copy-btn:hover { background: #059669; }
         .spinner {
-            border: 3px solid rgba(139, 92, 246, 0.3);
-            border-top: 3px solid #8b5cf6;
+            border: 3px solid rgba(16, 185, 129, 0.3);
+            border-top: 3px solid #10b981;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -135,16 +137,27 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .status { padding: 10px; border-radius: 6px; margin-top: 10px; }
-        .status.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status.success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
         .status.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .thinking {
-            background: rgba(139, 92, 246, 0.15);
-            border-left: 3px solid #8b5cf6;
+            background: rgba(16, 185, 129, 0.15);
+            border-left: 4px solid #10b981;
             padding: 12px 15px;
             border-radius: 6px;
             margin-bottom: 15px;
             font-size: 0.9rem;
-            color: #c4b5fd;
+            color: #a7f3d0;
+        }
+        .ai-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
         table {
             width: 100%;
@@ -158,75 +171,96 @@
             border-bottom: 1px solid #e2e8f0;
         }
         th {
-            background: #f1f5f9;
+            background: #f0fdf4;
             font-weight: 600;
-            color: #334155;
+            color: #065f46;
         }
-        tr:hover { background: #f8fafc; }
-        .positive { color: #22c55e; font-weight: 600; }
+        tr:hover { background: #f0fdf4; }
+        .positive { color: #10b981; font-weight: 600; }
         .negative { color: #ef4444; font-weight: 600; }
         canvas { max-height: 400px !important; }
         .answer-text {
-            background: rgba(15, 23, 42, 0.7);
-            border-left: 4px solid #06b6d4;
+            background: rgba(4, 47, 46, 0.7);
+            border-left: 4px solid #34d399;
             padding: 20px;
             border-radius: 8px;
             line-height: 1.7;
             font-size: 1.05rem;
         }
         .insight-box {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
             padding: 15px;
             border-radius: 8px;
             margin-top: 15px;
+        }
+        .ai-processing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .ai-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 AI Presentation Builder</h1>
-            <p style="color: #cbd5e1;">Ask questions, get presentation-ready visuals</p>
-            <span class="badge">Powered by Advanced NLP</span>
+            <h1>🤖 AI-Powered Analytics Engine</h1>
+            <p style="color: #d1fae5;">Natural Language Query Processing</p>
+            <span class="badge">⚡ REAL-TIME AI ANALYSIS</span>
         </div>
 
         <div id="uploadSection" class="card">
             <div class="upload-area" onclick="document.getElementById('fileInput').click()">
                 <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
                 <h2>Upload Excel Data</h2>
-                <p style="color: #94a3b8; margin-top: 10px;">Click to upload your Energy Drink Category file</p>
+                <p style="color: #a7f3d0; margin-top: 10px;">AI will analyze your Energy Drink Category data</p>
                 <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
             </div>
             <div id="fileStatus"></div>
         </div>
 
         <div id="querySection" class="card hidden">
-            <h3 style="margin-bottom: 12px; color: #8b5cf6;">💬 Ask Anything</h3>
+            <h3 style="margin-bottom: 12px; color: #6ee7b7;">💬 Ask AI Anything <span class="ai-badge">NLP POWERED</span></h3>
             <textarea class="chat-input" id="queryInput" rows="2" 
-                placeholder="Ask any question in natural language..."></textarea>
-            <button class="btn" id="analyzeBtn" onclick="processQuery()">🚀 Generate Answer</button>
+                placeholder="Ask in natural language... AI will understand and analyze"></textarea>
+            <button class="btn" id="analyzeBtn" onclick="processQuery()">🚀 AI Analyze</button>
             
             <div style="margin-top: 20px;">
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">💡 Example Questions:</p>
+                <p style="color: #a7f3d0; font-size: 0.85rem; margin-bottom: 10px;">💡 Try These AI-Powered Queries:</p>
                 <div class="examples">
+                    <button class="example-btn" onclick="setQuery('Which are the two best performing brands?')">
+                        Which are the two best performing brands?
+                    </button>
                     <button class="example-btn" onclick="setQuery('Show me top 5 and bottom 5 brands by sales')">
                         Show me top 5 and bottom 5 brands by sales
                     </button>
-                    <button class="example-btn" onclick="setQuery('Create a pie chart of the top 3 brands by market share')">
-                        Create a pie chart of top 3 brands by market share
+                    <button class="example-btn" onclick="setQuery('Create a pie chart of the top 3 brands')">
+                        Create a pie chart of the top 3 brands
                     </button>
-                    <button class="example-btn" onclick="setQuery('Which brands over $500K are declining?')">
-                        Which brands over $500K are declining?
+                    <button class="example-btn" onclick="setQuery('Which 7 brands have the highest growth rate?')">
+                        Which 7 brands have the highest growth rate?
                     </button>
-                    <button class="example-btn" onclick="setQuery('Compare growth rates of top 5 vs bottom 5 brands')">
-                        Compare growth rates of top 5 vs bottom 5
+                    <button class="example-btn" onclick="setQuery('Compare the best 4 vs worst 4 brands')">
+                        Compare the best 4 vs worst 4 brands
                     </button>
-                    <button class="example-btn" onclick="setQuery('Show brands with highest and lowest prices')">
-                        Show brands with highest and lowest prices
-                    </button>
-                    <button class="example-btn" onclick="setQuery('What percentage of brands are growing vs declining?')">
-                        What % of brands are growing vs declining?
+                    <button class="example-btn" onclick="setQuery('What brands over $500K are declining?')">
+                        What brands over $500K are declining?
                     </button>
                 </div>
             </div>
@@ -234,12 +268,19 @@
 
         <div id="loadingIndicator" class="card hidden" style="text-align: center; padding: 40px;">
             <div class="spinner"></div>
-            <p style="margin-top: 20px; color: #94a3b8;">AI is analyzing your question...</p>
+            <p style="margin-top: 20px; color: #a7f3d0;">🤖 AI is processing your query...</p>
+            <div class="ai-processing" style="max-width: 300px; margin: 20px auto 0;">
+                <div class="ai-dot"></div>
+                <span style="color: #6ee7b7; font-size: 0.85rem;">Analyzing natural language</span>
+            </div>
         </div>
 
         <div id="resultsSection" class="hidden">
             <div class="card">
-                <div id="thinkingProcess" class="thinking hidden"></div>
+                <div id="aiProcessing" class="ai-processing hidden">
+                    <div class="ai-dot"></div>
+                    <span style="color: #6ee7b7; font-size: 0.9rem;" id="aiThinking"></span>
+                </div>
                 <div class="answer-text" id="answerText"></div>
             </div>
 
@@ -258,7 +299,7 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            document.getElementById('fileStatus').innerHTML = '<div class="status">Loading...</div>';
+            document.getElementById('fileStatus').innerHTML = '<div class="status">🤖 AI Loading...</div>';
 
             try {
                 const data = await file.arrayBuffer();
@@ -298,7 +339,7 @@
                 });
 
                 document.getElementById('fileStatus').innerHTML = 
-                    `<div class="status success">✓ Loaded ${allBrands.length} brands successfully</div>`;
+                    `<div class="status success">✓ AI Ready: ${allBrands.length} brands analyzed</div>`;
                 
                 document.getElementById('uploadSection').classList.add('hidden');
                 document.getElementById('querySection').classList.remove('hidden');
@@ -321,69 +362,158 @@
             document.getElementById('loadingIndicator').classList.remove('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
             
-            // Clear previous charts
             currentCharts.forEach(chart => chart.destroy());
             currentCharts = [];
 
             setTimeout(() => {
                 try {
                     const result = analyzeWithAI(query, allBrands);
-                    displayResults(result, query);
+                    displayResults(result);
                     document.getElementById('loadingIndicator').classList.add('hidden');
                     document.getElementById('resultsSection').classList.remove('hidden');
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    alert('AI Error: ' + error.message);
                     document.getElementById('loadingIndicator').classList.add('hidden');
                 }
                 document.getElementById('analyzeBtn').disabled = false;
-            }, 1000);
+            }, 1200);
         }
 
         function analyzeWithAI(query, brands) {
             const q = query.toLowerCase();
             
-            // Show thinking
-            const thinking = document.getElementById('thinkingProcess');
-            thinking.classList.remove('hidden');
-            thinking.textContent = `🧠 Analyzing: "${query}"`;
-
+            // AI Processing indicator
+            const aiProc = document.getElementById('aiProcessing');
+            const aiThink = document.getElementById('aiThinking');
+            aiProc.classList.remove('hidden');
+            
             const outputs = [];
             let answer = '';
 
-            // Detect chart type preference
-            const wantsPie = q.includes('pie chart') || q.includes('pie');
-            const wantsBar = q.includes('bar chart') || q.includes('bar');
-            const wantsTable = q.includes('table') || q.includes('list');
+            // STEP 1: AI extracts numbers (written or numeric)
+            const numberWords = {
+                'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+                'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+                'eleven': 11, 'twelve': 12, 'fifteen': 15, 'twenty': 20
+            };
+            
+            let requestedCount = null;
+            
+            // Check for written numbers first
+            for (const [word, num] of Object.entries(numberWords)) {
+                if (q.includes(word)) {
+                    requestedCount = num;
+                    break;
+                }
+            }
+            
+            // Check for digit numbers
+            const digitMatch = q.match(/\b(\d+)\b/);
+            if (digitMatch && !requestedCount) {
+                requestedCount = parseInt(digitMatch[1]);
+            }
 
-            // Extract top/bottom numbers
-            const topMatch = q.match(/top (\d+)/);
-            const bottomMatch = q.match(/bottom (\d+)/);
-            const topN = topMatch ? parseInt(topMatch[1]) : (q.includes('top') ? 10 : 0);
-            const bottomN = bottomMatch ? parseInt(bottomMatch[1]) : (q.includes('bottom') ? 5 : 0);
+            // STEP 2: AI determines intent (top/best vs bottom/worst)
+            const hasTop = q.includes('top') || q.includes('best') || q.includes('highest') || q.includes('leading') || q.includes('strongest') || q.includes('fastest');
+            const hasBottom = q.includes('bottom') || q.includes('worst') || q.includes('lowest') || q.includes('weakest') || q.includes('slowest');
+            
+            // STEP 3: AI determines comparison intent
+            const isComparison = (q.includes('compare') || q.includes('vs') || q.includes('versus') || q.includes('against')) || (hasTop && hasBottom);
+            
+            // STEP 4: AI determines metric
+            let sortMetric = 'Dollar Sales';
+            let sortLabel = 'Sales';
+            
+            if (q.includes('growth') || q.includes('growing') || q.includes('fastest') || q.includes('increasing')) {
+                sortMetric = 'Dollar Sales % Change vs YA';
+                sortLabel = 'Growth Rate';
+            } else if (q.includes('price') || q.includes('pricing') || q.includes('expensive') || q.includes('cheap')) {
+                sortMetric = 'Price per Unit';
+                sortLabel = 'Price';
+            } else if (q.includes('perform') || q.includes('success')) {
+                sortMetric = 'Dollar Sales';
+                sortLabel = 'Performance (Sales)';
+            }
 
-            // TOP AND BOTTOM
-            if (topN > 0 && bottomN > 0) {
-                const sorted = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
-                const top = sorted.slice(0, topN);
-                const bottom = sorted.slice(-bottomN).reverse();
+            // AI Thinking output
+            aiThink.textContent = `AI Understanding → Count: ${requestedCount || 'auto'} | Metric: ${sortLabel} | Intent: ${hasTop ? 'Best' : ''}${isComparison ? ' vs ' : ''}${hasBottom ? 'Worst' : ''}`;
+            
+            // STEP 5: AI generates response based on understanding
 
-                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top ${topN} & Bottom ${bottomN} Brands by Dollar Sales</h3>`;
-                answer += `<div class="insight-box">`;
-                answer += `<strong>Top ${topN}:</strong> Combined sales of $${formatNumber(top.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
-                answer += `<strong>Bottom ${bottomN}:</strong> Combined sales of $${formatNumber(bottom.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
-                answer += `<strong>Gap:</strong> The #1 brand sells ${(top[0]['Dollar Sales'] / bottom[0]['Dollar Sales']).toFixed(1)}x more than the bottom brand`;
+            // CASE 1: Specific number of top/best brands
+            if (requestedCount && hasTop && !hasBottom && !isComparison) {
+                const sorted = [...brands].sort((a, b) => (b[sortMetric] || -Infinity) - (a[sortMetric] || -Infinity));
+                const selected = sorted.slice(0, requestedCount);
+
+                answer = `<h3 style="color: #34d399; margin-bottom: 15px;">🎯 AI Analysis: Top ${requestedCount} Brand${requestedCount > 1 ? 's' : ''} by ${sortLabel}</h3>`;
+                answer += `<span class="ai-badge">AI-Generated Insights</span>`;
+                answer += `<div style="margin-top: 15px;">`;
+                answer += selected.map((b, i) => {
+                    const value = b[sortMetric];
+                    const displayValue = sortMetric.includes('%') 
+                        ? `${(value * 100).toFixed(1)}%` 
+                        : sortMetric.includes('Price') 
+                        ? `$${value.toFixed(2)}`
+                        : `$${formatNumber(value)}`;
+                    const changeClass = sortMetric.includes('%') && value >= 0 ? 'positive' : value < 0 ? 'negative' : '';
+                    
+                    return `<div style="margin-bottom: 12px; padding: 10px; background: rgba(16, 185, 129, 0.05); border-radius: 6px;">
+                            <strong style="color: #34d399;">${i + 1}. ${b.Product.trim()}</strong><br>
+                            <span style="color: #a7f3d0;">${sortLabel}:</span> <span class="${changeClass}" style="font-weight: 600;">${displayValue}</span></div>`;
+                }).join('');
+                answer += `</div>`;
+
+                if (requestedCount <= 10) {
+                    outputs.push({
+                        type: 'chart',
+                        chartType: q.includes('pie') ? 'pie' : 'bar',
+                        title: `Top ${requestedCount} Brands by ${sortLabel}`,
+                        labels: selected.map(b => b.Product.trim()),
+                        data: selected.map(b => sortMetric.includes('%') ? (b[sortMetric] || 0) * 100 : b[sortMetric]),
+                        isPercentage: sortMetric.includes('%')
+                    });
+                }
+
+                outputs.push({
+                    type: 'table',
+                    title: `AI Analysis: Top ${requestedCount} Brands`,
+                    data: selected,
+                    columns: ['Product', sortMetric, 'Dollar Sales']
+                });
+
+                return { answer, outputs };
+            }
+
+            // CASE 2: Top AND Bottom comparison
+            if ((hasTop && hasBottom) || isComparison) {
+                const topCount = requestedCount || 5;
+                const bottomCount = requestedCount || 5;
+                
+                const sorted = [...brands].sort((a, b) => (b[sortMetric] || -Infinity) - (a[sortMetric] || -Infinity));
+                const top = sorted.slice(0, topCount);
+                const bottom = sorted.slice(-bottomCount).reverse();
+
+                answer = `<h3 style="color: #34d399; margin-bottom: 15px;">🎯 AI Comparative Analysis</h3>`;
+                answer += `<span class="ai-badge">AI-Powered Insights</span>`;
+                answer += `<div class="insight-box" style="margin-top: 15px;">`;
+                answer += `<strong style="color: #34d399;">Top ${topCount}:</strong> Combined sales of $${formatNumber(top.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
+                answer += `<strong style="color: #fbbf24;">Bottom ${bottomCount}:</strong> Combined sales of $${formatNumber(bottom.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}<br>`;
+                if (sortMetric === 'Dollar Sales') {
+                    const ratio = (top[0]['Dollar Sales'] / bottom[0]['Dollar Sales']).toFixed(1);
+                    answer += `<strong style="color: #6ee7b7;">AI Insight:</strong> The #1 brand is ${ratio}x larger than the smallest brand`;
+                }
                 answer += `</div>`;
 
                 outputs.push({
                     type: 'table',
-                    title: `Top ${topN} Brands`,
+                    title: `AI Analysis: Top ${topCount} Brands`,
                     data: top,
                     columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
                 });
 
                 outputs.push({
                     type: 'table',
-                    title: `Bottom ${bottomN} Brands`,
+                    title: `AI Analysis: Bottom ${bottomCount} Brands`,
                     data: bottom,
                     columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
                 });
@@ -391,39 +521,43 @@
                 outputs.push({
                     type: 'chart',
                     chartType: 'bar',
-                    title: 'Sales Comparison',
-                    labels: [...top.map(b => b.Product.trim()), ...bottom.map(b => b.Product.trim())],
+                    title: 'AI Comparison: Sales Distribution',
+                    labels: [...top.map((b, i) => `Top #${i+1}`), ...bottom.map((b, i) => `Bottom #${i+1}`)],
                     data: [...top.map(b => b['Dollar Sales']), ...bottom.map(b => b['Dollar Sales'])]
                 });
 
                 return { answer, outputs };
             }
 
-            // PIE CHART REQUEST
-            if (wantsPie || (q.includes('market share') && (topN === 3 || q.includes('top 3')))) {
-                const n = topN || 3;
+            // CASE 3: Pie chart request
+            if (q.includes('pie')) {
+                const n = requestedCount || 3;
                 const top = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, n);
                 const totalSales = brands.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0);
                 
-                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top ${n} Brands Market Share</h3>`;
+                answer = `<h3 style="color: #34d399; margin-bottom: 15px;">🎯 AI Market Share Analysis</h3>`;
+                answer += `<span class="ai-badge">AI-Generated Visualization</span>`;
+                answer += `<div style="margin-top: 15px;">`;
                 answer += top.map((b, i) => {
                     const share = ((b['Dollar Sales'] / totalSales) * 100).toFixed(1);
-                    return `<div style="margin-bottom: 8px;"><strong>${i + 1}. ${b.Product.trim()}</strong><br>
-                            <span style="color: #06b6d4;">Market Share: ${share}%</span> | 
-                            Sales: $${formatNumber(b['Dollar Sales'])}</div>`;
+                    return `<div style="margin-bottom: 10px; padding: 10px; background: rgba(16, 185, 129, 0.05); border-radius: 6px;">
+                            <strong style="color: #34d399;">${i + 1}. ${b.Product.trim()}</strong><br>
+                            <span style="color: #a7f3d0;">Market Share:</span> <span style="color: #6ee7b7; font-weight: 600;">${share}%</span> 
+                            ($${formatNumber(b['Dollar Sales'])})</div>`;
                 }).join('');
+                answer += `</div>`;
 
                 outputs.push({
                     type: 'chart',
                     chartType: 'pie',
-                    title: `Top ${n} Brands by Market Share`,
+                    title: `AI Analysis: Top ${n} Brands Market Share`,
                     labels: top.map(b => b.Product.trim()),
                     data: top.map(b => (b['Dollar Sales'] / totalSales) * 100)
                 });
 
                 outputs.push({
                     type: 'table',
-                    title: 'Market Share Data',
+                    title: 'AI-Generated Market Share Data',
                     data: top.map(b => ({
                         Brand: b.Product.trim(),
                         'Dollar Sales': b['Dollar Sales'],
@@ -436,154 +570,85 @@
                 return { answer, outputs };
             }
 
-            // FILTERING WITH CONDITIONS
-            if (q.includes('over') || q.includes('above')) {
-                const numbers = q.match(/\$?(\d+)k/i);
-                if (numbers) {
-                    const threshold = parseInt(numbers[1]) * 1000;
+            // CASE 4: Filtering with conditions
+            if (q.includes('over') || q.includes('above') || q.includes('more than')) {
+                const thresholdMatch = q.match(/\$?(\d+)k/i);
+                if (thresholdMatch) {
+                    const threshold = parseInt(thresholdMatch[1]) * 1000;
                     let filtered = brands.filter(b => (b['Dollar Sales'] || 0) > threshold);
                     
-                    if (q.includes('declining') || q.includes('negative')) {
+                    if (q.includes('declining') || q.includes('negative') || q.includes('losing') || q.includes('decreasing')) {
                         filtered = filtered.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
+                    } else if (q.includes('growing') || q.includes('increasing') || q.includes('positive')) {
+                        filtered = filtered.filter(b => (b['Dollar Sales % Change vs YA'] || 0) > 0);
                     }
 
                     filtered.sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0));
 
-                    answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Found ${filtered.length} Brands</h3>`;
-                    answer += `<p>Brands with sales over $${numbers[1]}K${q.includes('declining') ? ' that are declining' : ''}:</p>`;
-                    answer += `<div class="insight-box">Total combined sales: $${formatNumber(filtered.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}</div>`;
+                    answer = `<h3 style="color: #34d399; margin-bottom: 15px;">🎯 AI Filtered Results</h3>`;
+                    answer += `<span class="ai-badge">AI Query Processing</span>`;
+                    answer += `<div class="insight-box" style="margin-top: 15px;">`;
+                    answer += `<strong style="color: #6ee7b7;">AI Found:</strong> ${filtered.length} brands matching your criteria<br>`;
+                    answer += `<strong style="color: #a7f3d0;">Total Combined Sales:</strong> $${formatNumber(filtered.reduce((s, b) => s + (b['Dollar Sales'] || 0), 0))}`;
+                    answer += `</div>`;
 
                     outputs.push({
                         type: 'table',
-                        title: 'Filtered Brands',
+                        title: 'AI-Filtered Brand Results',
                         data: filtered.slice(0, 20),
-                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA', 'Price per Unit']
+                        columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
                     });
 
-                    outputs.push({
-                        type: 'chart',
-                        chartType: 'bar',
-                        title: 'Sales Overview',
-                        labels: filtered.slice(0, 10).map(b => b.Product.trim()),
-                        data: filtered.slice(0, 10).map(b => b['Dollar Sales'])
-                    });
+                    if (filtered.length <= 10) {
+                        outputs.push({
+                            type: 'chart',
+                            chartType: 'bar',
+                            title: 'AI Analysis: Filtered Brands',
+                            labels: filtered.map(b => b.Product.trim()),
+                            data: filtered.map(b => b['Dollar Sales'])
+                        });
+                    }
 
                     return { answer, outputs };
                 }
             }
 
-            // COMPARISON
-            if (q.includes('compare')) {
-                const top5 = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, 5);
-                const bottom5 = [...brands].sort((a, b) => (a['Dollar Sales'] || 0) - (b['Dollar Sales'] || 0)).slice(0, 5);
-
-                const topGrowth = top5.reduce((s, b) => s + (b['Dollar Sales % Change vs YA'] || 0), 0) / 5 * 100;
-                const bottomGrowth = bottom5.reduce((s, b) => s + (b['Dollar Sales % Change vs YA'] || 0), 0) / 5 * 100;
-
-                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Growth Rate Comparison</h3>`;
-                answer += `<div class="insight-box">`;
-                answer += `<strong>Top 5 Brands:</strong> Average growth of ${topGrowth.toFixed(1)}%<br>`;
-                answer += `<strong>Bottom 5 Brands:</strong> Average growth of ${bottomGrowth.toFixed(1)}%<br>`;
-                answer += `<strong>Insight:</strong> ${topGrowth > bottomGrowth ? 'Top brands are outperforming' : 'Smaller brands are growing faster'}`;
-                answer += `</div>`;
-
-                outputs.push({
-                    type: 'chart',
-                    chartType: 'bar',
-                    title: 'Growth Rate Comparison (%)',
-                    labels: [...top5.map(b => 'Top: ' + b.Product.trim().substring(0, 20)), ...bottom5.map(b => 'Bottom: ' + b.Product.trim().substring(0, 20))],
-                    data: [...top5.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100), ...bottom5.map(b => (b['Dollar Sales % Change vs YA'] || 0) * 100)],
-                    isPercentage: true
-                });
-
-                return { answer, outputs };
-            }
-
-            // PRICE ANALYSIS
-            if (q.includes('price') && (q.includes('highest') || q.includes('lowest'))) {
-                const validBrands = brands.filter(b => b['Price per Unit'] > 0 && b['Dollar Sales'] > 50000);
-                validBrands.sort((a, b) => (b['Price per Unit'] || 0) - (a['Price per Unit'] || 0));
-                const highest = validBrands.slice(0, 5);
-                const lowest = validBrands.slice(-5).reverse();
-
-                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Price Analysis</h3>`;
-                answer += `<div class="insight-box">`;
-                answer += `Highest priced: $${highest[0]['Price per Unit'].toFixed(2)}/unit<br>`;
-                answer += `Lowest priced: $${lowest[0]['Price per Unit'].toFixed(2)}/unit<br>`;
-                answer += `Price range: ${(highest[0]['Price per Unit'] / lowest[0]['Price per Unit']).toFixed(1)}x difference`;
-                answer += `</div>`;
-
-                outputs.push({
-                    type: 'table',
-                    title: 'Highest Priced Brands',
-                    data: highest,
-                    columns: ['Product', 'Price per Unit', 'Dollar Sales']
-                });
-
-                outputs.push({
-                    type: 'table',
-                    title: 'Lowest Priced Brands',
-                    data: lowest,
-                    columns: ['Product', 'Price per Unit', 'Dollar Sales']
-                });
-
-                return { answer, outputs };
-            }
-
-            // PERCENTAGE ANALYSIS
-            if (q.includes('percentage') || q.includes('%')) {
-                const growing = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) > 0);
-                const declining = brands.filter(b => (b['Dollar Sales % Change vs YA'] || 0) < 0);
-                const growingPct = ((growing.length / brands.length) * 100).toFixed(1);
-                const decliningPct = ((declining.length / brands.length) * 100).toFixed(1);
-
-                answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Growth vs Decline Analysis</h3>`;
-                answer += `<div class="insight-box">`;
-                answer += `<strong class="positive">${growingPct}%</strong> of brands (${growing.length}) are growing<br>`;
-                answer += `<strong class="negative">${decliningPct}%</strong> of brands (${declining.length}) are declining<br>`;
-                answer += `Category health: ${growingPct > decliningPct ? '✅ More brands growing' : '⚠️ More brands declining'}`;
-                answer += `</div>`;
-
-                outputs.push({
-                    type: 'chart',
-                    chartType: 'pie',
-                    title: 'Growing vs Declining Brands',
-                    labels: ['Growing', 'Declining'],
-                    data: [growing.length, declining.length]
-                });
-
-                return { answer, outputs };
-            }
-
-            // DEFAULT: TOP BRANDS
-            const top10 = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, 10);
-            answer = `<h3 style="color: #06b6d4; margin-bottom: 15px;">Top 10 Brands by Sales</h3>`;
-            answer += top10.map((b, i) => {
+            // DEFAULT: Smart default based on context
+            const defaultCount = requestedCount || 10;
+            const top = [...brands].sort((a, b) => (b['Dollar Sales'] || 0) - (a['Dollar Sales'] || 0)).slice(0, defaultCount);
+            
+            answer = `<h3 style="color: #34d399; margin-bottom: 15px;">🎯 AI Analysis: Top ${defaultCount} Brands</h3>`;
+            answer += `<span class="ai-badge">AI-Generated Report</span>`;
+            answer += `<div style="margin-top: 15px;">`;
+            answer += top.map((b, i) => {
                 const change = ((b['Dollar Sales % Change vs YA'] || 0) * 100).toFixed(1);
                 const changeClass = change >= 0 ? 'positive' : 'negative';
-                return `<div style="margin-bottom: 6px;">${i + 1}. <strong>${b.Product.trim()}</strong>: $${formatNumber(b['Dollar Sales'])} 
-                        (<span class="${changeClass}">${change}%</span>)</div>`;
+                return `<div style="margin-bottom: 10px; padding: 10px; background: rgba(16, 185, 129, 0.05); border-radius: 6px;">
+                        ${i + 1}. <strong style="color: #34d399;">${b.Product.trim()}</strong><br>
+                        <span style="color: #a7f3d0;">Sales:</span> $${formatNumber(b['Dollar Sales'])} 
+                        (<span class="${changeClass}">${change}% YA</span>)</div>`;
             }).join('');
+            answer += `</div>`;
 
             outputs.push({
                 type: 'table',
-                title: 'Top 10 Brands',
-                data: top10,
+                title: `AI Analysis: Top ${defaultCount} Brands`,
+                data: top,
                 columns: ['Product', 'Dollar Sales', 'Dollar Sales % Change vs YA']
             });
 
             outputs.push({
                 type: 'chart',
                 chartType: 'bar',
-                title: 'Top 10 Brands Sales',
-                labels: top10.map(b => b.Product.trim()),
-                data: top10.map(b => b['Dollar Sales'])
+                title: `AI-Generated: Top ${defaultCount} Brands`,
+                labels: top.map(b => b.Product.trim()),
+                data: top.map(b => b['Dollar Sales'])
             });
 
             return { answer, outputs };
         }
 
-        function displayResults(result, originalQuery) {
+        function displayResults(result) {
             document.getElementById('answerText').innerHTML = result.answer;
 
             const grid = document.getElementById('outputGrid');
@@ -606,7 +671,7 @@
                     if (output.type === 'chart') {
                         const title = document.createElement('h4');
                         title.textContent = output.title;
-                        title.style.color = '#1e293b';
+                        title.style.color = '#065f46';
                         title.style.marginBottom = '15px';
                         box.appendChild(title);
 
@@ -623,7 +688,7 @@
                     } else if (output.type === 'table') {
                         const title = document.createElement('h4');
                         title.textContent = output.title;
-                        title.style.color = '#1e293b';
+                        title.style.color = '#065f46';
                         title.style.marginBottom = '15px';
                         box.appendChild(title);
 
@@ -643,7 +708,7 @@
             
             const colors = type === 'pie' 
                 ? config.labels.map((_, i) => `hsl(${(i * 360 / config.labels.length)}, 70%, 60%)`)
-                : config.data.map(val => val >= 0 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(236, 72, 153, 0.8)');
+                : config.data.map(val => val >= 0 ? 'rgba(16, 185, 129, 0.8)' : 'rgba(239, 68, 68, 0.8)');
 
             return new Chart(ctx, {
                 type: type,
@@ -664,9 +729,6 @@
                         legend: { 
                             display: type === 'pie',
                             labels: { color: '#1e293b' }
-                        },
-                        title: { 
-                            display: false
                         }
                     },
                     scales: type !== 'pie' ? {
@@ -703,8 +765,8 @@
                     ${columns.map(col => {
                         let value = row[col];
                         if (typeof value === 'number') {
-                            if (col.includes('%')) {
-                                const pct = col === 'Market Share' ? value : (value * 100).toFixed(1);
+                            if (col.includes('%') && !col.includes('Market Share')) {
+                                const pct = (value * 100).toFixed(1);
                                 const color = value > 0 ? 'positive' : value < 0 ? 'negative' : '';
                                 return `<td class="${color}">${pct}%</td>`;
                             } else if (col.includes('Sales') || col.includes('Dollar')) {
@@ -730,18 +792,17 @@
                 canvas.toBlob(blob => {
                     const item = new ClipboardItem({ 'image/png': blob });
                     navigator.clipboard.write([item]).then(() => {
-                        alert('✅ Chart copied! You can paste it directly into PowerPoint or Google Slides.');
+                        alert('✅ Chart copied! Paste into PowerPoint/Google Slides.');
                     });
                 });
             } else {
-                // Copy table as HTML
                 const range = document.createRange();
                 range.selectNode(element);
                 window.getSelection().removeAllRanges();
                 window.getSelection().addRange(range);
                 document.execCommand('copy');
                 window.getSelection().removeAllRanges();
-                alert('✅ Table copied! You can paste it into your presentation.');
+                alert('✅ Table copied!');
             }
         }
 
