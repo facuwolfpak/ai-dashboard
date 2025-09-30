@@ -715,6 +715,58 @@
                 }
             }
 
+            // AVERAGE QUESTIONS
+            if (q.includes('average') || q.includes('mean')) {
+                let metric = 'Dollar Sales';
+                let label = 'sales';
+                
+                if (q.includes('price')) {
+                    metric = 'Price per Unit';
+                    label = 'price per unit';
+                    brands = brands.filter(b => b[metric] > 0);
+                } else if (q.includes('growth')) {
+                    metric = 'Dollar Sales % Change vs YA';
+                    label = 'growth rate';
+                    brands = brands.filter(b => b[metric] !== null);
+                }
+                
+                const avg = brands.reduce((s, b) => s + (b[metric] || 0), 0) / brands.length;
+                const highest = [...brands].sort((a, b) => (b[metric] || 0) - (a[metric] || 0))[0];
+                const lowest = [...brands].sort((a, b) => (a[metric] || 0) - (b[metric] || 0))[0];
+                
+                conversationContext.lastBrands = brands.slice(0, 10);
+                thinking.textContent = `🧠 Calculating average ${label} across ${brands.length} brands`;
+                
+                const displayAvg = metric.includes('Price') ? `${avg.toFixed(2)}` : 
+                                  metric.includes('%') ? `${(avg * 100).toFixed(1)}%` :
+                                  `${formatNumber(avg)}`;
+                
+                answer = `<h3 style="color: #34d399; margin-bottom: 20px;">Average ${label.charAt(0).toUpperCase() + label.slice(1)}</h3>`;
+                answer += `<div class="big-number">${displayAvg}</div>`;
+                answer += `<div class="insight-box">`;
+                answer += `<strong>Highest:</strong> ${highest.Product.trim()} - ${metric.includes('Price') ? `${highest[metric].toFixed(2)}` : metric.includes('%') ? `${(highest[metric] * 100).toFixed(1)}%` : `${formatNumber(highest[metric])}`}<br>`;
+                answer += `<strong>Lowest:</strong> ${lowest.Product.trim()} - ${metric.includes('Price') ? `${lowest[metric].toFixed(2)}` : metric.includes('%') ? `${(lowest[metric] * 100).toFixed(1)}%` : `${formatNumber(lowest[metric])}`}<br>`;
+                answer += `<strong>Range:</strong> ${(highest[metric] / lowest[metric]).toFixed(1)}x difference`;
+                answer += `</div>`;
+
+                summary = `Average ${label}: ${displayAvg}`;
+                followUps = [
+                    'Show me the top 10 brands',
+                    'Which brand is closest to average?',
+                    'What percentage are above average?',
+                    'Compare highest vs lowest'
+                ];
+
+                outputs.push({
+                    type: 'table',
+                    title: `Top 10 Brands by ${label}`,
+                    data: [...brands].sort((a, b) => (b[metric] || 0) - (a[metric] || 0)).slice(0, 10),
+                    columns: ['Product', metric, 'Dollar Sales']
+                });
+
+                return { answer, outputs, summary, followUps };
+            }
+
             // WHICH BRAND HAS HIGHEST
             if (q.includes('which') && (q.includes('highest') || q.includes('best'))) {
                 let metric = 'Dollar Sales';
