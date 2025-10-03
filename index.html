@@ -259,9 +259,11 @@ Note: This single file contains the full frontend. Scroll to the bottom for serv
         let finalChunk = '';
         for (let i = ev.resultIndex; i < ev.results.length; i++) {
           const r = ev.results[i];
-          if (r.isFinal) finalChunk += r[0].transcript + '\n';
+          if (r.isFinal) finalChunk += r[0].transcript + '
+';
         }
-        if (finalChunk) el('notes').value += (el('notes').value ? '\n' : '') + finalChunk.trim();
+        if (finalChunk) el('notes').value += (el('notes').value ? '
+' : '') + finalChunk.trim();
       };
       state.recognizer.onend = ()=>{
         if (state.recording) {
