@@ -1,530 +1,249 @@
-<!--
-AI Action Dashboard — Facundo starter kit
-=================================================
-What you get (MVP):
-1) A single‑page dashboard you can host on GitHub Pages (static).
-2) Upload .txt/.md/.docx/.pdf meeting notes (txt/md best). The app will:
-   • Extract action items (owner, due date, distributor/customer, status) with a built‑in heuristic parser (no API needed),
-     OR (recommended) send notes to your own serverless AI endpoint for higher accuracy.
-3) Ask natural‑language questions like: "What distributors have pending items?" and get an answer + filtered table.
-4) Local persistence via browser localStorage (MVP). Swap to Supabase/Firebase later without rewriting UI.
-
-How to deploy in 5 minutes (MVP / no backend):
-- Create a new GitHub repo → add this file as index.html → enable GitHub Pages → done.
-- You can use heuristic parsing immediately (toggle in Settings panel).
-
-How to enable AI (serverless, keeps your API key safe):
-- If you use Vercel: create /api/ingest.js and /api/query.js from the snippets at the end. Set env var OPENAI_API_KEY (or Anthropic, etc.).
-- In the dashboard Settings, set "Backend Mode" to "Serverless AI" and paste your API base URLs (e.g. /api/ingest and /api/query).
-
-Note: This single file contains the full frontend. Scroll to the bottom for serverless function code (Node.js, Vercel). You can copy those into /api.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Action Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Tariff & HS Code Finder</title>
   <style>
-    :root { --bg: #0b0f14; --card:#0e1621; --muted:#9fb0c3; --accent:#60a5fa; }
-    html, body { height: 100%; background: linear-gradient(180deg, #0b0f14 0%, #0e1621 100%); color: #e6edf3; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    .card { background: rgba(14,22,33,0.85); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 10px 30px rgba(0,0,0,0.35); border-radius: 18px; }
-    .btn { transition: all .15s ease; }
-    .btn:hover { transform: translateY(-1px); }
-    .pill { border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 4px 10px; font-size: 12px; }
-    .kbd { border: 1px solid rgba(255,255,255,.18); padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,.04); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
-    .grid-fit { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
-    .tw-input { background:#0a1320; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; outline:none; width:100%; }
-    .tw-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(96,165,250,.15); }
-    .tw-select { background:#0a1320; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; outline:none; width:100%; color:#e6edf3; }
-    .badge { font-size:12px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
-    .status-open { background:#33241f; border-color:#7a3c2a; color:#ffb088; }
-    .status-done { background:#1d3326; border-color:#315b3f; color:#9be2b2; }
-    .status-hold { background:#2a2835; border-color:#49415a; color:#c9b3ff; }
-    .link { color:#93c5fd; text-decoration: underline; text-underline-offset: 3px; }
-      .dropzone { border:1.5px dashed rgba(255,255,255,.25); border-radius:14px; padding:14px; background: rgba(255,255,255,.03); text-align:center; }
-    .dropzone.dragover { border-color: var(--accent); background: rgba(96,165,250,.08); }
-    .rec-dot { width:10px; height:10px; border-radius:999px; background:#ef4444; display:inline-block; margin-right:6px; box-shadow:0 0 0 0 rgba(239,68,68,.7); animation:pulse 1s infinite; }
-    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)} 70%{box-shadow:0 0 0 10px rgba(239,68,68,0)} 100%{box-shadow:0 0 0 0 rgba(239,68,68,0)} }
+    :root{--bg:#0b1020;--card:#121936;--muted:#8fa3c5;--accent:#4dd2ff;--ok:#8be28b;--err:#ff6b6b}
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";background:linear-gradient(180deg,#0b1020,#0b1020 35%,#0e1530);color:#e9eefc}
+    header{padding:24px 20px 8px;max-width:1100px;margin:0 auto}
+    h1{margin:0 0 6px;font-weight:800;letter-spacing:.2px}
+    p.sub{margin:0;color:var(--muted)}
+    main{max-width:1100px;margin:24px auto 80px;padding:0 20px;display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+    .card h2{margin:0 0 8px;font-size:18px}
+    .pad{padding:18px}
+    label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+    input[type=text], textarea, select{width:100%;background:#0a1128;border:1px solid rgba(255,255,255,.12);color:#e9eefc;border-radius:10px;padding:10px 12px}
+    textarea{min-height:96px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    button{appearance:none;background:var(--accent);color:#001221;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .results{padding:0 0 10px}
+    .result{border-top:1px solid rgba(255,255,255,.08);padding:12px 0}
+    code, pre{background:#071022;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 10px;color:#bfe4ff;display:block;overflow:auto}
+    .tag{display:inline-block;background:#09203f;color:#cfe7ff;border:1px solid rgba(77,210,255,.35);padding:2px 8px;border-radius:999px;font-size:12px;margin:2px 8px 2px 0}
+    a{color:#77d3ff}
+    footer{max-width:1100px;margin:24px auto;padding:0 20px}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px}
+    .callout{background:#09142c;border-left:3px solid var(--accent);padding:10px 12px;border-radius:10px}
   </style>
 </head>
-<body class="min-h-screen">
-  <header class="max-w-7xl mx-auto px-5 pt-8 pb-4">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400"></div>
-        <div>
-          <h1 class="text-2xl font-semibold">AI Action Dashboard</h1>
-          <p class="text-sm text-slate-400">Upload notes → extract action items → ask questions like “Which distributors have pending items?”</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="btn-export" class="btn pill">Export JSON</button>
-        <button id="btn-import" class="btn pill">Import JSON</button>
-        <input id="import-file" type="file" accept="application/json" class="hidden"/>
-      </div>
-    </div>
+<body>
+  <header>
+    <h1>Tariff &amp; HS Code Finder (beta)</h1>
+    <p class="sub">Enter a product description and choose origin/destination. The tool will search official tariff services and return likely HS/HTS codes and duty info where live APIs exist.</p>
   </header>
 
-  <main class="max-w-7xl mx-auto px-5 pb-24">
-    <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Left column: Ingest & Ask -->
-      <section class="lg:col-span-1 card p-5">
-        <h2 class="text-lg font-semibold mb-3">Ingest notes</h2>
-        <div class="space-y-3">
-          <input id="title" class="tw-input" placeholder="Meeting title (e.g., PriceSmart 2025 planning)"/>
-          <textarea id="notes" class="tw-input" rows="10" placeholder="Paste your notes here (txt/markdown best). Use lines like: 
-- [ ] Action: Send spec sheet to Eatics (owner: Facu, due: 2025-10-07, distributor: Eatics, status: open)"></textarea>
-          <div class="flex items-center gap-2">
-            <button id="btn-mic" type="button" class="btn rounded-xl px-3 py-2 bg-rose-500/20 hover:bg-rose-500/30">🎙️ Dictate</button>
-            <span id="mic-status" class="text-xs text-slate-400">Mic: idle</span>
-            <select id="mic-lang" class="tw-select w-44 ml-auto">
-              <option value="en-US">English (US)</option>
-              <option value="es-ES">Español (ES)</option>
-              <option value="es-MX">Español (MX)</option>
-              <option value="pt-BR">Português (BR)</option>
-            </select>
-          </div>
-          <div id="dropzone" class="dropzone text-sm text-slate-400">Drop .txt / .md files here (PDF/DOCX text extraction varies by browser). Click "Upload file" for manual.</div>
-          <div class="grid-fit">
+  <main>
+    <section class="card">
+      <div class="pad">
+        <h2>Search</h2>
+        <form id="form">
+          <label>Product category</label>
+          <input type="text" id="category" placeholder="e.g., almond milk, beef jerky, lithium‑ion battery" required />
+
+          <label>Details (materials, % composition, use, packaging, processing)</label>
+          <textarea id="details" placeholder="e.g., plant‑based beverage; 1L aseptic carton; almond base; sweetened"></textarea>
+
+          <div class="row">
             <div>
-              <label class="text-xs text-slate-400">Parsing mode</label>
-              <select id="mode" class="tw-select">
-                <option value="heuristic">Heuristic (no AI)</option>
-                <option value="serverless">Serverless AI (recommended)</option>
-              </select>
+              <label>Country of origin</label>
+              <select id="origin"></select>
             </div>
-            <div id="serverless-settings" class="hidden">
-              <label class="text-xs text-slate-400">Serverless endpoints</label>
-              <input id="ingest-url" class="tw-input mt-1" placeholder="/api/ingest"/>
-              <input id="query-url" class="tw-input mt-2" placeholder="/api/query"/>
+            <div>
+              <label>Country of destination</label>
+              <select id="destination"></select>
             </div>
           </div>
-          <div class="flex gap-2 flex-wrap">
-            <button id="btn-ingest" class="btn bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-4 py-2">Save &amp; Extract (Ctrl+Enter)</button>
-            <button id="btn-file" type="button" class="btn bg-slate-700 hover:bg-slate-600 rounded-xl px-4 py-2">Choose File</button>
-            <input id="file-input" type="file" accept=".txt,.md,.pdf,.docx" class="hidden"/>
+
+          <div class="row" style="margin-top:14px">
+            <button id="go" type="submit">Find HS &amp; tariffs</button>
+            <button id="clear" type="button">Clear</button>
           </div>
-          <p id="ingest-status" class="text-sm text-slate-400"></p>
-        </div>
+          <p class="hint">Tip: Be specific (composition %, fat %, whether sweetened/unsweetened, fresh vs cooked, etc.). Classification depends on the exact description.</p>
+        </form>
+      </div>
+    </section>
 
-        <hr class="my-6 border-slate-800"/>
-
-        <h2 class="text-lg font-semibold mb-3">Ask your data</h2>
-        <input id="question" class="tw-input" placeholder="e.g., What distributors have pending items?"/>
-        <button id="btn-ask" class="btn w-full mt-2 bg-violet-500 hover:bg-violet-600 text-white rounded-xl px-4 py-2">Ask</button>
-        <p class="text-xs text-slate-400 mt-2">Tip: press <span class="kbd">/</span> to focus the question box</p>
-        <div id="answer" class="mt-4 text-slate-200"></div>
-      </section>
-
-      <!-- Right column: Table -->
-      <section class="lg:col-span-2 card p-5">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold">Action items</h2>
-          <div class="flex gap-2">
-            <select id="filter-status" class="tw-select w-40">
-              <option value="">Status: All</option>
-              <option value="open">Open</option>
-              <option value="hold">On Hold</option>
-              <option value="done">Done</option>
-            </select>
-            <input id="filter-distributor" class="tw-input w-56" placeholder="Filter by distributor"/>
-          </div>
+    <section class="card">
+      <div class="pad">
+        <h2>Live sources & reliability</h2>
+        <div class="callout small">
+          <p><strong>United States (imports):</strong> USITC HTS REST API (<a href="https://hts.usitc.gov/" target="_blank" rel="noopener">HTS</a>) queried via <code>https://hts.usitc.gov/reststop</code>. Updated with each HTS revision. See API guide for endpoints. </p>
+          <p><strong>United Kingdom:</strong> GOV.UK Trade Tariff API (<a href="https://api.trade-tariff.service.gov.uk/" target="_blank" rel="noopener">docs</a>) at <code>https://www.trade-tariff.service.gov.uk/uk/api</code>, updated daily, no API key required.</p>
+          <p><strong>European Union & other countries:</strong> For now this tool links you to official portals (EU <em>Access2Markets</em>, WTO/UNCTAD <em>WITS/TRAINs</em>) with prefilled guidance where possible.</p>
         </div>
-        <div class="mt-4 overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="text-slate-400">
-              <tr class="text-left border-b border-slate-800">
-                <th class="py-2 pr-3">Distributor</th>
-                <th class="py-2 pr-3">Action</th>
-                <th class="py-2 pr-3">Owner</th>
-                <th class="py-2 pr-3">Due</th>
-                <th class="py-2 pr-3">Status</th>
-                <th class="py-2 pr-3">Source</th>
-              </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+        <p class="small muted">Duty outcomes can change with quotas, safeguards, anti‑dumping, preferential programs (FTA), and other measures. Always verify with local customs or a broker before filing.</p>
+      </div>
+    </section>
+
+    <section id="output" class="card" style="grid-column: 1 / span 2">
+      <div class="pad">
+        <h2>Results</h2>
+        <div id="status" class="muted small">Waiting for your search…</div>
+        <div id="results" class="results"></div>
+      </div>
+    </section>
   </main>
 
-  <template id="row-tpl">
-    <tr class="border-b border-slate-800/60">
-      <td class="py-2 pr-3 font-medium"></td>
-      <td class="py-2 pr-3"></td>
-      <td class="py-2 pr-3"></td>
-      <td class="py-2 pr-3"></td>
-      <td class="py-2 pr-3"><span class="badge"></span></td>
-      <td class="py-2 pr-3 text-slate-400"></td>
-    </tr>
-  </template>
+  <footer class="small muted">
+    <p>Sources: USITC HTS API; GOV.UK Trade Tariff API; EU Access2Markets (TARIC); World Bank WITS/UNCTAD TRAINS. This page performs only client‑side requests to official APIs and displays direct links to authoritative tariff pages.</p>
+  </footer>
 
   <script>
-    // --------- State ---------
-    const state = {
-      items: JSON.parse(localStorage.getItem('ai_action_items') || '[]'),
-      mode: 'heuristic',
-      ingestUrl: '/api/ingest',
-      queryUrl: '/api/query',
-      recording: false,
-      recognizer: null
-    };
+    // --- Country list (ISO alpha-2 where available) ---
+    const countries = [
+      {code:"US", name:"United States"},
+      {code:"GB", name:"United Kingdom"},
+      {code:"EU", name:"European Union"},
+      {code:"AU", name:"Australia"}, {code:"CA", name:"Canada"}, {code:"CN", name:"China"}, {code:"JP", name:"Japan"}, {code:"KR", name:"Korea, Republic of"}, {code:"MX", name:"Mexico"}, {code:"SG", name:"Singapore"}, {code:"BR", name:"Brazil"}, {code:"CL", name:"Chile"}, {code:"CO", name:"Colombia"}, {code:"IL", name:"Israel"}, {code:"AE", name:"United Arab Emirates"}
+    ].sort((a,b)=>a.name.localeCompare(b.name));
 
-    // --------- Helpers ---------
-    const el = id => document.getElementById(id);
-    const fmtDate = s => s ? new Date(s).toISOString().slice(0,10) : '';
-    const save = () => localStorage.setItem('ai_action_items', JSON.stringify(state.items));
+    const originSel = document.getElementById('origin');
+    const destSel = document.getElementById('destination');
+    countries.forEach(c=>{
+      const o1=document.createElement('option'); o1.value=c.code; o1.textContent=c.name; originSel.appendChild(o1);
+      const o2=document.createElement('option'); o2.value=c.code; o2.textContent=c.name; destSel.appendChild(o2);
+    });
+    originSel.value = 'US';
+    destSel.value = 'US';
 
-    // Simple heuristic extraction: looks for checklist/task patterns
-    function heuristicExtract(text, meta={}) {
-      const lines = text.split(/\n+/);
-      const results = [];
-      const taskRe = /(?:\-|\*|\d+\.)?\s*(?:\[([ xX])\]\s*)?(?:Action:)?\s*(.+?)(?:\s*\(([^\)]*)\))?$/i;
-      const kvRe = /(owner|due|distributor|status)\s*:\s*([^,;\)]+)\s*/ig;
-      for (const raw of lines) {
-        const line = raw.trim();
-        if (!line) continue;
-        const m = line.match(taskRe);
-        if (!m) continue;
-        let desc = m[2]?.trim() || '';
-        if (!desc) continue;
-        const item = { id: crypto.randomUUID(), description: desc, owner:'', due:'', distributor:'', status:'open', source: meta.title||'Untitled' };
-        const metaStr = m[3]||'';
-        let mm; while((mm = kvRe.exec(metaStr))){
-          const k = mm[1].toLowerCase(); const v = mm[2].trim();
-          if (k==='due') { const d = new Date(v); if(!isNaN(d)) item.due = d.toISOString(); }
-          else item[k] = v;
-        }
-        // If checkbox was [x], mark done
-        if (m[1] && m[1].toLowerCase()==='x') item.status = 'done';
-        results.push(item);
-      }
-      return results;
-    }
+    const form = document.getElementById('form');
+    const resultsEl = document.getElementById('results');
+    const statusEl = document.getElementById('status');
+    const clearBtn = document.getElementById('clear');
 
-    function render(items = state.items) {
-      const tbody = el('rows');
-      tbody.innerHTML = '';
-      const tpl = el('row-tpl');
-      const statusFilter = el('filter-status').value;
-      const distFilter = el('filter-distributor').value.trim().toLowerCase();
-      const filtered = items.filter(it =>
-        (!statusFilter || it.status === statusFilter) &&
-        (!distFilter || (it.distributor||'').toLowerCase().includes(distFilter))
-      );
-      for (const it of filtered) {
-        const row = tpl.content.firstElementChild.cloneNode(true);
-        row.children[0].textContent = it.distributor || '—';
-        row.children[1].textContent = it.description;
-        row.children[2].textContent = it.owner || '—';
-        row.children[3].textContent = fmtDate(it.due);
-        const badge = row.children[4].firstElementChild;
-        badge.textContent = it.status || 'open';
-        badge.classList.add(
-          it.status==='done' ? 'status-done' : it.status==='hold' ? 'status-hold' : 'status-open'
-        );
-        row.children[5].textContent = it.source || '';
-        tbody.appendChild(row);
-      }
-    }
+    clearBtn.onclick = () => { resultsEl.innerHTML = ''; statusEl.textContent = 'Cleared.'; };
 
-    function setModeUI() {
-      const mode = el('mode').value;
-      state.mode = mode;
-      el('serverless-settings').classList.toggle('hidden', mode !== 'serverless');
-    }
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const category = document.getElementById('category').value.trim();
+      const details = document.getElementById('details').value.trim();
+      const origin = originSel.value; const dest = destSel.value;
+      const query = [category, details].filter(Boolean).join(' ').trim();
+      resultsEl.innerHTML = '';
+      statusEl.textContent = 'Searching…';
 
-    // --------- Mic (Web Speech API) ---------
-    function setupMic(){
-      const status = el('mic-status');
-      const btn = el('btn-mic');
-      if (!window.isSecureContext) {
-        status.textContent = 'Mic: requires HTTPS (GitHub Pages is OK)';
-        btn.disabled = true; return;
-      }
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { status.textContent = 'Mic: not supported in this browser'; btn.disabled = true; return; }
-      state.recognizer = new SR();
-      state.recognizer.continuous = true;
-      state.recognizer.interimResults = true;
-      state.recognizer.onstart = ()=>{ status.innerHTML = '<span class="rec-dot"></span>Listening…'; btn.textContent = '⏹ Stop'; };
-      state.recognizer.onerror = (e)=>{ status.textContent = 'Mic error: ' + (e.error||'unknown'); };
-      state.recognizer.onresult = (ev)=>{
-        let finalChunk = '';
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const r = ev.results[i];
-          if (r.isFinal) finalChunk += r[0].transcript + '
-';
-        }
-        if (finalChunk) el('notes').value += (el('notes').value ? '
-' : '') + finalChunk.trim();
-      };
-      state.recognizer.onend = ()=>{
-        if (state.recording) {
-          try { state.recognizer.start(); } catch {}
-        } else {
-          status.textContent = 'Mic: stopped'; btn.textContent = '🎙️ Dictate';
-        }
-      };
-    }
-      state.recognizer = new SR();
-      state.recognizer.continuous = true; state.recognizer.interimResults = true;
-      state.recognizer.onresult = (ev)=>{
-        let finalChunk = '';
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const r = ev.results[i];
-          const t = r[0].transcript;
-          if (r.isFinal) finalChunk += t + '
-';
-        }
-        if (finalChunk) el('notes').value += (el('notes').value ? '
-' : '') + finalChunk.trim();
-      };
-      state.recognizer.onend = ()=>{ if(state.recording){ // auto-restart for long dictations
-        try { state.recognizer.start(); } catch {}
-      } };
-    }
-    function toggleMic(){
-      if (!state.recognizer) return;
-      if (!state.recording){
-        try {
-          state.recognizer.lang = el('mic-lang').value || 'en-US';
-          state.recording = true;
-          state.recognizer.start();
-        } catch(e){ el('mic-status').textContent = 'Mic error: '+e.message; }
-      } else {
-        try {
-          state.recording = false;
-          state.recognizer.stop();
-        } catch(e){ el('mic-status').textContent = 'Mic error: '+e.message; }
-      }
-    }
-        catch(e){ el('mic-status').textContent = 'Mic error: '+e.message; }
-      } else {
-        try { state.recording = false; state.recognizer.stop(); el('mic-status').textContent = 'Mic: stopped'; el('btn-mic').textContent = '🎙️ Dictate'; }
-        catch(e){ el('mic-status').textContent = 'Mic error: '+e.message; }
-      }
-    }
-
-    // --------- Drag & Drop ---------
-    function setupDrop(){
-      const dz = el('dropzone');
-      if (!dz) return;
-      ;['dragenter','dragover'].forEach(ev=> dz.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dz.classList.add('dragover'); }));
-      ;['dragleave','drop'].forEach(ev=> dz.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dz.classList.remove('dragover'); }));
-      dz.addEventListener('drop', async (e)=>{
-        const files = [...(e.dataTransfer?.files || [])];
-        if (!files.length) return;
-        let combined = '';
-        for (const f of files){
-          try {
-            if (/\.(txt|md)$/i.test(f.name)) {
-              combined += `
-
-# ${f.name}
-` + await f.text();
-            } else {
-              combined += `
-
-# ${f.name}
-(Preview not supported here — use the Upload button for better extraction)`;
-            }
-          } catch {}
-        }
-        if (combined.trim()) el('notes').value = (el('notes').value ? el('notes').value+'
-' : '') + combined.trim();
-      });
-    }
-
-    // --------- Events ---------
-    el('mode').addEventListener('change', setModeUI);
-    el('btn-mic').addEventListener('click', toggleMic);
-    el('btn-file').addEventListener('click', ()=> el('file-input').click());
-    // Ctrl/Cmd+Enter to Save & Extract
-    el('notes').addEventListener('keydown', (e)=>{ if ((e.ctrlKey||e.metaKey) && e.key==='Enter'){ e.preventDefault(); el('btn-ingest').click(); }});
-    el('btn-mic').addEventListener('click', toggleMic);
-
-    el('btn-ingest').addEventListener('click', async () => {
-      const title = el('title').value.trim();
-      const text = el('notes').value.trim();
-      if (!text) { el('ingest-status').textContent = 'Paste some notes first.'; return; }
-
-      el('ingest-status').textContent = 'Parsing…';
-
-      let newItems = [];
       try {
-        if (state.mode === 'heuristic') {
-          newItems = heuristicExtract(text, { title });
+        if(!query) throw new Error('Please enter a product description.');
+
+        if(dest === 'US') {
+          await searchUSITC(query);
+        } else if (dest === 'GB') {
+          await searchUKTariff(query, origin);
+        } else if (dest === 'EU') {
+          addResult(`EU (TARIC)`, `Use the EU Access2Markets portal to combine your product and origin/destination. This link opens the portal.`, [
+            linkTag('Open Access2Markets', 'https://trade.ec.europa.eu/access-to-markets/en/content/welcome-access2markets-market-access-database-users')
+          ]);
+          addResult('Global (WITS/UNCTAD TRAINS, averages)', 'Use WITS for MFN & preferential tariff statistics and HS6-level data (registration may be required).', [
+            linkTag('WITS API guide', 'https://wits.worldbank.org/witsapiintro.aspx?lang=en')
+          ]);
         } else {
-          const ingestUrl = (el('ingest-url').value || state.ingestUrl).trim();
-          const r = await fetch(ingestUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title, text }) });
-          if (!r.ok) throw new Error('Serverless ingest failed');
-          const data = await r.json();
-          newItems = data.items || [];
+          addResult('No live API for this destination (yet)', `For ${destSel.options[destSel.selectedIndex].text}, use the official portal(s) below and then return with the HS code to check US/UK as needed.`, [
+            linkTag('WITS country portal', 'https://wits.worldbank.org/'),
+            linkTag('Access2Markets (if trading with EU)', 'https://trade.ec.europa.eu/access-to-markets/en/content/welcome-access2markets-market-access-database-users')
+          ]);
         }
-        state.items = [...newItems, ...state.items];
-        save();
-        render();
-        el('ingest-status').textContent = `Added ${newItems.length} action(s).`;
-        el('notes').value=''; el('title').value='';
-      } catch (e) {
-        console.error(e);
-        el('ingest-status').textContent = 'Error: ' + e.message;
+        statusEl.textContent = 'Done.';
+      } catch(err){
+        statusEl.textContent = 'Error: ' + err.message;
+        console.error(err);
       }
     });
 
-    el('file-input').addEventListener('change', async (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      const text = await file.text();
-      el('notes').value = text;
-      el('title').value = file.name.replace(/\.[^.]+$/,'');
-    });
+    function addResult(title, subtitle, tags=[], extraHTML=''){
+      const d=document.createElement('div'); d.className='result';
+      d.innerHTML = `<div><span class="tag">${title}</span></div><div class="muted small" style="margin:4px 0 8px">${subtitle||''}</div>${extraHTML}`;
+      if(tags && tags.length){ const wrap=document.createElement('div'); tags.forEach(t=>wrap.appendChild(t)); d.appendChild(wrap); }
+      resultsEl.appendChild(d);
+    }
+    function linkTag(text, href){ const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener'; a.textContent=text; a.className='tag'; return a; }
 
-    el('filter-status').addEventListener('change', () => render());
-    el('filter-distributor').addEventListener('input', () => render());
+    // --- US: HTS search (USITC) ---
+    async function searchUSITC(query){
+      const url = `https://hts.usitc.gov/reststop/search?keyword=${encodeURIComponent(query)}`;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('USITC HTS search failed');
+      const data = await r.json();
+      const items = Array.isArray(data) ? data.slice(0, 10) : [];
+      if(items.length===0){ addResult('United States (HTS)', 'No matches returned. Try simplifying the description or different keywords.'); return; }
 
-    document.addEventListener('keydown', (e)=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA'){ e.preventDefault(); el('question').focus(); }});
+      addResult('United States (HTS)', 'Top likely HTS matches. Click the HTS page to see duty (General/Special) and notes.');
+      items.forEach(it=>{
+        const hts = it.htsno || it.number || it.hts_no || '';
+        const descr = (it.shortdes || it.descr || it.description || '').trim();
+        const duty = (it.general || it.rate || '');
+        const link = `https://hts.usitc.gov/search?query=${encodeURIComponent(hts || descr)}`;
+        const html = `
+          <div style="margin:8px 0">
+            <div><strong>${hts || '(HTS candidate)'}</strong> — ${escapeHtml(descr)}</div>
+            <div class="small muted">General rate (if available): ${escapeHtml(String(duty || 'see page'))}</div>
+            <div class="small">${linkAnchor('Open in HTS', link)} · ${rawJsonToggle(it)}</div>
+          </div>`;
+        addResult('', '', [], html);
+      });
+    }
 
-    el('btn-ask').addEventListener('click', async () => {
-      const q = el('question').value.trim(); if (!q) return;
-      // Quick built-in intent: common question from Facu
-      if (/pending items|pendientes/i.test(q)) {
-        const pending = state.items.filter(it => (it.status||'open').toLowerCase()==='open');
-        const byDist = {};
-        for (const it of pending) {
-          const d = (it.distributor||'Unassigned').trim();
-          byDist[d] = (byDist[d]||0)+1;
+    // --- UK: Trade Tariff API (search references, then commodity detail incl. measures) ---
+    async function searchUKTariff(query, origin){
+      // Step 1: find references (keywords -> candidate commodities)
+      const url = 'https://www.trade-tariff.service.gov.uk/uk/api/search_references?query=' + encodeURIComponent(query);
+      const r = await fetch(url, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
+      if(!r.ok) throw new Error('UK Trade Tariff search failed');
+      const ref = await r.json();
+      const refs = (ref && ref.data) ? ref.data.slice(0,8) : [];
+      if(refs.length===0){ addResult('United Kingdom', 'No matches returned. Try different words.'); return; }
+
+      addResult('United Kingdom', 'Top likely UK commodity matches with live measures (duty) when available.');
+
+      for(const sr of refs){
+        const commodityId = (sr.attributes && sr.attributes.reference_class === 'Commodity') ? sr.attributes.reference : null;
+        const label = (sr.attributes && sr.attributes.title) ? sr.attributes.title : 'Match';
+        if(!commodityId){
+          // Show the reference and link to public UI
+          const ui = 'https://www.trade-tariff.service.gov.uk/commodities/' + encodeURIComponent(sr.attributes.reference || '');
+          const html = `<div style="margin:8px 0"><strong>${escapeHtml(label)}</strong> — ${linkAnchor('Open commodity', ui)} ${rawJsonToggle(sr)}</div>`;
+          addResult('', '', [], html);
+          continue;
         }
-        const summary = Object.entries(byDist).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`• ${d}: ${n} open`).join('<br>');
-        el('answer').innerHTML = summary || 'No pending items.';
-        el('filter-status').value = 'open'; render();
-        return;
+        // Step 2: fetch commodity detail (includes measures & duty rates)
+        const cUrl = `https://www.trade-tariff.service.gov.uk/uk/api/commodities/${commodityId}`;
+        const cr = await fetch(cUrl, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
+        const cd = await cr.json();
+        const desc = cd?.data?.attributes?.description || label;
+        const measures = (cd?.included || []).filter(x=>x.type==='measure');
+        // Try to surface ad valorem third-country (erga omnes) measures
+        const lines = measures.map(m=>{
+          const rate = m?.attributes?.duty_expression?.formatted || '';
+          const geo  = m?.attributes?.geographical_area_description || m?.attributes?.geographical_area_id || '';
+          const type = m?.attributes?.measure_type_description || '';
+          return rate ? `• ${escapeHtml(type)} — <strong>${escapeHtml(rate)}</strong> (${escapeHtml(geo)})` : null;
+        }).filter(Boolean).slice(0,6).join('<br>');
+
+        const commodityUI = `https://www.trade-tariff.service.gov.uk/commodities/${commodityId}`;
+        const html = `
+          <div style="margin:8px 0">
+            <div><strong>${commodityId}</strong> — ${escapeHtml(desc)}</div>
+            <div class="small" style="margin:6px 0">${lines || 'Open commodity to view measures (duty, VAT, preferences).'}</div>
+            <div class="small">${linkAnchor('Open in UK Tariff', commodityUI)} · ${rawJsonToggle(cd)}</div>
+          </div>`;
+        addResult('', '', [], html);
       }
+    }
 
-      if (state.mode === 'serverless') {
-        const queryUrl = (el('query-url').value || state.queryUrl).trim();
-        try {
-          const r = await fetch(queryUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ question: q, items: state.items })});
-          const data = await r.json();
-          el('answer').innerText = data.answer || 'No answer.';
-        } catch (e) {
-          el('answer').innerText = 'Query error: ' + e.message;
-        }
-      } else {
-        // Simple client-side filter as fallback
-        const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-        const matches = state.items.filter(it => words.every(w => JSON.stringify(it).toLowerCase().includes(w)));
-        el('answer').innerHTML = `Found ${matches.length} matching item(s).`; 
-        render(matches);
-      }
-    });
-
-    el('btn-export').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(state.items, null, 2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='ai_action_items.json'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    el('btn-import').addEventListener('click', ()=> el('import-file').click());
-    el('import-file').addEventListener('change', async (e)=>{
-      const f = e.target.files[0]; if (!f) return;
-      const txt = await f.text();
-      try { const arr = JSON.parse(txt); if (Array.isArray(arr)) { state.items = arr; save(); render(); } }
-      catch {}
-    });
-
-    // Initial
-    setModeUI();
-    setupMic();
-    setupDrop();
-    render();
+    // --- helpers ---
+    function linkAnchor(text, href){ return `<a href="${href}" target="_blank" rel="noopener">${text}</a>` }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])) }
+    function rawJsonToggle(obj){
+      const id = 'j' + Math.random().toString(36).slice(2);
+      const pretty = escapeHtml(JSON.stringify(obj, null, 2));
+      return `<details style="display:inline-block"><summary>raw JSON</summary><pre>${pretty}</pre></details>`;
+    }
   </script>
-
-  <!-- ======================= SERVERLESS (copy into /api on Vercel) =======================
-  File: /api/ingest.js  — Extract structured actions from freeform notes using OpenAI
-  ----------------------------------------------------------------------------------- -->
-  <!--
-  export default async function handler(req, res) {
-    try {
-      if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-      const { title = 'Untitled', text = '' } = req.body || {};
-      if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
-
-      const prompt = `You are an operations analyst for a CPG export broker (Califia Farms, Level-Up Premium Foods, WolfPak). Extract action items as JSON array with fields: id (uuid), description, owner, due (ISO8601 or empty), distributor, status in {open, hold, done}, source. Be concise.\n\nTitle: ${title}\nNotes:\n${text}`;
-
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You extract structured tasks for a sales/export pipeline.' },
-            { role: 'user', content: prompt }
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.2
-        })
-      });
-      const data = await r.json();
-      // Expect { items: [...] }
-      let items = [];
-      try { const obj = JSON.parse(data.choices?.[0]?.message?.content || '{}'); items = obj.items || obj || []; } catch {}
-      // If model returned array directly
-      if (Array.isArray(items)) items = items; else if (Array.isArray(obj)) items = obj; 
-      // Ensure shape
-      items = (items || []).map(it => ({
-        id: it.id || crypto.randomUUID?.() || Math.random().toString(36).slice(2),
-        description: it.description || '', owner: it.owner || '', due: it.due || '',
-        distributor: it.distributor || '', status: (it.status||'open').toLowerCase(), source: title
-      }));
-      return res.status(200).json({ items });
-    } catch (e) {
-      console.error(e);
-      return res.status(500).json({ error: e.message });
-    }
-  }
-  -->
-
-  <!--
-  File: /api/query.js — Natural language Q&A over current items
-  ------------------------------------------------------------ -->
-  <!--
-  export default async function handler(req, res) {
-    try {
-      if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-      const { question = '', items = [] } = req.body || {};
-      if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'Missing OPENAI_API_KEY' });
-
-      const sys = `You answer succinctly as a commercial ops assistant for an export broker. If the user asks for "distributors with pending items", list distributors with count of tasks where status = open. If dates are asked, use due. Reply in the same language as the question.`;
-      const content = `DATA = ${JSON.stringify(items).slice(0, 120_000)}\n\nQUESTION = ${question}`;
-
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
-        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [ { role:'system', content: sys }, { role:'user', content } ], temperature: 0.1 })
-      });
-      const data = await r.json();
-      const answer = data.choices?.[0]?.message?.content?.trim() || 'No answer.';
-      return res.status(200).json({ answer });
-    } catch (e) {
-      console.error(e); return res.status(500).json({ error: e.message });
-    }
-  }
-  -->
-
-  <!--
-  Notes:
-  - Swap OpenAI for Anthropic (Claude) or Azure OpenAI by changing the fetch URL and payload shape.
-  - Persist items centrally by replacing localStorage with Supabase: create a table actions(id, description, owner, due, distributor, status, source, created_at) and replace save()/load() with RPC.
-  - To ingest recordings/transcripts automatically, post them to /api/ingest after your meetings and they will appear on refresh.
-  - Security: never expose API keys in the frontend. Use serverless functions.
-  - File parsing: for PDF/DOCX you’ll get best results if you convert to text before uploading, but many browsers will still return partial text.
-  -->
 </body>
 </html>
