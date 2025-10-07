@@ -132,10 +132,14 @@
       try {
         if(!query) throw new Error('Please enter a product description.');
 
+        // Always try to propose HS candidates using the UK commodity index (works globally)
+        await searchUKTariff(query, origin, {measures: dest === 'GB'});
+
+        // Destination-specific sections
         if(dest === 'US') {
           await searchUSITC(query);
         } else if (dest === 'GB') {
-          await searchUKTariff(query, origin);
+          // measures already included above
         } else if (dest === 'EU') {
           addResult(`EU (TARIC)`, `Use the EU Access2Markets portal to combine your product and origin/destination. This link opens the portal.`, [
             linkTag('Open Access2Markets', 'https://trade.ec.europa.eu/access-to-markets/en/content/welcome-access2markets-market-access-database-users')
@@ -144,7 +148,8 @@
             linkTag('WITS API guide', 'https://wits.worldbank.org/witsapiintro.aspx?lang=en')
           ]);
         } else {
-          addResult('No live API for this destination (yet)', `For ${destSel.options[destSel.selectedIndex].text}, use the official portal(s) below and then return with the HS code to check US/UK as needed.`, [
+          // For other destinations (e.g., SG, AU, MX, etc.), we show HS candidates above, then link to portals.
+          addResult('Destination-specific tariffs', `No public API for ${destSel.options[destSel.selectedIndex].text} from the browser. Use the official portal below with one of the HS candidates shown above.`, [
             linkTag('WITS country portal', 'https://wits.worldbank.org/'),
             linkTag('Access2Markets (if trading with EU)', 'https://trade.ec.europa.eu/access-to-markets/en/content/welcome-access2markets-market-access-database-users')
           ]);
@@ -199,10 +204,60 @@
     }
 
     // --- UK: Trade Tariff API (search references, then commodity detail incl. measures) ---
-    async function searchUKTariff(query, origin){
+    async function searchUKTariff(query, origin, opts={measures:false}){
       // Step 1: find references (keywords -> candidate commodities)
       const url = 'https://api.trade-tariff.service.gov.uk/uk/api/search_references?query=' + encodeURIComponent(query);
-      const r = await fetch(url, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
+      let ref;
+      try{
+        const r = await fetch(url, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
+        if(!r.ok) throw new Error('UK Trade Tariff search failed');
+        ref = await r.json();
+      }catch(e){
+        addResult('HS candidates (fallback)', 'Could not query UK tariff API. Try again later, or refine your search.');
+        return;
+      }
+      const refs = (ref && ref.data) ? ref.data.slice(0,8) : [];
+      if(refs.length===0){ addResult('HS candidates', 'No matches returned. Try different words.'); return; }
+
+      addResult(opts.measures ? 'United Kingdom' : 'HS candidates (from UK index)', opts.measures ? 'Top likely UK commodity matches with live measures (duty) when available.' : 'Likely HS/commodity matches. Open the commodity pages for full details, then use the HS elsewhere.');
+
+      for(const sr of refs){
+        const commodityId = (sr.attributes && sr.attributes.reference_class === 'Commodity') ? sr.attributes.reference : null;
+        const label = (sr.attributes && sr.attributes.title) ? sr.attributes.title : 'Match';
+        const ui = 'https://www.trade-tariff.service.gov.uk/commodities/' + encodeURIComponent(sr.attributes.reference || '');
+        if(!commodityId){
+          const html = `<div style="margin:8px 0"><strong>${escapeHtml(label)}</strong> — ${linkAnchor('Open commodity', ui)} ${rawJsonToggle(sr)}</div>`;
+          addResult('', '', [], html);
+          continue;
+        }
+        if(!opts.measures){
+          const html = `<div style="margin:8px 0"><strong>${commodityId}</strong> — ${escapeHtml(label)} · ${linkAnchor('Open commodity', ui)}</div>`;
+          addResult('', '', [], html);
+          continue;
+        }
+        // With measures (UK destination)
+        const cUrl = `https://api.trade-tariff.service.gov.uk/uk/api/commodities/${commodityId}`;
+        const cr = await fetch(cUrl, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
+        const cd = await cr.json();
+        const desc = cd?.data?.attributes?.description || label;
+        const measures = (cd?.included || []).filter(x=>x.type==='measure');
+        const lines = measures.map(m=>{
+          const rate = m?.attributes?.duty_expression?.formatted || '';
+          const geo  = m?.attributes?.geographical_area_description || m?.attributes?.geographical_area_id || '';
+          const type = m?.attributes?.measure_type_description || '';
+          return rate ? `• ${escapeHtml(type)} — <strong>${escapeHtml(rate)}</strong> (${escapeHtml(geo)})` : null;
+        }).filter(Boolean).slice(0,6).join('<br>');
+
+        const commodityUI = `https://www.trade-tariff.service.gov.uk/commodities/${commodityId}`;
+        const html = `
+          <div style="margin:8px 0">
+            <div><strong>${commodityId}</strong> — ${escapeHtml(desc)}</div>
+            <div class="small" style="margin:6px 0">${lines || 'Open commodity to view measures (duty, VAT, preferences).'}</div>
+            <div class="small">${linkAnchor('Open in UK Tariff', commodityUI)} · ${rawJsonToggle(cd)}</div>
+          </div>`;
+        addResult('', '', [], html);
+      }
+    } });
       if(!r.ok) throw new Error('UK Trade Tariff search failed');
       const ref = await r.json();
       const refs = (ref && ref.data) ? ref.data.slice(0,8) : [];
@@ -221,7 +276,7 @@
           continue;
         }
         // Step 2: fetch commodity detail (includes measures & duty rates)
-        const cUrl = `https://www.trade-tariff.service.gov.uk/uk/api/commodities/${commodityId}`;
+        const cUrl = `https://api.trade-tariff.service.gov.uk/uk/api/commodities/${commodityId}`;
         const cr = await fetch(cUrl, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
         const cd = await cr.json();
         const desc = cd?.data?.attributes?.description || label;
