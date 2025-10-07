@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tariff & HS Code Finder</title>
   <style>
-    :root{--bg:#0b1020;--card:#121936;--muted:#8fa3c5;--accent:#4dd2ff;--ok:#8be28b;--err:#ff6b6b}
+    :root{--bg:#ffffff;--card:#ffffff;--muted:#5b6b7a;--accent:#0b6cff;--ok:#1a7f37;--err:#d62828}
     *{box-sizing:border-box}
-    body{margin:0;font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";background:linear-gradient(180deg,#0b1020,#0b1020 35%,#0e1530);color:#e9eefc}
+    body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,Apple Color Emoji,Segoe UI Emoji;background:#fff;color:#0f172a}
     header{padding:24px 20px 8px;max-width:1100px;margin:0 auto}
     h1{margin:0 0 6px;font-weight:800;letter-spacing:.2px}
     p.sub{margin:0;color:var(--muted)}
     main{max-width:1100px;margin:24px auto 80px;padding:0 20px;display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+    .card{background:var(--card);border:1px solid rgba(15,23,42,.08);border-radius:14px;box-shadow:0 6px 24px rgba(2,6,23,.06)}
     .card h2{margin:0 0 8px;font-size:18px}
     .pad{padding:18px}
     label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
-    input[type=text], textarea, select{width:100%;background:#0a1128;border:1px solid rgba(255,255,255,.12);color:#e9eefc;border-radius:10px;padding:10px 12px}
-    textarea{min-height:96px;resize:vertical}
+    input[type=text], textarea, select{width:100%;background:#fff;border:1px solid rgba(15,23,42,.15);color:#0f172a;border-radius:10px;padding:10px 12px}
+    textarea{color:#0b6cff}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     button{appearance:none;background:var(--accent);color:#001221;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
     button:disabled{opacity:.5}
@@ -25,8 +25,8 @@
     .small{font-size:12px}
     .results{padding:0 0 10px}
     .result{border-top:1px solid rgba(255,255,255,.08);padding:12px 0}
-    code, pre{background:#071022;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 10px;color:#bfe4ff;display:block;overflow:auto}
-    .tag{display:inline-block;background:#09203f;color:#cfe7ff;border:1px solid rgba(77,210,255,.35);padding:2px 8px;border-radius:999px;font-size:12px;margin:2px 8px 2px 0}
+    code, pre{background:#f8fafc;border:1px solid rgba(15,23,42,.08);border-radius:8px;padding:8px 10px;color:#0b3a73;display:block;overflow:auto}
+    .tag{display:inline-block;background:#eef2ff;color:#1e3a8a;border:1px solid rgba(11,108,255,.25);padding:2px 8px;border-radius:999px;font-size:12px;margin:2px 8px 2px 0}
     a{color:#77d3ff}
     footer{max-width:1100px;margin:24px auto;padding:0 20px}
     .hint{font-size:12px;color:var(--muted);margin-top:8px}
@@ -167,9 +167,18 @@
     // --- US: HTS search (USITC) ---
     async function searchUSITC(query){
       const url = `https://hts.usitc.gov/reststop/search?keyword=${encodeURIComponent(query)}`;
-      const r = await fetch(url);
-      if(!r.ok) throw new Error('USITC HTS search failed');
-      const data = await r.json();
+      let data;
+      try{
+        const r = await fetch(url, {mode:'cors'});
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        data = await r.json();
+      } catch(err){
+        // CORS or network error — USITC often blocks browser origins. Provide graceful fallback.
+        addResult('United States (HTS)', 'Live API access from static sites is often blocked by CORS on hts.usitc.gov. Use the direct HTS search link below, then copy the HTS code back here if you want to compare elsewhere.', [
+          linkTag('Open HTS with your query', `https://hts.usitc.gov/search?query=${encodeURIComponent(query)}`)
+        ]);
+        return;
+      }
       const items = Array.isArray(data) ? data.slice(0, 10) : [];
       if(items.length===0){ addResult('United States (HTS)', 'No matches returned. Try simplifying the description or different keywords.'); return; }
 
@@ -192,7 +201,7 @@
     // --- UK: Trade Tariff API (search references, then commodity detail incl. measures) ---
     async function searchUKTariff(query, origin){
       // Step 1: find references (keywords -> candidate commodities)
-      const url = 'https://www.trade-tariff.service.gov.uk/uk/api/search_references?query=' + encodeURIComponent(query);
+      const url = 'https://api.trade-tariff.service.gov.uk/uk/api/search_references?query=' + encodeURIComponent(query);
       const r = await fetch(url, { headers: { 'Accept': 'application/vnd.hmrc.2.0+json' } });
       if(!r.ok) throw new Error('UK Trade Tariff search failed');
       const ref = await r.json();
